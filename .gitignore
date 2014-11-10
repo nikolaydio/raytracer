@@ -26,3 +26,10 @@
 *.exe
 *.out
 *.app
+
+bin
+lib
+obj
+3rdparty
+*.suo
+*.user
