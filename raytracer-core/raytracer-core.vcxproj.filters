@@ -3,10 +3,13 @@
   <ItemGroup>
     <ClInclude Include="scene.h" />
     <ClInclude Include="camera.h" />
+    <ClInclude Include="film.h" />
+    <ClInclude Include="surface.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="scene.cpp" />
     <ClCompile Include="film.cpp" />
     <ClCompile Include="camera.cpp" />
+    <ClCompile Include="surface.cpp" />
   </ItemGroup>
 </Project>

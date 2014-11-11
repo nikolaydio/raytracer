@@ -1,5 +1,7 @@
 #include <scene.h>
 #include <camera.h>
+#include <surface.h>
+#include <film.h>
 
 #include <SDL.h>
 
@@ -10,7 +12,8 @@
 #define REQUIRE(cond) do { if(!(cond)) { printf("Cond failed %s: %s\n", __FILE__, __LINE__); exit(0); }  }while(0)
 
 int main(int argc, char* argv[]) {
-	rt::core::Film film(WND_SIZE_X, WND_SIZE_Y);
+	rt::core::Surface2d film_surface(WND_SIZE_X, WND_SIZE_Y);
+	rt::core::Film film(&film_surface);
 	rt::core::Camera cam;
 	rt::core::Scene scene;
 
@@ -46,7 +49,7 @@ int main(int argc, char* argv[]) {
 
 		for (int y = 0; y < h; ++y) {
 			for (int x = 0; x < w; ++x) {
-				pixels[y * w + x] = *(uint32_t*)&film.pixel(x, y);
+				pixels[y * w + x] = *(uint32_t*)&film_surface.pixel(x, y);
 			}
 		}
 

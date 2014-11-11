@@ -7,12 +7,16 @@ namespace rt {
 		//Keeps the list of objects and performs the ray tracing
 		//The idea is to allow it to do some of spatial paritioning.
 		class RayResult{};
+		class Ray{};
+		class Primitive{};
 		class Scene {
 		public:
 			Scene() {}
 			~Scene() {}
 
-			RayResult pick();
+			bool intersect(Ray ray, RayResult* result);
+		private:
+			std::vector<Primitive*> _primitives;
 		};
 	}
 }

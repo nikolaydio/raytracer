@@ -1,19 +1,14 @@
 #include "camera.h"
-
+#include "film.h"
 
 namespace rt {
 	namespace core {
-		Film::Film(int width, int height) {
-			_pixels = new Pixel[width * height];
-			_width = width;
-			_height = height;
+		Film::Film(Surface2d* surface) : _surface(surface) {
+
+
 		}
 		Film::~Film() {
-			delete[] _pixels;
-		}
 
-		Pixel& Film::pixel(int x, int y) {
-			return _pixels[y * _width + x];
 		}
 	}
 }
