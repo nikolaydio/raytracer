@@ -1,6 +1,7 @@
 #include "renderer.h"
 
 #include <SDL.h>
+#include <glm/gtc/matrix_transform.hpp>
 
 
 #define WND_SIZE_X 640
@@ -12,7 +13,8 @@ int main(int argc, char* argv[]) {
 	rt::core::Surface2d film_surface(WND_SIZE_X, WND_SIZE_Y);
 
 	rt::core::Film film(&film_surface);
-	rt::core::Camera cam;
+
+	rt::core::Camera cam(glm::lookAt(glm::vec3(0, 0, 0), glm::vec3(0, 0, 1), glm::vec3(0, 1, 0)), 60, 4.f/3.f);
 	rt::core::Scene scene;
 	rt::core::Sampler sampler;
 	rt::core::Integrator integrator;

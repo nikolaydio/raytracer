@@ -53,8 +53,11 @@ namespace rt {
 
 			Sample* samples = new Sample[sub_sampler.max_samples()];
 			while (int samples_count = sub_sampler.next_samples(samples)) {
-				for (int i = 0; i < samples_count; ++i)
-					printf("%f, %f\n", samples[i].position.x, samples[i].position.y);
+				for (int i = 0; i < samples_count; ++i) {
+					Ray ray;
+					samples[i].position /= _film->get_surface()->get_size();
+					_camera.find_ray(samples[i], &ray);
+				}
 			}
 			delete[] samples;
 		}
