@@ -1,7 +1,4 @@
-#include <scene.h>
-#include <camera.h>
-#include <surface.h>
-#include <film.h>
+#include "renderer.h"
 
 #include <SDL.h>
 
@@ -13,9 +10,17 @@
 
 int main(int argc, char* argv[]) {
 	rt::core::Surface2d film_surface(WND_SIZE_X, WND_SIZE_Y);
+
 	rt::core::Film film(&film_surface);
 	rt::core::Camera cam;
 	rt::core::Scene scene;
+	rt::core::Sampler sampler;
+	rt::core::Integrator integrator;
+
+	rt::core::Renderer renderer(sampler, cam, scene, integrator);
+	renderer.film() = &film;
+
+	renderer.run_singlethreaded();
 
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 		printf("Failed to init SDL");

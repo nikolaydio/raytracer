@@ -5,11 +5,13 @@
     <ClInclude Include="camera.h" />
     <ClInclude Include="film.h" />
     <ClInclude Include="surface.h" />
+    <ClInclude Include="renderer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="scene.cpp" />
     <ClCompile Include="film.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="surface.cpp" />
+    <ClCompile Include="renderer.cpp" />
   </ItemGroup>
 </Project>

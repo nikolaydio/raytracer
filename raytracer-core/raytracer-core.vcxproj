@@ -89,12 +89,14 @@
   <ItemGroup>
     <ClInclude Include="camera.h" />
     <ClInclude Include="film.h" />
+    <ClInclude Include="renderer.h" />
     <ClInclude Include="scene.h" />
     <ClInclude Include="surface.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="film.cpp" />
+    <ClCompile Include="renderer.cpp" />
     <ClCompile Include="scene.cpp" />
     <ClCompile Include="surface.cpp" />
   </ItemGroup>
