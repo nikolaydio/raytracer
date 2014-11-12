@@ -15,9 +15,16 @@ namespace rt {
 		}
 		int Sampler::SubSampler::next_samples(Sample* samples) {
 			int completed_samples = _current_position;
-			for (; _current_position < _max_samples; ++_current_position) {
-				int row = completed_samples / (int)_size.x;
-				int column = completed_samples % (int)_size.x;
+			//calculate the target samples for this iteration from
+			//the entire pool
+			int target_samples = (int)_size.x * (int)_size.y;
+			if (target_samples > _max_samples + completed_samples){
+				target_samples = _max_samples + completed_samples;
+			}
+			
+			for (; _current_position < target_samples; ++_current_position) {
+				int row = _current_position / (int)_size.x;
+				int column = _current_position % (int)_size.x;
 
 				samples[_current_position - completed_samples].position =
 					_pos + glm::vec2(column, row);
@@ -45,8 +52,9 @@ namespace rt {
 										_film->get_surface()->get_size());
 
 			Sample* samples = new Sample[sub_sampler.max_samples()];
-			while (sub_sampler.next_samples(samples)) {
-				
+			while (int samples_count = sub_sampler.next_samples(samples)) {
+				for (int i = 0; i < samples_count; ++i)
+					printf("%f, %f\n", samples[i].position.x, samples[i].position.y);
 			}
 			delete[] samples;
 		}
