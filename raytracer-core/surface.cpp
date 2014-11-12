@@ -16,5 +16,8 @@ namespace rt {
 		Color& Surface2d::pixel(int x, int y) {
 			return _pixels[y * _width + x];
 		}
+		glm::vec2 Surface2d::get_size() {
+			return glm::vec2(_width, _height);
+		}
 	}
 }

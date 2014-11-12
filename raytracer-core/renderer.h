@@ -4,7 +4,23 @@
 #include "film.h"
 namespace rt {
 	namespace core {
-		class Sampler {};
+		class Sampler {
+		public:
+			Sampler() {}
+			~Sampler() {}
+
+			class SubSampler {
+				glm::vec2 _pos, _size;
+				int _max_samples;
+				int _current_position;
+			public:
+				SubSampler(glm::vec2 pos, glm::vec2 size);
+
+				int max_samples();
+				int next_samples(Sample* samples);
+			};
+			SubSampler create_subsampler(glm::vec2 pos, glm::vec2 size) const;
+		};
 		
 		class Integrator {};
 
@@ -15,6 +31,7 @@ namespace rt {
 			const Integrator& _integrator;
 			
 			Film* _film;
+
 		public:
 			Renderer(const Sampler& sampler,
 				const Camera& camera,
@@ -27,7 +44,7 @@ namespace rt {
 
 			void run_multithreaded() {}
 			void run_singlethreaded();
-			void run_task_based() {}
+			void generate_tasks() {}
 		};
 	}
 }

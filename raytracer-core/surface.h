@@ -30,6 +30,7 @@ namespace rt {
 			~Surface2d();
 
 			Color& pixel(int x, int y);
+			glm::vec2 get_size();
 		};
 	}
 }

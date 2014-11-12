@@ -10,5 +10,8 @@ namespace rt {
 		Film::~Film() {
 
 		}
+		Surface2d* Film::get_surface() {
+			return _surface;
+		}
 	}
 }

@@ -8,6 +8,7 @@ namespace rt {
 			Surface2d* _surface;
 		public:
 			void apply_radiance(int x, int y, Color value);
+			Surface2d* get_surface();
 
 			Film(Surface2d* target);
 			~Film();
