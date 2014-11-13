@@ -54,17 +54,18 @@ public:
 };
 
 int main(int argc, char* argv[]) {
+
 	rt::core::Surface2d film_surface(WND_SIZE_X, WND_SIZE_Y);
 
 	rt::core::Film film(&film_surface);
 
-	rt::core::Camera cam(glm::lookAt(glm::vec3(0, 0, -3), glm::vec3(0, 0, -4), glm::vec3(0, 1, 0)), 60, 4.f/3.f);
+	rt::core::Camera cam(glm::lookAt(glm::vec3(0, 0, -3), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0)), 60, 4.f / 3.f);
 	rt::core::Scene scene;
 	
 	rt::core::Material material;
 	material.color = glm::vec3(0, 1, 0);
 	Sphere sphere;
-	rt::core::Primitive primitive(glm::mat4(), &material, &sphere);
+	rt::core::Primitive primitive(glm::translate(glm::mat4(), glm::vec3(0,0,3)), &material, &sphere);
 	scene.add_primitive(&primitive);
 
 	rt::core::Sampler sampler;
