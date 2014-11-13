@@ -25,7 +25,7 @@ namespace rt {
 			ray->orientation = glm::vec3(sample.position, 1);
 
 			ray->origin = xyz(_camera_to_world * glm::vec4(ray->origin, 1));
-			ray->orientation = xyz(_camera_to_world * glm::vec4(ray->orientation, 0));
+			ray->orientation = glm::normalize(xyz(_camera_to_world * glm::vec4(ray->orientation, 0)));
 		}
 	}
 }

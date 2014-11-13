@@ -9,13 +9,64 @@
 
 #define REQUIRE(cond) do { if(!(cond)) { printf("Cond failed %s: %s\n", __FILE__, __LINE__); exit(0); }  }while(0)
 
+bool IntersectSphere(glm::vec3 sphere_pos, float radius, glm::vec3 rpos, glm::vec3 rdir, float* dist_out) {
+	glm::vec3 L = sphere_pos - rpos;
+	float tca = glm::dot(L, rdir);
+	if (tca < 0) return false;
+	float d2 = glm::dot(L, L) - tca * tca;
+	if (d2 > radius) return false;
+	float thc = glm::sqrt(radius - d2);
+	float t0 = tca - thc;
+	float t1 = tca + thc;
+
+
+	if (t0 > t1) {
+		float temp = t0;
+		t0 = t1;
+		t1 = temp;
+	}
+
+	if (t1 < 0)
+		return false;
+
+	if (t0 < 0){
+		*dist_out = t1;
+		return true;
+	}
+	else{
+		*dist_out = t0;
+		return true;
+	}
+}
+
+class Sphere : public rt::core::Shape {
+public:
+	virtual bool intersect(glm::mat4 transform, rt::core::Ray ray, rt::core::Intersection* result) const {
+		glm::vec4 pos = transform[3];
+		float radius = transform[0][0];
+		if (IntersectSphere(glm::vec3(pos), radius, ray.origin, ray.orientation, &result->d)) {
+			result->normal = (ray.origin + ray.orientation * result->d) - glm::vec3(pos);
+			result->normal = glm::normalize(result->normal);
+			return true;
+		}
+		return false;
+	}
+};
+
 int main(int argc, char* argv[]) {
 	rt::core::Surface2d film_surface(WND_SIZE_X, WND_SIZE_Y);
 
 	rt::core::Film film(&film_surface);
 
-	rt::core::Camera cam(glm::lookAt(glm::vec3(0, 0, 0), glm::vec3(0, 0, 1), glm::vec3(0, 1, 0)), 60, 4.f/3.f);
+	rt::core::Camera cam(glm::lookAt(glm::vec3(0, 0, -3), glm::vec3(0, 0, -4), glm::vec3(0, 1, 0)), 60, 4.f/3.f);
 	rt::core::Scene scene;
+	
+	rt::core::Material material;
+	material.color = glm::vec3(0, 1, 0);
+	Sphere sphere;
+	rt::core::Primitive primitive(glm::mat4(), &material, &sphere);
+	scene.add_primitive(&primitive);
+
 	rt::core::Sampler sampler;
 	rt::core::Integrator integrator;
 

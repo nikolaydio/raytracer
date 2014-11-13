@@ -22,7 +22,12 @@ namespace rt {
 			SubSampler create_subsampler(glm::vec2 pos, glm::vec2 size) const;
 		};
 		
-		class Integrator {};
+		class Integrator {
+		public:
+			virtual float calculate_radiance(Intersection intersection) const {
+				return 1.0;
+			}
+		};
 
 		class Renderer {
 			const Sampler& _sampler;
