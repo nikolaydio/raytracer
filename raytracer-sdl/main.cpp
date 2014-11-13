@@ -59,7 +59,7 @@ int main(int argc, char* argv[]) {
 
 	rt::core::Film film(&film_surface);
 
-	rt::core::Camera cam(glm::lookAt(glm::vec3(0, 0, -3), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0)), 60, 4.f / 3.f);
+	rt::core::Camera cam(glm::vec3(0, 0, 0), glm::vec3(0,0,3), 60, 4.f / 3.f);
 	rt::core::Scene scene;
 	
 	rt::core::Material material;
