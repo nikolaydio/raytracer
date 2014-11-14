@@ -40,12 +40,14 @@ bool IntersectSphere(glm::vec3 sphere_pos, float radius, glm::vec3 rpos, glm::ve
 }
 
 class Sphere : public rt::core::Shape {
+	glm::vec3 _pos;
+	float _radius;
 public:
-	virtual bool intersect(glm::mat4 transform, rt::core::Ray ray, rt::core::Intersection* result) const {
-		glm::vec4 pos = transform[3];
-		float radius = transform[0][0];
-		if (IntersectSphere(glm::vec3(pos), radius, ray.origin, ray.orientation, &result->d)) {
-			result->normal = (ray.origin + ray.orientation * result->d) - glm::vec3(pos);
+	Sphere(glm::vec3 pos, float radius)
+		: _pos(pos), _radius(radius) {}
+	virtual bool intersect(rt::core::Ray ray, rt::core::Intersection* result) const {
+		if (IntersectSphere(_pos, _radius, ray.origin, ray.orientation, &result->d)) {
+			result->normal = (ray.origin + ray.orientation * result->d) - _pos;
 			result->normal = glm::normalize(result->normal);
 			return true;
 		}
@@ -53,20 +55,28 @@ public:
 	}
 };
 
+void build_scene(rt::core::AggregatePrimitiveBuilder* builder) {
+	auto* material = new rt::core::Material;
+	material->color = glm::vec3(0, 0.6, 0);
+	Sphere* sphere = new Sphere(glm::vec3(0, 0, 3), 1);
+	auto* primitive = new rt::core::GeoPrimitive(sphere, material);
+
+	builder->add_primitive(primitive);
+}
+
 int main(int argc, char* argv[]) {
 
 	rt::core::Surface2d film_surface(WND_SIZE_X, WND_SIZE_Y);
 
 	rt::core::Film film(&film_surface);
 
-	rt::core::Camera cam(glm::vec3(0, 0, 0), glm::vec3(0,0,3), 60, 4.f / 3.f);
+	rt::core::Camera cam(glm::vec3(0, 0, 0), glm::vec3(0, 0, 3), 60, (float)WND_SIZE_X / (float)WND_SIZE_Y);
+
+	rt::core::AggregatePrimitiveBuilder* builder = rt::core::create_builder_bruteforce();
+	build_scene(builder);
+
 	rt::core::Scene scene;
-	
-	rt::core::Material material;
-	material.color = glm::vec3(0, 1, 0);
-	Sphere sphere;
-	rt::core::Primitive primitive(glm::translate(glm::mat4(), glm::vec3(0,0,3)), &material, &sphere);
-	scene.add_primitive(&primitive);
+	scene.set_primitive(builder->end_primitive());
 
 	rt::core::Sampler sampler;
 	rt::core::Integrator integrator;
