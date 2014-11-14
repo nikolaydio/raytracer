@@ -6,6 +6,8 @@
     <ClInclude Include="film.h" />
     <ClInclude Include="surface.h" />
     <ClInclude Include="renderer.h" />
+    <ClInclude Include="primitive.h" />
+    <ClInclude Include="types.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="scene.cpp" />
@@ -13,5 +15,6 @@
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="surface.cpp" />
     <ClCompile Include="renderer.cpp" />
+    <ClCompile Include="primitive.cpp" />
   </ItemGroup>
 </Project>

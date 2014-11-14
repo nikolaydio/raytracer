@@ -7,7 +7,7 @@ namespace rt {
 	namespace core {
 		class Camera {
 		public:
-			Camera(glm::mat4x4 cam_to_world, float fov, float aspect_ratio);
+			Camera(glm::vec3 eye, glm::vec3 target, float fov, float aspect_ratio);
 			~Camera() {}
 
 			void find_ray(Sample sample, Ray* ray) const;

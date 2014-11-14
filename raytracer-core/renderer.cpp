@@ -55,8 +55,17 @@ namespace rt {
 			while (int samples_count = sub_sampler.next_samples(samples)) {
 				for (int i = 0; i < samples_count; ++i) {
 					Ray ray;
+					glm::vec2 original_position = samples[i].position;
 					samples[i].position /= _film->get_surface()->get_size();
 					_camera.find_ray(samples[i], &ray);
+
+					Intersection intersection;
+					if (_scene.intersect(ray, &intersection)) {
+						float radiance = _integrator.calculate_radiance(intersection);
+						glm::vec3 color = intersection.material->color * radiance;
+
+						_film->apply_radiance((int)original_position.x, (int)original_position.y, Color(color));
+					}
 				}
 			}
 			delete[] samples;

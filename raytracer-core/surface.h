@@ -16,6 +16,14 @@ namespace rt {
 				r = 255; g = 255;
 				b = 255; x = 255;
 			}
+			explicit Color(glm::vec3 color) {
+				color = glm::clamp(color, glm::vec3(0, 0, 0), glm::vec3(1, 1, 1));
+
+				r = (unsigned char)(color.r * 255);
+				g = (unsigned char)(color.g * 255);
+				b = (unsigned char)(color.b * 255);
+				x = 255;
+			}
 			unsigned char r;
 			unsigned char g;
 			unsigned char b;
