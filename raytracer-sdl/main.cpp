@@ -57,6 +57,43 @@ public:
 	}
 };
 
+class Triangle : public rt::core::Shape {
+	glm::vec3 p0, p1, p2;
+public:
+	Triangle(glm::vec3 a, glm::vec3 b, glm::vec3 c) : p0(a), p1(b), p2(c) {}
+
+	bool intersect(rt::core::Ray ray, rt::core::Intersection* result) const {
+		glm::vec3 e1 = p1 - p0;
+		glm::vec3 e2 = p2 - p0;
+		glm::vec3 s1 = glm::cross(ray.orientation, e2);
+		float divisor = glm::dot(s1, e1);
+		if (divisor == 0.) {
+			return false;
+		}
+		float invDivisor = 1.f / divisor;
+
+		//first barycentric coordinate
+		glm::vec3 d = ray.origin - p0;
+		float b1 = glm::dot(d, s1) * invDivisor;
+		if (b1 < 0. || b1 > 1.) {
+			return false;
+		}
+		//second
+		glm::vec3 s2 = glm::cross(d, e1);
+		float b2 = glm::dot(ray.orientation, s2) * invDivisor;
+		if (b2 <0. || b1 + b2 > 1.) {
+			return false;
+		}
+		float t = glm::dot(e2, s2) * invDivisor;
+		result->d = t;
+		result->position = ray.origin + ray.orientation * t;
+		result->normal = glm::cross(e1, e2);
+		return true;
+	}
+	rt::core::AABB get_bounding_box() const {
+		return rt::core::AABB(p0, p1, p2);
+	}
+};
 
 void build_scene(rt::core::Scene* scene) {
 	rt::core::Material mat;
@@ -64,16 +101,25 @@ void build_scene(rt::core::Scene* scene) {
 	mat.reflected = glm::vec3(0.3, 0.9, 0.7);
 	rt::core::MaterialId left_sph_mat = scene->new_material(mat);
 
-	mat.emitted = glm::vec3(0.9, 0.0, 0.0);
+	mat.emitted = glm::vec3(0.69, 0.12, 0.164);
 	mat.reflected = glm::vec3(0.9, 0.04, 0.7);
 	rt::core::MaterialId right_sph_mat = scene->new_material(mat);
 
-	Sphere* sphere = new Sphere(glm::vec3(10, 10, 10), 1);
-	rt::core::GeoPrimitive* prim = new rt::core::GeoPrimitive(sphere, left_sph_mat);
+	mat.emitted = glm::vec3(0.24, 0.3, 0.67);
+	mat.reflected = glm::vec3(0.9, 0.04, 0.7);
+	rt::core::MaterialId right_tri_mat = scene->new_material(mat);
+
+	rt::core::Shape* shape = new Sphere(glm::vec3(10, 10, 10), 1);
+	rt::core::GeoPrimitive* prim = new rt::core::GeoPrimitive(shape, left_sph_mat);
 	scene->add_primitive(prim);
 
-	sphere = new Sphere(glm::vec3(12, 9.6, 10), 1.25);
-	prim = new rt::core::GeoPrimitive(sphere, right_sph_mat);
+	shape = new Sphere(glm::vec3(12, 9.6, 10), 1.25);
+	prim = new rt::core::GeoPrimitive(shape, right_sph_mat);
+	scene->add_primitive(prim);
+
+
+	shape = new Triangle(glm::vec3(5,5,14), glm::vec3(15, 15, 14), glm::vec3(25, 5, 14));
+	prim = new rt::core::GeoPrimitive(shape, right_tri_mat);
 	scene->add_primitive(prim);
 }
 
