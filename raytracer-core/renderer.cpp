@@ -61,8 +61,7 @@ namespace rt {
 
 					Intersection intersection;
 					if (_scene.intersect(ray, &intersection)) {
-						float radiance = _integrator.calculate_radiance(intersection);
-						glm::vec3 color = intersection.material->color * radiance;
+						glm::vec3 color = _integrator.calculate_radiance(_scene, intersection);
 
 						_film->apply_radiance((int)original_position.x, (int)original_position.y, Color(color));
 					}

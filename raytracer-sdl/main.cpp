@@ -1,5 +1,4 @@
 #include "renderer.h"
-
 #include <SDL.h>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -53,15 +52,29 @@ public:
 		}
 		return false;
 	}
+	rt::core::AABB get_bounding_box() const {
+		return rt::core::AABB(_pos - _radius, _pos + _radius);
+	}
 };
 
-void build_scene(rt::core::AggregatePrimitiveBuilder* builder) {
-	auto* material = new rt::core::Material;
-	material->color = glm::vec3(0, 0.6, 0);
-	Sphere* sphere = new Sphere(glm::vec3(0, 0, 3), 1);
-	auto* primitive = new rt::core::GeoPrimitive(sphere, material);
 
-	builder->add_primitive(primitive);
+void build_scene(rt::core::Scene* scene) {
+	rt::core::Material mat;
+	mat.emitted = glm::vec3(0.2, 0.86, 0.45);
+	mat.reflected = glm::vec3(0.3, 0.9, 0.7);
+	rt::core::MaterialId left_sph_mat = scene->new_material(mat);
+
+	mat.emitted = glm::vec3(0.9, 0.0, 0.0);
+	mat.reflected = glm::vec3(0.9, 0.04, 0.7);
+	rt::core::MaterialId right_sph_mat = scene->new_material(mat);
+
+	Sphere* sphere = new Sphere(glm::vec3(10, 10, 10), 1);
+	rt::core::GeoPrimitive* prim = new rt::core::GeoPrimitive(sphere, left_sph_mat);
+	scene->add_primitive(prim);
+
+	sphere = new Sphere(glm::vec3(12, 9.6, 10), 1.25);
+	prim = new rt::core::GeoPrimitive(sphere, right_sph_mat);
+	scene->add_primitive(prim);
 }
 
 int main(int argc, char* argv[]) {
@@ -70,13 +83,12 @@ int main(int argc, char* argv[]) {
 
 	rt::core::Film film(&film_surface);
 
-	rt::core::Camera cam(glm::vec3(0, 0, 0), glm::vec3(0, 0, 3), 60, (float)WND_SIZE_X / (float)WND_SIZE_Y);
-
-	rt::core::AggregatePrimitiveBuilder* builder = rt::core::create_builder_bruteforce();
-	build_scene(builder);
+	rt::core::Camera cam(glm::vec3(10.5, 10.5, 3), glm::vec3(11, 10, 10), 60, (float)WND_SIZE_X / (float)WND_SIZE_Y);
 
 	rt::core::Scene scene;
-	scene.set_primitive(builder->end_primitive());
+	build_scene(&scene);
+
+	scene.accelerate_and_rebuild(new rt::core::DefaultAccelerator);
 
 	rt::core::Sampler sampler;
 	rt::core::Integrator integrator;
