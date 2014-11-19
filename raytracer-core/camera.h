@@ -5,6 +5,7 @@
 
 namespace rt {
 	namespace core {
+		glm::mat4 create_camera_to_world(glm::vec3 eye, glm::vec3 target);
 		class Camera {
 		public:
 			Camera(glm::vec3 eye, glm::vec3 target, float fov, float aspect_ratio);
