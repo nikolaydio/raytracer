@@ -24,8 +24,9 @@ namespace rt {
 		
 		class Integrator {
 		public:
-			virtual float calculate_radiance(Intersection intersection) const {
-				return 1.0;
+			virtual glm::vec3 calculate_radiance(const Scene& scene, Intersection intersection) const {
+				glm::vec3 emitted = scene.get_material(intersection.material).emitted;
+				return emitted;
 			}
 		};
 
