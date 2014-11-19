@@ -72,7 +72,7 @@ void build_scene(rt::core::Scene* scene) {
 	rt::core::GeoPrimitive* prim = new rt::core::GeoPrimitive(sphere, left_sph_mat);
 	scene->add_primitive(prim);
 
-	sphere = new Sphere(glm::vec3(11, 11, 11), 1.25);
+	sphere = new Sphere(glm::vec3(12, 9.6, 10), 1.25);
 	prim = new rt::core::GeoPrimitive(sphere, right_sph_mat);
 	scene->add_primitive(prim);
 }
@@ -83,7 +83,7 @@ int main(int argc, char* argv[]) {
 
 	rt::core::Film film(&film_surface);
 
-	rt::core::Camera cam(glm::vec3(0, 0, 0), glm::vec3(11.5, 11.5, 11.5), 60, (float)WND_SIZE_X / (float)WND_SIZE_Y);
+	rt::core::Camera cam(glm::vec3(10.5, 10.5, 3), glm::vec3(11, 10, 10), 60, (float)WND_SIZE_X / (float)WND_SIZE_Y);
 
 	rt::core::Scene scene;
 	build_scene(&scene);
