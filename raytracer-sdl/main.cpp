@@ -46,8 +46,8 @@ public:
 		: _pos(pos), _radius(radius) {}
 	virtual bool intersect(rt::core::Ray ray, rt::core::Intersection* result) const {
 		if (IntersectSphere(_pos, _radius, ray.origin, ray.orientation, &result->d)) {
-			result->normal = (ray.origin + ray.orientation * result->d) - _pos;
-			result->normal = glm::normalize(result->normal);
+			result->position = (ray.origin + ray.orientation * result->d);
+			result->normal = glm::normalize(result->position - _pos);
 			return true;
 		}
 		return false;
@@ -87,7 +87,7 @@ public:
 		float t = glm::dot(e2, s2) * invDivisor;
 		result->d = t;
 		result->position = ray.origin + ray.orientation * t;
-		result->normal = glm::cross(e1, e2);
+		result->normal = glm::normalize(glm::cross(e2, e1));
 		return true;
 	}
 	rt::core::AABB get_bounding_box() const {
@@ -106,21 +106,72 @@ void build_scene(rt::core::Scene* scene) {
 	rt::core::MaterialId right_sph_mat = scene->new_material(mat);
 
 	mat.emitted = glm::vec3(0.24, 0.3, 0.67);
-	mat.reflected = glm::vec3(0.9, 0.04, 0.7);
+	mat.reflected = glm::vec3(0.1, 0.1, 0.1);
 	rt::core::MaterialId right_tri_mat = scene->new_material(mat);
 
-	rt::core::Shape* shape = new Sphere(glm::vec3(10, 10, 10), 1);
+	mat.emitted = glm::vec3(0.14, 0.15, 0.37);
+	mat.reflected = glm::vec3(0, 0, 0);
+	rt::core::MaterialId blue = scene->new_material(mat);
+
+
+	mat.emitted = glm::vec3(0.98, 0.98, 0.98);
+	mat.reflected = glm::vec3(0.1, 0.1, 0.1);
+	rt::core::MaterialId white = scene->new_material(mat);
+
+	rt::core::Shape* shape = new Sphere(glm::vec3(0, 0, 0), 1);
 	rt::core::GeoPrimitive* prim = new rt::core::GeoPrimitive(shape, left_sph_mat);
 	scene->add_primitive(prim);
 
-	shape = new Sphere(glm::vec3(12, 9.6, 10), 1.25);
+	shape = new Sphere(glm::vec3(2, -0.6, 0), 1.25);
 	prim = new rt::core::GeoPrimitive(shape, right_sph_mat);
 	scene->add_primitive(prim);
 
+	shape = new Sphere(glm::vec3(1.5, -2, 0), 0.65);
+	prim = new rt::core::GeoPrimitive(shape, white);
+	scene->add_primitive(prim);
 
-	shape = new Triangle(glm::vec3(5,5,14), glm::vec3(15, 15, 14), glm::vec3(25, 5, 14));
+
+	shape = new Triangle(glm::vec3(-5,-5,14), glm::vec3(5, 5, 14), glm::vec3(15, -5, 14));
 	prim = new rt::core::GeoPrimitive(shape, right_tri_mat);
 	scene->add_primitive(prim);
+
+	shape = new Triangle(glm::vec3(-300, -300, 50), glm::vec3(0, 200, 50), glm::vec3(300, -300, 50));
+	prim = new rt::core::GeoPrimitive(shape, blue);
+	scene->add_primitive(prim);
+}
+
+void putpixel(SDL_Surface *surface, int x, int y, Uint32 pixel)
+{
+	int bpp = surface->format->BytesPerPixel;
+	/* Here p is the address to the pixel we want to set */
+	Uint8 *p = (Uint8 *)surface->pixels + y * surface->pitch + x * bpp;
+
+	switch (bpp) {
+	case 1:
+		*p = pixel;
+		break;
+
+	case 2:
+		*(Uint16 *)p = pixel;
+		break;
+
+	case 3:
+		if (SDL_BYTEORDER == SDL_BIG_ENDIAN) {
+			p[0] = (pixel >> 16) & 0xff;
+			p[1] = (pixel >> 8) & 0xff;
+			p[2] = pixel & 0xff;
+		}
+		else {
+			p[0] = pixel & 0xff;
+			p[1] = (pixel >> 8) & 0xff;
+			p[2] = (pixel >> 16) & 0xff;
+		}
+		break;
+
+	case 4:
+		*(Uint32 *)p = pixel;
+		break;
+	}
 }
 
 int main(int argc, char* argv[]) {
@@ -129,14 +180,14 @@ int main(int argc, char* argv[]) {
 
 	rt::core::Film film(&film_surface);
 
-	rt::core::Camera cam(glm::vec3(10.5, 10.5, 3), glm::vec3(11, 10, 10), 60, (float)WND_SIZE_X / (float)WND_SIZE_Y);
+	rt::core::Camera cam(glm::vec3(1, -0.1, -5), glm::vec3(1.5, -0.3, 0), 60, (float)WND_SIZE_X / (float)WND_SIZE_Y);
 
 	rt::core::Scene scene;
 	build_scene(&scene);
 
 	scene.accelerate_and_rebuild(new rt::core::DefaultAccelerator);
 
-	rt::core::Sampler sampler;
+	rt::core::Sampler sampler(1);
 	rt::core::Integrator integrator;
 
 	rt::core::Renderer renderer(sampler, cam, scene, integrator);
@@ -159,10 +210,11 @@ int main(int argc, char* argv[]) {
 	REQUIRE(w == WND_SIZE_X);
 	REQUIRE(h == WND_SIZE_Y);
 
+
 	SDL_Surface* surface = SDL_GetWindowSurface(window);
 	REQUIRE(surface);
 
-	uint32_t* pixels = (uint32_t*)surface->pixels;
+
 	bool running = true;
 	while (running) {
 
@@ -174,11 +226,14 @@ int main(int argc, char* argv[]) {
 			}
 		}
 
+		SDL_LockSurface(surface);
+		uint32_t* pixels = (uint32_t*)surface->pixels;
 		for (int y = 0; y < h; ++y) {
 			for (int x = 0; x < w; ++x) {
-				pixels[y * w + x] = *(uint32_t*)&film_surface.pixel(x, y);
+				putpixel(surface, x, y, *(Uint32*)&film_surface.pixel(x, y));
 			}
 		}
+		SDL_UnlockSurface(surface);
 
 		SDL_UpdateWindowSurface(window);
 		SDL_Delay(120);
