@@ -18,6 +18,7 @@ namespace rt {
 				float _sampling;
 			public:
 				SubSampler(glm::vec2 pos, glm::vec2 size, float sampling);
+				SubSampler() {}
 
 				int max_samples();
 				int next_samples(Sample* samples);
@@ -27,6 +28,9 @@ namespace rt {
 		
 		class Integrator {
 		public:
+			glm::vec3 calculate_ray() {
+
+			}
 			virtual glm::vec3 calculate_radiance(const Scene& scene, Ray ray, Intersection intersection) const {
 				glm::vec3 emitted = scene.get_material(intersection.material).emitted;
 
@@ -39,7 +43,15 @@ namespace rt {
 				if (scene.intersect(nray, &nested)) {
 					incident = scene.get_material(nested.material).emitted;
 				}
-				glm::vec3 reflected = glm::max(glm::vec3(0,0,0), BRDF * incident * glm::dot(intersection.normal, -ray.orientation));
+				float coef = 2 * glm::dot(intersection.normal, nray.orientation);
+
+				glm::vec3 reflected = glm::max(glm::vec3(0, 0, 0), BRDF * incident * coef);
+				
+				coef = glm::dot(intersection.normal, -ray.orientation);
+				emitted = glm::max(glm::vec3(0, 0, 0), emitted);
+				for (int i = 0; i < 3; ++i) {
+					
+				}
 				return emitted + reflected;
 			}
 		};
@@ -52,6 +64,7 @@ namespace rt {
 			
 			Film* _film;
 
+			void process_subsampler(Sampler::SubSampler& sampler);
 		public:
 			Renderer(const Sampler& sampler,
 				const Camera& camera,
@@ -62,8 +75,9 @@ namespace rt {
 
 			Film*& film();
 
-			void run_multithreaded() {}
+			void run_multithreaded(int chunk_size = 16);
 			void run_singlethreaded();
+
 			void generate_tasks() {}
 		};
 	}
