@@ -34,10 +34,10 @@ namespace rt {
 			ray->origin = glm::vec3(0, 0, 0);
 			glm::vec2 orientation = sample.position - glm::vec2(0.5, 0.5);
 			orientation *= _field_of_view;
-			ray->orientation = glm::normalize(glm::vec3(orientation, 1));
+			ray->direction = glm::normalize(glm::vec3(orientation, 1));
 
 			ray->origin = glm::vec3(_camera_to_world * glm::vec4(ray->origin, 1));
-			ray->orientation = -glm::vec3(_camera_to_world * glm::vec4(ray->orientation, 0));
+			ray->direction = -glm::vec3(_camera_to_world * glm::vec4(ray->direction, 0));
 		}
 	}
 }

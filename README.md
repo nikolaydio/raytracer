@@ -1,22 +1,17 @@
 # RayTracer #
 
-### Short term tasks ###
- * Plane shapes
+### Tasks ###
  * K-d tree accelerator
- * Implement proper integrator(some stuff still not researched)
- * Actual per-pixel sampling
- * Multithreaded using OpenMP
+ * Implement proper path tracer integrator(almost researched, may require some work in the sampling area)
  * Makefile for building under linux
+ * Texture support. Linear filtering may be required if the result is looking too bad.
+ * Mesh loading using assimp
 
-### Long term tasks ###
- * Required
-  * Mesh shapes
-  * Task based multithreading
-  * Textures
- * Nice to have
-  * Depth of field
-  * Distributed RNG in the sampler
-  * OpenGL backend for real-time camera positioning(may take a bit more than other tasks)
+### Done Tasks ###
+ * Multithreaded using OpenMP
+ * Triangle Shape
+ * Sampling (as in work done per end-result pixel)
+
 
 
 ### Compilling ###

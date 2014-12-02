@@ -7,7 +7,7 @@ namespace rt {
 
 		struct Ray{
 			glm::vec3 origin;
-			glm::vec3 orientation;
+			glm::vec3 direction;
 		};
 		struct Material;
 		struct Intersection{
@@ -25,6 +25,7 @@ namespace rt {
 		struct Sample {
 			glm::vec2 position;
 		};
+		typedef glm::vec3 Spectrum;
 
 		//those 2 classes should not be here!!
 		class AABB {

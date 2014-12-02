@@ -31,23 +31,23 @@ namespace rt {
 			glm::vec3 calculate_ray() {
 
 			}
-			virtual glm::vec3 calculate_radiance(const Scene& scene, Ray ray, Intersection intersection) const {
-				glm::vec3 emitted = scene.get_material(intersection.material).emitted;
+			virtual Spectrum calculate_radiance(const Scene& scene, Ray ray, Intersection intersection) const {
+				Spectrum emitted = scene.get_material(intersection.material).emitted;
 
 				glm::vec3 BRDF = scene.get_material(intersection.material).reflected;
-				glm::vec3 incident = glm::vec3(0, 0, 0);
+				Spectrum incident = glm::vec3(0, 0, 0);
 				Intersection nested;
 				Ray nray;
 				nray.origin = intersection.position;
-				nray.orientation = glm::reflect(ray.orientation, intersection.normal);
+				nray.direction = glm::reflect(ray.direction, intersection.normal);
 				if (scene.intersect(nray, &nested)) {
 					incident = scene.get_material(nested.material).emitted;
 				}
-				float coef = 2 * glm::dot(intersection.normal, nray.orientation);
+				float coef = 2 * glm::dot(intersection.normal, nray.direction);
 
-				glm::vec3 reflected = glm::max(glm::vec3(0, 0, 0), BRDF * incident * coef);
+				Spectrum reflected = glm::max(glm::vec3(0, 0, 0), BRDF * incident * coef);
 				
-				coef = glm::dot(intersection.normal, -ray.orientation);
+				coef = glm::dot(intersection.normal, -ray.direction);
 				emitted = glm::max(glm::vec3(0, 0, 0), emitted);
 				for (int i = 0; i < 3; ++i) {
 					

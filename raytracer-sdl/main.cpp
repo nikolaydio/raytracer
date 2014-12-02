@@ -45,8 +45,8 @@ public:
 	Sphere(glm::vec3 pos, float radius)
 		: _pos(pos), _radius(radius) {}
 	virtual bool intersect(rt::core::Ray ray, rt::core::Intersection* result) const {
-		if (IntersectSphere(_pos, _radius, ray.origin, ray.orientation, &result->d)) {
-			result->position = (ray.origin + ray.orientation * result->d);
+		if (IntersectSphere(_pos, _radius, ray.origin, ray.direction, &result->d)) {
+			result->position = (ray.origin + ray.direction * result->d);
 			result->normal = glm::normalize(result->position - _pos);
 			return true;
 		}
@@ -65,13 +65,12 @@ public:
 	bool intersect(rt::core::Ray ray, rt::core::Intersection* result) const {
 		glm::vec3 e1 = p1 - p0;
 		glm::vec3 e2 = p2 - p0;
-		glm::vec3 s1 = glm::cross(ray.orientation, e2);
+		glm::vec3 s1 = glm::cross(ray.direction, e2);
 		float divisor = glm::dot(s1, e1);
 		if (divisor == 0.) {
 			return false;
 		}
 		float invDivisor = 1.f / divisor;
-
 		//first barycentric coordinate
 		glm::vec3 d = ray.origin - p0;
 		float b1 = glm::dot(d, s1) * invDivisor;
@@ -80,13 +79,13 @@ public:
 		}
 		//second
 		glm::vec3 s2 = glm::cross(d, e1);
-		float b2 = glm::dot(ray.orientation, s2) * invDivisor;
+		float b2 = glm::dot(ray.direction, s2) * invDivisor;
 		if (b2 <0. || b1 + b2 > 1.) {
 			return false;
 		}
 		float t = glm::dot(e2, s2) * invDivisor;
 		result->d = t;
-		result->position = ray.origin + ray.orientation * t;
+		result->position = ray.origin + ray.direction * t;
 		result->normal = glm::normalize(glm::cross(e2, e1));
 		return true;
 	}
@@ -105,12 +104,12 @@ void build_scene(rt::core::Scene* scene) {
 	mat.reflected = glm::vec3(0.9, 0.04, 0.7);
 	rt::core::MaterialId right_sph_mat = scene->new_material(mat);
 
-	mat.emitted = glm::vec3(0.24, 0.3, 0.67);
-	mat.reflected = glm::vec3(0.1, 0.1, 0.1);
+	mat.emitted = glm::vec3(1, 1, 1);
+	mat.reflected = glm::vec3(0.4, 0.4, 0.4);
 	rt::core::MaterialId right_tri_mat = scene->new_material(mat);
 
 	mat.emitted = glm::vec3(0.14, 0.15, 0.37);
-	mat.reflected = glm::vec3(0, 0, 0);
+	mat.reflected = glm::vec3(0.6, 0.6, 0.6);
 	rt::core::MaterialId blue = scene->new_material(mat);
 
 
@@ -128,14 +127,15 @@ void build_scene(rt::core::Scene* scene) {
 
 	shape = new Sphere(glm::vec3(1.5, -2, 0), 0.65);
 	prim = new rt::core::GeoPrimitive(shape, white);
-	scene->add_primitive(prim);
+	//scene->add_primitive(prim);
 
 
-	shape = new Triangle(glm::vec3(-5,-5,14), glm::vec3(5, 5, 14), glm::vec3(15, -5, 14));
+	shape = new Triangle(glm::vec3(15,-5,10), glm::vec3(15, 5, 9), glm::vec3(15, -5, 5));
 	prim = new rt::core::GeoPrimitive(shape, right_tri_mat);
 	scene->add_primitive(prim);
 
-	shape = new Triangle(glm::vec3(-300, -300, 50), glm::vec3(0, 200, 50), glm::vec3(300, -300, 50));
+	float pos = 2.5;
+	shape = new Triangle(glm::vec3(-300, -300, pos), glm::vec3(0, 200, pos), glm::vec3(300, -300, pos));
 	prim = new rt::core::GeoPrimitive(shape, blue);
 	scene->add_primitive(prim);
 }
@@ -193,7 +193,7 @@ int main(int argc, char* argv[]) {
 	rt::core::Renderer renderer(sampler, cam, scene, integrator);
 	renderer.film() = &film;
 
-	renderer.run_singlethreaded();
+	renderer.run_multithreaded();
 
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 		printf("Failed to init SDL");

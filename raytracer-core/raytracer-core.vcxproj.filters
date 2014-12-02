@@ -1,20 +1,64 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClInclude Include="scene.h" />
-    <ClInclude Include="camera.h" />
-    <ClInclude Include="film.h" />
-    <ClInclude Include="surface.h" />
-    <ClInclude Include="renderer.h" />
-    <ClInclude Include="primitive.h" />
     <ClInclude Include="types.h" />
+    <ClInclude Include="renderer.h">
+      <Filter>Raytracer\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="camera.h">
+      <Filter>Raytracer\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="film.h">
+      <Filter>Raytracer\Surface</Filter>
+    </ClInclude>
+    <ClInclude Include="surface.h">
+      <Filter>Raytracer\Surface</Filter>
+    </ClInclude>
+    <ClInclude Include="scene.h">
+      <Filter>Raytracer\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="primitive.h">
+      <Filter>Raytracer\Scene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="scene.cpp" />
-    <ClCompile Include="film.cpp" />
-    <ClCompile Include="camera.cpp" />
-    <ClCompile Include="surface.cpp" />
-    <ClCompile Include="renderer.cpp" />
-    <ClCompile Include="primitive.cpp" />
+    <ClCompile Include="renderer.cpp">
+      <Filter>Raytracer\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="camera.cpp">
+      <Filter>Raytracer\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="film.cpp">
+      <Filter>Raytracer\Surface</Filter>
+    </ClCompile>
+    <ClCompile Include="surface.cpp">
+      <Filter>Raytracer\Surface</Filter>
+    </ClCompile>
+    <ClCompile Include="scene.cpp">
+      <Filter>Raytracer\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="primitive.cpp">
+      <Filter>Raytracer\Scene</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Utility">
+      <UniqueIdentifier>{b7bef174-660c-4e59-aa12-a9389b7e5811}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Raytracer">
+      <UniqueIdentifier>{d1e692f3-a784-4103-9874-bc17b39b6a80}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Raytracer\Renderer">
+      <UniqueIdentifier>{6f505a21-94fe-4356-b8b1-683c48b4016d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Raytracer\Camera">
+      <UniqueIdentifier>{444360cb-a7ad-4e72-b725-487023ec3862}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Raytracer\Surface">
+      <UniqueIdentifier>{665e7c8c-1826-45bc-9201-0e8c1f58527f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Raytracer\Scene">
+      <UniqueIdentifier>{5ba28398-b473-4fb6-9650-6e66d93001fd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>
