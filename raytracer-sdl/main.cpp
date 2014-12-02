@@ -67,6 +67,8 @@ public:
 		glm::vec3 e2 = p2 - p0;
 		glm::vec3 s1 = glm::cross(ray.direction, e2);
 		float divisor = glm::dot(s1, e1);
+
+		//this line is looking suspicious
 		if (divisor == 0.) {
 			return false;
 		}
@@ -84,9 +86,13 @@ public:
 			return false;
 		}
 		float t = glm::dot(e2, s2) * invDivisor;
+		//this is a threashhold for not colliding with itself
+		if (t < 0.0001) {
+			return false;
+		}
 		result->d = t;
 		result->position = ray.origin + ray.direction * t;
-		result->normal = glm::normalize(glm::cross(e2, e1));
+		result->normal = glm::normalize(glm::cross(e1, e2));
 		return true;
 	}
 	rt::core::AABB get_bounding_box() const {
@@ -97,7 +103,7 @@ public:
 void build_scene(rt::core::Scene* scene) {
 	rt::core::Material mat;
 	mat.emitted = glm::vec3(0.2, 0.86, 0.45);
-	mat.reflected = glm::vec3(0.3, 0.9, 0.7);
+	mat.reflected = glm::vec3(0.2, 0.86, 0.45);
 	rt::core::MaterialId left_sph_mat = scene->new_material(mat);
 
 	mat.emitted = glm::vec3(0.69, 0.12, 0.164);
@@ -127,14 +133,14 @@ void build_scene(rt::core::Scene* scene) {
 
 	shape = new Sphere(glm::vec3(1.5, -2, 0), 0.65);
 	prim = new rt::core::GeoPrimitive(shape, white);
-	//scene->add_primitive(prim);
+	scene->add_primitive(prim);
 
 
 	shape = new Triangle(glm::vec3(15,-5,10), glm::vec3(15, 5, 9), glm::vec3(15, -5, 5));
 	prim = new rt::core::GeoPrimitive(shape, right_tri_mat);
 	scene->add_primitive(prim);
 
-	float pos = 2.5;
+	float pos = 100;
 	shape = new Triangle(glm::vec3(-300, -300, pos), glm::vec3(0, 200, pos), glm::vec3(300, -300, pos));
 	prim = new rt::core::GeoPrimitive(shape, blue);
 	scene->add_primitive(prim);
@@ -174,7 +180,30 @@ void putpixel(SDL_Surface *surface, int x, int y, Uint32 pixel)
 	}
 }
 
+void test() {
+	Triangle a(glm::vec3(0, 0, 0), glm::vec3(0, 1, 0), glm::vec3(1, 0, 0));
+	rt::core::Intersection isect;
+	rt::core::Ray ray;
+	ray.origin = glm::vec3(0.1, 0.1, -1);
+	ray.direction = glm::vec3(0, 0, 1);
+	assert(a.intersect(ray, &isect));
+	assert(isect.normal == glm::vec3(0,0,-1));
+	assert(isect.position == glm::vec3(0.1, 0.1, 0));
+
+	ray.origin = glm::vec3(1, 1, -1);
+	assert(!a.intersect(ray, &isect));
+
+	ray.origin = glm::vec3(0.1, 0.1, 1);
+	ray.direction = glm::vec3(0, 0, -1);
+	assert(a.intersect(ray, &isect));
+	assert(isect.normal == glm::vec3(0, 0, -1));
+	assert(isect.position == glm::vec3(0.1, 0.1, 0));
+}
+
 int main(int argc, char* argv[]) {
+#ifdef _DEBUG
+	test();
+#endif
 
 	rt::core::Surface2d film_surface(WND_SIZE_X, WND_SIZE_Y);
 

@@ -20,6 +20,7 @@
     <ClInclude Include="primitive.h">
       <Filter>Raytracer\Scene</Filter>
     </ClInclude>
+    <ClInclude Include="config.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="renderer.cpp">
@@ -56,6 +57,9 @@
     </Filter>
     <Filter Include="Raytracer\Surface">
       <UniqueIdentifier>{665e7c8c-1826-45bc-9201-0e8c1f58527f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Raytracer\Accelerators">
+      <UniqueIdentifier>{0ef2e6ba-fe52-4404-9060-fb50d15a2884}</UniqueIdentifier>
     </Filter>
     <Filter Include="Raytracer\Scene">
       <UniqueIdentifier>{5ba28398-b473-4fb6-9650-6e66d93001fd}</UniqueIdentifier>

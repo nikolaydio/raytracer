@@ -92,6 +92,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="camera.h" />
+    <ClInclude Include="config.h" />
     <ClInclude Include="film.h" />
     <ClInclude Include="primitive.h" />
     <ClInclude Include="renderer.h" />

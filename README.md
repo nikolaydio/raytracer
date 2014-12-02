@@ -6,6 +6,7 @@
  * Makefile for building under linux
  * Texture support. Linear filtering may be required if the result is looking too bad.
  * Mesh loading using assimp
+ * Scene loading from a basic text format
 
 ### Done Tasks ###
  * Multithreaded using OpenMP
