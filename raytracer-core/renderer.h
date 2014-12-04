@@ -2,6 +2,7 @@
 #include "scene.h"
 #include "camera.h"
 #include "film.h"
+#include "resource_manager.h"
 namespace rt {
 	namespace core {
 		class Sampler {
@@ -26,22 +27,25 @@ namespace rt {
 			SubSampler create_subsampler(glm::vec2 pos, glm::vec2 size) const;
 		};
 		
+		Material get_material(ResourceManager& man, MaterialId id);
+
 		class Integrator {
 		public:
 			glm::vec3 calculate_ray() {
 
 			}
-			virtual Spectrum calculate_radiance(const Scene& scene, Ray ray, Intersection isect) const {
-				Spectrum emitted = scene.get_material(isect.material).emitted;
+			virtual Spectrum calculate_radiance(ResourceManager& man, const Scene& scene, Ray ray, Intersection isect) const {
+	
+				Spectrum emitted = get_material(man, isect.material).emitted;
 
-				glm::vec3 BRDF = scene.get_material(isect.material).reflected;
+				glm::vec3 BRDF = get_material(man, isect.material).reflected;
 				Spectrum incident = glm::vec3(0, 0, 0);
 				Intersection nested;
 				Ray nray;
 				nray.origin = isect.position;
 				nray.direction = glm::normalize(glm::reflect(ray.direction, isect.normal));
 				if (scene.intersect(nray, &nested)) {
-					incident = scene.get_material(nested.material).emitted;
+					incident = get_material(man, nested.material).emitted;
 				}
 				float coef = glm::dot(isect.normal, nray.direction);
 
@@ -56,6 +60,7 @@ namespace rt {
 			const Camera& _camera;
 			const Scene& _scene;
 			const Integrator& _integrator;
+			ResourceManager& _manager;
 			
 			Film* _film;
 
@@ -64,7 +69,8 @@ namespace rt {
 			Renderer(const Sampler& sampler,
 				const Camera& camera,
 				const Scene& scene,
-				const Integrator& integrator);
+				const Integrator& integrator,
+				ResourceManager& manager);
 
 			~Renderer() {}
 

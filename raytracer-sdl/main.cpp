@@ -68,8 +68,7 @@ public:
 		glm::vec3 s1 = glm::cross(ray.direction, e2);
 		float divisor = glm::dot(s1, e1);
 
-		//this line is looking suspicious
-		if (divisor == 0.) {
+		if (glm::abs(divisor) < 0.00000001) {
 			return false;
 		}
 		float invDivisor = 1.f / divisor;
@@ -86,6 +85,7 @@ public:
 			return false;
 		}
 		float t = glm::dot(e2, s2) * invDivisor;
+		
 		//this is a threashhold for not colliding with itself
 		if (t < 0.0001) {
 			return false;
@@ -100,50 +100,40 @@ public:
 	}
 };
 
-void build_scene(rt::core::Scene* scene) {
-	rt::core::Material mat;
-	mat.emitted = glm::vec3(0.2, 0.86, 0.45);
-	mat.reflected = glm::vec3(0.2, 0.86, 0.45);
-	rt::core::MaterialId left_sph_mat = scene->new_material(mat);
+#define MURMUR_STRING(str, seed) (rt::core::MurmurHash2(str, strlen(str), seed))
+rt::core::MaterialId make_material(const char* path, rt::core::ResourceManager& man, rt::core::Material mat) {
+	rt::core::Material* pmat = new rt::core::Material(mat);
+	rt::core::MaterialId hash = rt::core::MurmurHash2(path, strlen(path), 0);
+	uint32_t type_hash = MURMUR_STRING(".material", 0);
 
-	mat.emitted = glm::vec3(0.69, 0.12, 0.164);
-	mat.reflected = glm::vec3(0.9, 0.04, 0.7);
-	rt::core::MaterialId right_sph_mat = scene->new_material(mat);
-
-	mat.emitted = glm::vec3(1, 1, 1);
-	mat.reflected = glm::vec3(0.4, 0.4, 0.4);
-	rt::core::MaterialId right_tri_mat = scene->new_material(mat);
-
-	mat.emitted = glm::vec3(0.14, 0.15, 0.37);
-	mat.reflected = glm::vec3(0.6, 0.6, 0.6);
-	rt::core::MaterialId blue = scene->new_material(mat);
+	man.add_resource({ hash, type_hash }, { pmat , sizeof(rt::core::Material) });
+	
+	return hash;
+}
+void build_scene(rt::core::ResourceManager& manager, rt::core::Scene* scene) {
+	rt::core::MaterialId left_sph_mat =
+		make_material("/left", manager, { glm::vec3(0.2, 0.86, 0.45), glm::vec3(0.2, 0.86, 0.45) });
 
 
-	mat.emitted = glm::vec3(0.98, 0.98, 0.98);
-	mat.reflected = glm::vec3(0.1, 0.1, 0.1);
-	rt::core::MaterialId white = scene->new_material(mat);
+	rt::core::MaterialId right_sph_mat =
+		make_material("/right", manager, { glm::vec3(0.69, 0.12, 0.164), glm::vec3(0.9, 0.04, 0.7) });
 
-	rt::core::Shape* shape = new Sphere(glm::vec3(0, 0, 0), 1);
-	rt::core::GeoPrimitive* prim = new rt::core::GeoPrimitive(shape, left_sph_mat);
-	scene->add_primitive(prim);
-
-	shape = new Sphere(glm::vec3(2, -0.6, 0), 1.25);
-	prim = new rt::core::GeoPrimitive(shape, right_sph_mat);
-	scene->add_primitive(prim);
-
-	shape = new Sphere(glm::vec3(1.5, -2, 0), 0.65);
-	prim = new rt::core::GeoPrimitive(shape, white);
-	scene->add_primitive(prim);
+	rt::core::MaterialId right_tri_mat =
+		make_material("/bg", manager, { glm::vec3(1, 1, 1), glm::vec3(0.4, 0.4, 0.4) });
 
 
-	shape = new Triangle(glm::vec3(15,-5,10), glm::vec3(15, 5, 9), glm::vec3(15, -5, 5));
-	prim = new rt::core::GeoPrimitive(shape, right_tri_mat);
-	scene->add_primitive(prim);
+	scene->push_node({ glm::mat4(), new Sphere(glm::vec3(0, 0, 0), 1) }, left_sph_mat);
+	scene->push_node({ glm::mat4(), new Sphere(glm::vec3(2, -0.6, 0), 1.25) }, right_sph_mat);
 
-	float pos = 100;
+
+
+	float height = -5.0f;
+	rt::core::Shape* shape = new Triangle(glm::vec3(-3000, height, -300), glm::vec3(0, height, 300), glm::vec3(3000, height, -300));
+	scene->push_node({ glm::mat4(), shape }, right_tri_mat);
+
+	float pos = 15;
 	shape = new Triangle(glm::vec3(-300, -300, pos), glm::vec3(0, 200, pos), glm::vec3(300, -300, pos));
-	prim = new rt::core::GeoPrimitive(shape, blue);
-	scene->add_primitive(prim);
+	scene->push_node({ glm::mat4(), shape }, right_tri_mat);
 }
 
 void putpixel(SDL_Surface *surface, int x, int y, Uint32 pixel)
@@ -204,6 +194,7 @@ int main(int argc, char* argv[]) {
 #ifdef _DEBUG
 	test();
 #endif
+	rt::core::ResourceManager manager;
 
 	rt::core::Surface2d film_surface(WND_SIZE_X, WND_SIZE_Y);
 
@@ -212,14 +203,14 @@ int main(int argc, char* argv[]) {
 	rt::core::Camera cam(glm::vec3(1, -0.1, -5), glm::vec3(1.5, -0.3, 0), 60, (float)WND_SIZE_X / (float)WND_SIZE_Y);
 
 	rt::core::Scene scene;
-	build_scene(&scene);
+	build_scene(manager, &scene);
 
-	scene.accelerate_and_rebuild(new rt::core::DefaultAccelerator);
+	scene.accelerate_and_rebuild(new rt::core::DefaultAccelerator(scene.get_adapter()));
 
-	rt::core::Sampler sampler(1);
+	rt::core::Sampler sampler(16);
 	rt::core::Integrator integrator;
 
-	rt::core::Renderer renderer(sampler, cam, scene, integrator);
+	rt::core::Renderer renderer(sampler, cam, scene, integrator, manager);
 	renderer.film() = &film;
 
 	renderer.run_multithreaded();
