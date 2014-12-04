@@ -1,7 +1,8 @@
 #include "renderer.h"
 #include <SDL.h>
 #include <glm/gtc/matrix_transform.hpp>
-
+#include <chrono>
+#include <iostream>
 
 #define WND_SIZE_X 640
 #define WND_SIZE_Y 480
@@ -222,7 +223,12 @@ int main(int argc, char* argv[]) {
 	rt::core::Renderer renderer(sampler, cam, scene, integrator);
 	renderer.film() = &film;
 
+	auto begin = std::chrono::high_resolution_clock::now();
 	renderer.run_multithreaded();
+	auto end = std::chrono::high_resolution_clock::now();
+	auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
+	double seconds = (double)duration / 1000.0 / 1000.0 / 1000.0;
+	std::cout << "Render time: " << seconds << std::endl;
 
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 		printf("Failed to init SDL");
