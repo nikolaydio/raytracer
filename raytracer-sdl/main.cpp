@@ -107,20 +107,19 @@ rt::core::MaterialId make_material(const char* path, rt::core::ResourceManager& 
 	rt::core::MaterialId hash = rt::core::MurmurHash2(path, strlen(path), 0);
 	uint32_t type_hash = MURMUR_STRING(".material", 0);
 
-	man.add_resource({ hash, type_hash }, { pmat , sizeof(rt::core::Material) });
-	
+	//man.add_resource({ hash, type_hash }, { pmat , sizeof(rt::core::Material) });
+	man.add_material(mat);
 	return hash;
 }
 void build_scene(rt::core::ResourceManager& manager, rt::core::Scene* scene) {
 	rt::core::MaterialId left_sph_mat =
-		make_material("/left", manager, { glm::vec3(0.2, 0.86, 0.45), glm::vec3(0.2, 0.86, 0.45) });
-
+		manager.add_material({ glm::vec3(0.2, 0.86, 0.45), glm::vec3(0.2, 0.86, 0.45) });
 
 	rt::core::MaterialId right_sph_mat =
-		make_material("/right", manager, { glm::vec3(0.69, 0.12, 0.164), glm::vec3(0.9, 0.04, 0.7) });
+		manager.add_material({ glm::vec3(0.69, 0.12, 0.164), glm::vec3(0.9, 0.04, 0.7) });
 
 	rt::core::MaterialId right_tri_mat =
-		make_material("/bg", manager, { glm::vec3(1, 1, 1), glm::vec3(0.4, 0.4, 0.4) });
+		manager.add_material({ glm::vec3(0.4, 0.6, 0.9), glm::vec3(0.4, 0.4, 0.4) });
 
 
 	scene->push_node({ glm::mat4(), new Sphere(glm::vec3(0, 0, 0), 1) }, left_sph_mat);
@@ -208,7 +207,7 @@ int main(int argc, char* argv[]) {
 
 	scene.accelerate_and_rebuild(new rt::core::DefaultAccelerator(scene.get_adapter()));
 
-	rt::core::Sampler sampler(16);
+	rt::core::Sampler sampler(1);
 	rt::core::Integrator integrator;
 
 	rt::core::Renderer renderer(sampler, cam, scene, integrator, manager);

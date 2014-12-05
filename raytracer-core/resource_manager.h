@@ -2,6 +2,8 @@
 #include <cstdint>
 #include <unordered_map>
 #include <functional>
+#include <vector>
+#include "types.h"
 
 namespace rt {
 	namespace core {
@@ -23,21 +25,6 @@ namespace rt {
 			}
 		};
 
-	}
-}
-namespace std{
-	template <>
-	struct std::hash < rt::core::ResourceKey >
-	{
-		std::size_t operator()(const rt::core::ResourceKey& k) const
-		{
-			return ((k.path << 8) & 0xFFFFFF00) | (k.type & 0xFF);
-		}
-	};
-}
-
-namespace rt {
-	namespace core {
 		struct ResourceData {
 			void* ptr;
 			int size;
@@ -51,8 +38,12 @@ namespace rt {
 
 			//temp method
 			void add_resource(ResourceKey key, ResourceData data);
+
+			MaterialId add_material(Material mat);
+			Material material(MaterialId mat_id);
 		private:
-			std::unordered_map<ResourceKey, ResourceData> _resources;
+			//std::unordered_map<ResourceKey, ResourceData> _resources;
+			std::vector<Material> _materials;
 		};
 	}
 }

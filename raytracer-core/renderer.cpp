@@ -36,14 +36,6 @@ namespace rt {
 			return SubSampler(pos, size, sampling);
 		}
 
-		Material get_material(ResourceManager& man, MaterialId id) {
-			static uint32_t material_type_hash = MurmurHash2(".material", strlen(".material"), 0);
-			int dummy_size;
-			Material* mat = (Material*)man.resource(id, material_type_hash, dummy_size);
-			assert(mat);
-			return *mat;
-		}
-
 
 		Renderer::Renderer(const Sampler& sampler,
 			const Camera& camera,

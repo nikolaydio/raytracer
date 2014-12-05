@@ -26,8 +26,7 @@ namespace rt {
 			};
 			SubSampler create_subsampler(glm::vec2 pos, glm::vec2 size) const;
 		};
-		
-		Material get_material(ResourceManager& man, MaterialId id);
+	
 
 		class Integrator {
 		public:
@@ -35,17 +34,17 @@ namespace rt {
 
 			}
 			virtual Spectrum calculate_radiance(ResourceManager& man, const Scene& scene, Ray ray, Intersection isect) const {
-	
-				Spectrum emitted = get_material(man, isect.material).emitted;
+				Material mat = man.material(isect.material);
+				Spectrum emitted = mat.emitted;
 
-				glm::vec3 BRDF = get_material(man, isect.material).reflected;
+				glm::vec3 BRDF = mat.reflected;
 				Spectrum incident = glm::vec3(0, 0, 0);
 				Intersection nested;
 				Ray nray;
 				nray.origin = isect.position;
 				nray.direction = glm::normalize(glm::reflect(ray.direction, isect.normal));
 				if (scene.intersect(nray, &nested)) {
-					incident = get_material(man, nested.material).emitted;
+					incident = man.material(nested.material).emitted;
 				}
 				float coef = glm::dot(isect.normal, nray.direction);
 
