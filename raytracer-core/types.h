@@ -50,7 +50,7 @@ namespace rt {
 			AABB union_point(const glm::vec3 p) {
 				return AABB(_min, _max, p);
 			}
-			bool intersect(Ray ray) {
+			bool intersect(Ray ray) const {
 				glm::vec3 dirfrac = 1.0f / ray.direction;
 
 				float t1 = (_min.x - ray.origin.x)*dirfrac.x;

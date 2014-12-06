@@ -4,6 +4,12 @@
 #include <chrono>
 #include <iostream>
 
+#include <assimp/Importer.hpp> // C++ importer interface
+#include <assimp/scene.h> // Output data structure
+#include <assimp/postprocess.h> // Post processing flags
+#include <assimp/mesh.h>
+
+
 #define WND_SIZE_X 640
 #define WND_SIZE_Y 480
 
@@ -101,6 +107,63 @@ public:
 	}
 };
 
+class Mesh : public rt::core::Shape {
+	std::vector<glm::vec3> points;
+	class MeshAdapter : public rt::core::ElementAdapter {
+		std::vector<glm::vec3>& _mesh;
+
+	public:
+		MeshAdapter(std::vector<glm::vec3>& mesh) : _mesh(mesh) {}
+		virtual int count() {
+			return _mesh.size() / 3;
+		}
+		virtual rt::core::AABB get_bounding_box(int index) const {
+			rt::core::AABB aabb(
+				_mesh[index * 3], _mesh[index * 3 + 1], _mesh[index * 3 + 2]);
+
+			return aabb;
+		}
+		virtual bool intersect(int index, rt::core::Ray ray, rt::core::Intersection* result) const {
+			Triangle tri(_mesh[index * 3], _mesh[index * 3 + 1], _mesh[index * 3 + 2]);
+			return tri.intersect(ray, result);
+		}
+	};
+	MeshAdapter _adapter;
+	rt::core::Accelerator* _accelerator;
+	rt::core::AABB bbox;
+public:
+	Mesh() : _accelerator(0), _adapter(points) { }
+	rt::core::ElementAdapter& get_adapter() {
+		return _adapter;
+	}
+	void push_face(glm::vec3 a, glm::vec3 b, glm::vec3 c) {
+		points.push_back(a);
+		points.push_back(b);
+		points.push_back(c);
+	}
+	void push_vert(glm::vec3 a) {
+		points.push_back(a);
+	}
+	void set_accelerator(rt::core::Accelerator* acc) {
+		_accelerator = acc;
+		acc->rebuild(_adapter);
+		bbox = get_bounding_box();
+	}
+	bool intersect(rt::core::Ray ray, rt::core::Intersection* result) const {
+		if (!bbox.intersect(ray)) {
+			return false;
+		}
+		return _accelerator->intersect(ray, result);
+	}
+	rt::core::AABB get_bounding_box() const {
+		rt::core::AABB aabb(points[0]);
+		for (int i = 1; i < points.size(); ++i) {
+			aabb = aabb.union_point(points[i]);
+		}
+		return aabb;
+	}
+};
+
 #define MURMUR_STRING(str, seed) (rt::core::MurmurHash2(str, strlen(str), seed))
 rt::core::MaterialId make_material(const char* path, rt::core::ResourceManager& man, rt::core::Material mat) {
 	rt::core::Material* pmat = new rt::core::Material(mat);
@@ -110,6 +173,41 @@ rt::core::MaterialId make_material(const char* path, rt::core::ResourceManager& 
 	//man.add_resource({ hash, type_hash }, { pmat , sizeof(rt::core::Material) });
 	man.add_material(mat);
 	return hash;
+}
+
+rt::core::Shape* make_mesh(const char* filename) {
+	Assimp::Importer importer;
+
+	// And have it read the given file with some example postprocessing
+	// Usually - if speed is not the most important aspect for you - you'll
+	// propably to request more postprocessing than we do in this example.
+	const aiScene* scene = importer.ReadFile(filename,
+		aiProcess_CalcTangentSpace |
+		aiProcess_Triangulate |
+		aiProcess_SortByPType);
+	// If the import failed, report it
+	if (!scene)
+	{
+		return 0;
+	}
+	Mesh* rtmesh = new Mesh;;
+	const struct aiMesh* mesh = scene->mMeshes[0];;
+	for (unsigned int t = 0; t < mesh->mNumFaces; ++t)
+	{
+		const struct aiFace * face = &mesh->mFaces[t];
+		
+		for (int i = 2; i >= 0; --i) {
+			glm::vec3 v(mesh->mVertices[face->mIndices[i]].x,
+				mesh->mVertices[face->mIndices[i]].y,
+				mesh->mVertices[face->mIndices[i]].z);
+
+			rtmesh->push_vert(v);
+		}
+
+
+	}
+	rtmesh->set_accelerator(new rt::core::DefaultAccelerator(rtmesh->get_adapter()));
+	return rtmesh;
 }
 void build_scene(rt::core::ResourceManager& manager, rt::core::Scene* scene) {
 	rt::core::MaterialId left_sph_mat =
@@ -122,7 +220,8 @@ void build_scene(rt::core::ResourceManager& manager, rt::core::Scene* scene) {
 		manager.add_material({ glm::vec3(0.4, 0.6, 0.9), glm::vec3(0.4, 0.4, 0.4) });
 
 
-	scene->push_node({ glm::mat4(), new Sphere(glm::vec3(0, 0, 0), 1) }, left_sph_mat);
+	//scene->push_node({ glm::mat4(), new Sphere(glm::vec3(0, 0, 0), 1) }, left_sph_mat);
+	scene->push_node({ glm::mat4(), make_mesh("box.dae") }, left_sph_mat);
 	scene->push_node({ glm::mat4(), new Sphere(glm::vec3(2, -0.6, 0), 1.25) }, right_sph_mat);
 
 
@@ -200,7 +299,7 @@ int main(int argc, char* argv[]) {
 
 	rt::core::Film film(&film_surface);
 
-	rt::core::Camera cam(glm::vec3(1, -0.1, -5), glm::vec3(1.5, -0.3, 0), 60, (float)WND_SIZE_X / (float)WND_SIZE_Y);
+	rt::core::Camera cam(glm::vec3(-2, -0.1, -5), glm::vec3(0, -0.3, 0), 60, (float)WND_SIZE_X / (float)WND_SIZE_Y);
 
 	rt::core::Scene scene;
 	build_scene(manager, &scene);
