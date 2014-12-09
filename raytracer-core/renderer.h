@@ -3,6 +3,8 @@
 #include "camera.h"
 #include "film.h"
 #include "resource_manager.h"
+#include <random>
+
 namespace rt {
 	namespace core {
 		class Sampler {
@@ -27,13 +29,12 @@ namespace rt {
 			SubSampler create_subsampler(glm::vec2 pos, glm::vec2 size) const;
 		};
 	
-
 		class Integrator {
 		public:
-			glm::vec3 calculate_ray() {
-
-			}
-			virtual Spectrum calculate_radiance(ResourceManager& man, const Scene& scene, Ray ray, Intersection isect) const {
+			glm::vec3 calculate_color(ResourceManager& man, const Scene& scene, Ray ray, Intersection isect, int depth) const {
+				if (depth > 1) {
+					return glm::vec3(0, 0, 0);
+				}
 				Material mat = man.material(isect.material);
 				Spectrum emitted = mat.emitted;
 
@@ -41,16 +42,32 @@ namespace rt {
 				Spectrum incident = glm::vec3(0, 0, 0);
 				Intersection nested;
 				Ray nray;
-				nray.origin = isect.position;
-				nray.direction = glm::normalize(glm::reflect(ray.direction, isect.normal));
-				if (scene.intersect(nray, &nested)) {
-					incident = man.material(nested.material).emitted;
-				}
-				float coef = glm::dot(isect.normal, nray.direction);
+				Spectrum reflected(0, 0, 0);
 
-				Spectrum reflected = glm::clamp(BRDF * incident * coef, glm::vec3(0, 0, 0), glm::vec3(1, 1, 1));
+				std::random_device rd;
+				std::mt19937 gen(rd());
+				std::uniform_real_distribution<float> dis(-0.2, 0.2);
+
+				for (int i = 0; i < 6; ++i) {
+					nray.origin = isect.position;
+					nray.direction = glm::reflect(ray.direction, isect.normal);
+					nray.direction.x += dis(gen);
+					nray.direction.y += dis(gen);
+					nray.direction.z += dis(gen);
+					nray.direction = glm::normalize(nray.direction);
+					if (scene.intersect(nray, &nested)) {
+						incident = calculate_color(man, scene, nray, nested, depth + 1);
+						float coef = glm::dot(isect.normal, nray.direction);
+
+						reflected += glm::clamp(BRDF * incident * coef, glm::vec3(0, 0, 0), glm::vec3(1, 1, 1));
+					}
+				}
+				reflected /= 6.0f;
 
 				return glm::clamp(emitted + reflected, glm::vec3(0, 0, 0), glm::vec3(1, 1, 1));
+			}
+			virtual Spectrum calculate_radiance(ResourceManager& man, const Scene& scene, Ray ray, Intersection isect) const {
+				return calculate_color(man, scene, ray, isect, 0);
 			}
 		};
 

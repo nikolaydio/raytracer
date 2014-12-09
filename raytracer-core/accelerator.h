@@ -28,7 +28,7 @@ namespace rt {
 				Intersection check;
 				check.d = 0;
 
-				result->d = 9999999999;
+				result->d = INFINITY;
 				for (int i = 0; i < _adapter.count(); ++i) {
 					if (_adapter.intersect(i, ray, &check)) {
 						if (check.d < result->d) {
@@ -36,7 +36,7 @@ namespace rt {
 						}
 					}
 				}
-				if (result->d > 999999999) {
+				if (result->d == INFINITY) {
 					return false;
 				}
 				return true;
@@ -45,5 +45,8 @@ namespace rt {
 				_adapter = adapter;
 			}
 		};
+
+		Accelerator* create_kdtree(ElementAdapter& adapter);
+		Accelerator* create_default_accelerator(ElementAdapter& adapter);
 	}
 }

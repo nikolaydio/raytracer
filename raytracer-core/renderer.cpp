@@ -54,6 +54,8 @@ namespace rt {
 			process_subsampler(sub_sampler);
 		}
 		void Renderer::process_subsampler(Sampler::SubSampler& sampler) {
+			printf("1");
+
 			Sampler::SubSampler& sub_sampler = sampler;
 
 			Sample* samples = new Sample[sub_sampler.max_samples()];

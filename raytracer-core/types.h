@@ -47,6 +47,10 @@ namespace rt {
 				_min = glm::min(glm::min(p1, p2), p3);
 				_max = glm::max(glm::max(p1, p2), p3);
 			}
+			AABB(const AABB a, const AABB b) {
+				_min = glm::min(a._min, b._min);
+				_max = glm::max(a._max, b._max);
+			}
 			AABB union_point(const glm::vec3 p) {
 				return AABB(_min, _max, p);
 			}
@@ -74,7 +78,27 @@ namespace rt {
 				//t = tmin;
 				return true;
 			}
-
+			bool intersect(const AABB b) const {
+				if (_max.x < b._min.x) {
+					return false;
+				}
+				if (_max.y < b._min.y) {
+					return false;
+				}
+				if (_max.z < b._min.z) {
+					return false;
+				}
+				if (_min.x > b._max.x) {
+					return false;
+				}
+				if (_min.y > b._max.y) {
+					return false;
+				}
+				if (_min.z > b._max.z) {
+					return false;
+				}
+				return true;
+			}
 			glm::vec3 _min;
 			glm::vec3 _max;
 

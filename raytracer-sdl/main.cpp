@@ -195,33 +195,39 @@ rt::core::Shape* make_mesh(const char* filename) {
 	for (unsigned int t = 0; t < mesh->mNumFaces; ++t)
 	{
 		const struct aiFace * face = &mesh->mFaces[t];
-		
+
 		for (int i = 2; i >= 0; --i) {
 			glm::vec3 v(mesh->mVertices[face->mIndices[i]].x,
 				mesh->mVertices[face->mIndices[i]].y,
 				mesh->mVertices[face->mIndices[i]].z);
+
 
 			rtmesh->push_vert(v);
 		}
 
 
 	}
-	rtmesh->set_accelerator(new rt::core::DefaultAccelerator(rtmesh->get_adapter()));
+	rtmesh->set_accelerator(rt::core::create_kdtree(rtmesh->get_adapter()));
 	return rtmesh;
 }
 void build_scene(rt::core::ResourceManager& manager, rt::core::Scene* scene) {
 	rt::core::MaterialId left_sph_mat =
-		manager.add_material({ glm::vec3(0.2, 0.86, 0.45), glm::vec3(0.2, 0.86, 0.45) });
+		manager.add_material({ glm::vec3(1, 1, 1), glm::vec3(0.2, 0.86, 0.45) });
 
 	rt::core::MaterialId right_sph_mat =
-		manager.add_material({ glm::vec3(0.69, 0.12, 0.164), glm::vec3(0.9, 0.04, 0.7) });
+		manager.add_material({ glm::vec3(1, 1, 1), glm::vec3(0.9, 0.04, 0.7) });
 
 	rt::core::MaterialId right_tri_mat =
-		manager.add_material({ glm::vec3(0.4, 0.6, 0.9), glm::vec3(0.4, 0.4, 0.4) });
+		manager.add_material({ glm::vec3(1, 1, 1), glm::vec3(0.4, 0.4, 0.4) });
 
+	rt::core::MaterialId white =
+		manager.add_material({ glm::vec3(0, 0, 0), glm::vec3(1, 1, 1) });
 
 	//scene->push_node({ glm::mat4(), new Sphere(glm::vec3(0, 0, 0), 1) }, left_sph_mat);
-	scene->push_node({ glm::mat4(), make_mesh("box.dae") }, left_sph_mat);
+	glm::mat4 mesh_trans(1.);
+	mesh_trans = glm::rotate(mesh_trans, 140.0f, glm::vec3(1.f, 0.f, 0.f));
+	mesh_trans = glm::translate(mesh_trans, glm::vec3(1, -0, 0));
+	scene->push_node({ mesh_trans, make_mesh("chasha.dae") }, left_sph_mat);
 	scene->push_node({ glm::mat4(), new Sphere(glm::vec3(2, -0.6, 0), 1.25) }, right_sph_mat);
 
 
@@ -233,6 +239,10 @@ void build_scene(rt::core::ResourceManager& manager, rt::core::Scene* scene) {
 	float pos = 15;
 	shape = new Triangle(glm::vec3(-300, -300, pos), glm::vec3(0, 200, pos), glm::vec3(300, -300, pos));
 	scene->push_node({ glm::mat4(), shape }, right_tri_mat);
+
+	pos = 15;
+	shape = new Triangle(glm::vec3(1000, 300, pos), glm::vec3(0, -30.f, -40.f), glm::vec3(-1000, 300, pos));
+	//scene->push_node({ glm::mat4(), shape }, white);
 }
 
 void putpixel(SDL_Surface *surface, int x, int y, Uint32 pixel)
@@ -270,13 +280,14 @@ void putpixel(SDL_Surface *surface, int x, int y, Uint32 pixel)
 }
 
 void test() {
+	{
 	Triangle a(glm::vec3(0, 0, 0), glm::vec3(0, 1, 0), glm::vec3(1, 0, 0));
 	rt::core::Intersection isect;
 	rt::core::Ray ray;
 	ray.origin = glm::vec3(0.1, 0.1, -1);
 	ray.direction = glm::vec3(0, 0, 1);
 	assert(a.intersect(ray, &isect));
-	assert(isect.normal == glm::vec3(0,0,-1));
+	assert(isect.normal == glm::vec3(0, 0, -1));
 	assert(isect.position == glm::vec3(0.1, 0.1, 0));
 
 	ray.origin = glm::vec3(1, 1, -1);
@@ -287,6 +298,28 @@ void test() {
 	assert(a.intersect(ray, &isect));
 	assert(isect.normal == glm::vec3(0, 0, -1));
 	assert(isect.position == glm::vec3(0.1, 0.1, 0));
+
+	float fa = -INFINITY;
+	float fb = 10;
+	assert(!(fa > fb));
+	assert((fa < fb));
+	}
+
+
+
+
+
+
+	glm::vec4 a(0, 0, 0, 1), b(1, 0, 0, 0), c(1, 1, 1, 0);
+	glm::mat4 transform;
+	transform = glm::rotate(transform, 90.0f, glm::vec3(0, 1, 0));
+	glm::vec4 a1 = transform * a;
+	glm::vec4 b1 = transform * b;
+	glm::vec4 c1 = transform * c;
+
+	glm::vec4 a2 = glm::inverse(transform) * a1;
+	glm::vec4 b2 = glm::inverse(transform) * b1;
+	glm::vec4 c2 = glm::inverse(transform) * c1;
 }
 
 int main(int argc, char* argv[]) {
