@@ -4,6 +4,12 @@
 #include <chrono>
 #include <iostream>
 
+#include <assimp/Importer.hpp> // C++ importer interface
+#include <assimp/scene.h> // Output data structure
+#include <assimp/postprocess.h> // Post processing flags
+#include <assimp/mesh.h>
+
+
 #define WND_SIZE_X 640
 #define WND_SIZE_Y 480
 
@@ -69,8 +75,7 @@ public:
 		glm::vec3 s1 = glm::cross(ray.direction, e2);
 		float divisor = glm::dot(s1, e1);
 
-		//this line is looking suspicious
-		if (divisor == 0.) {
+		if (glm::abs(divisor) < 0.00000001) {
 			return false;
 		}
 		float invDivisor = 1.f / divisor;
@@ -87,6 +92,7 @@ public:
 			return false;
 		}
 		float t = glm::dot(e2, s2) * invDivisor;
+		
 		//this is a threashhold for not colliding with itself
 		if (t < 0.0001) {
 			return false;
@@ -101,50 +107,144 @@ public:
 	}
 };
 
-void build_scene(rt::core::Scene* scene) {
-	rt::core::Material mat;
-	mat.emitted = glm::vec3(0.2, 0.86, 0.45);
-	mat.reflected = glm::vec3(0.2, 0.86, 0.45);
-	rt::core::MaterialId left_sph_mat = scene->new_material(mat);
+class Mesh : public rt::core::Shape {
+	std::vector<glm::vec3> points;
+	class MeshAdapter : public rt::core::ElementAdapter {
+		std::vector<glm::vec3>& _mesh;
 
-	mat.emitted = glm::vec3(0.69, 0.12, 0.164);
-	mat.reflected = glm::vec3(0.9, 0.04, 0.7);
-	rt::core::MaterialId right_sph_mat = scene->new_material(mat);
+	public:
+		MeshAdapter(std::vector<glm::vec3>& mesh) : _mesh(mesh) {}
+		virtual int count() {
+			return _mesh.size() / 3;
+		}
+		virtual rt::core::AABB get_bounding_box(int index) const {
+			rt::core::AABB aabb(
+				_mesh[index * 3], _mesh[index * 3 + 1], _mesh[index * 3 + 2]);
 
-	mat.emitted = glm::vec3(1, 1, 1);
-	mat.reflected = glm::vec3(0.4, 0.4, 0.4);
-	rt::core::MaterialId right_tri_mat = scene->new_material(mat);
+			return aabb;
+		}
+		virtual bool intersect(int index, rt::core::Ray ray, rt::core::Intersection* result) const {
+			Triangle tri(_mesh[index * 3], _mesh[index * 3 + 1], _mesh[index * 3 + 2]);
+			return tri.intersect(ray, result);
+		}
+	};
+	MeshAdapter _adapter;
+	rt::core::Accelerator* _accelerator;
+	rt::core::AABB bbox;
+public:
+	Mesh() : _accelerator(0), _adapter(points) { }
+	rt::core::ElementAdapter& get_adapter() {
+		return _adapter;
+	}
+	void push_face(glm::vec3 a, glm::vec3 b, glm::vec3 c) {
+		points.push_back(a);
+		points.push_back(b);
+		points.push_back(c);
+	}
+	void push_vert(glm::vec3 a) {
+		points.push_back(a);
+	}
+	void set_accelerator(rt::core::Accelerator* acc) {
+		_accelerator = acc;
+		acc->rebuild(_adapter);
+		bbox = get_bounding_box();
+	}
+	bool intersect(rt::core::Ray ray, rt::core::Intersection* result) const {
+		if (!bbox.intersect(ray)) {
+			return false;
+		}
+		return _accelerator->intersect(ray, result);
+	}
+	rt::core::AABB get_bounding_box() const {
+		rt::core::AABB aabb(points[0]);
+		for (int i = 1; i < points.size(); ++i) {
+			aabb = aabb.union_point(points[i]);
+		}
+		return aabb;
+	}
+};
 
-	mat.emitted = glm::vec3(0.14, 0.15, 0.37);
-	mat.reflected = glm::vec3(0.6, 0.6, 0.6);
-	rt::core::MaterialId blue = scene->new_material(mat);
+#define MURMUR_STRING(str, seed) (rt::core::MurmurHash2(str, strlen(str), seed))
+rt::core::MaterialId make_material(const char* path, rt::core::ResourceManager& man, rt::core::Material mat) {
+	rt::core::Material* pmat = new rt::core::Material(mat);
+	rt::core::MaterialId hash = rt::core::MurmurHash2(path, strlen(path), 0);
+	uint32_t type_hash = MURMUR_STRING(".material", 0);
+
+	//man.add_resource({ hash, type_hash }, { pmat , sizeof(rt::core::Material) });
+	man.add_material(mat);
+	return hash;
+}
+
+rt::core::Shape* make_mesh(const char* filename) {
+	Assimp::Importer importer;
+
+	// And have it read the given file with some example postprocessing
+	// Usually - if speed is not the most important aspect for you - you'll
+	// propably to request more postprocessing than we do in this example.
+	const aiScene* scene = importer.ReadFile(filename,
+		aiProcess_CalcTangentSpace |
+		aiProcess_Triangulate |
+		aiProcess_SortByPType);
+	// If the import failed, report it
+	if (!scene)
+	{
+		return 0;
+	}
+	Mesh* rtmesh = new Mesh;;
+	const struct aiMesh* mesh = scene->mMeshes[0];;
+	for (unsigned int t = 0; t < mesh->mNumFaces; ++t)
+	{
+		const struct aiFace * face = &mesh->mFaces[t];
+
+		for (int i = 2; i >= 0; --i) {
+			glm::vec3 v(mesh->mVertices[face->mIndices[i]].x,
+				mesh->mVertices[face->mIndices[i]].z,
+				mesh->mVertices[face->mIndices[i]].y);
 
 
-	mat.emitted = glm::vec3(0.98, 0.98, 0.98);
-	mat.reflected = glm::vec3(0.1, 0.1, 0.1);
-	rt::core::MaterialId white = scene->new_material(mat);
-
-	rt::core::Shape* shape = new Sphere(glm::vec3(0, 0, 0), 1);
-	rt::core::GeoPrimitive* prim = new rt::core::GeoPrimitive(shape, left_sph_mat);
-	scene->add_primitive(prim);
-
-	shape = new Sphere(glm::vec3(2, -0.6, 0), 1.25);
-	prim = new rt::core::GeoPrimitive(shape, right_sph_mat);
-	scene->add_primitive(prim);
-
-	shape = new Sphere(glm::vec3(1.5, -2, 0), 0.65);
-	prim = new rt::core::GeoPrimitive(shape, white);
-	scene->add_primitive(prim);
+			rtmesh->push_vert(v);
+		}
 
 
-	shape = new Triangle(glm::vec3(15,-5,10), glm::vec3(15, 5, 9), glm::vec3(15, -5, 5));
-	prim = new rt::core::GeoPrimitive(shape, right_tri_mat);
-	scene->add_primitive(prim);
+	}
+	rtmesh->set_accelerator(rt::core::create_kdtree(rtmesh->get_adapter()));
+	return rtmesh;
+}
+void build_scene(rt::core::ResourceManager& manager, rt::core::Scene* scene) {
+	rt::core::MaterialId left_sph_mat =
+		manager.add_material({ glm::vec3(1, 1, 1), glm::vec3(0.2, 0.86, 0.45) });
 
-	float pos = 100;
+	rt::core::MaterialId right_sph_mat =
+		manager.add_material({ glm::vec3(1, 1, 1), glm::vec3(0.9, 0.04, 0.7) });
+
+	rt::core::MaterialId right_tri_mat =
+		manager.add_material({ glm::vec3(1, 1, 1), glm::vec3(0.4, 0.4, 0.4) });
+
+	rt::core::MaterialId white =
+		manager.add_material({ glm::vec3(0, 0, 0), glm::vec3(1, 1, 1) });
+
+	//scene->push_node({ glm::mat4(), new Sphere(glm::vec3(0, 0, 0), 1) }, left_sph_mat);
+	glm::mat4 mesh_trans;
+	mesh_trans = glm::rotate(mesh_trans, 45.0f, glm::vec3(1.f, 0.f, 0.f));
+	mesh_trans = glm::translate(mesh_trans, glm::vec3(-0.7, 1.4, 0));
+	scene->push_node({ mesh_trans, make_mesh("chasha.dae") }, left_sph_mat);
+	glm::mat4 sph_trans;
+	sph_trans = glm::translate(sph_trans, glm::vec3(0.7, 0.0, 0.4));
+	scene->push_node({ sph_trans, new Sphere(glm::vec3(0, 0, 0), 0.6) }, right_sph_mat);
+
+
+
+	float height = -5.0f;
+	rt::core::Shape* shape = new Triangle(glm::vec3(-3000, height, -300), glm::vec3(0, height, 300), glm::vec3(3000, height, -300));
+	scene->push_node({ glm::mat4(), shape }, right_tri_mat);
+
+	float pos = 15;
 	shape = new Triangle(glm::vec3(-300, -300, pos), glm::vec3(0, 200, pos), glm::vec3(300, -300, pos));
-	prim = new rt::core::GeoPrimitive(shape, blue);
-	scene->add_primitive(prim);
+	scene->push_node({ glm::mat4(), shape }, right_tri_mat);
+
+	pos = 15;
+	shape = new Triangle(glm::vec3(1000, 300, pos), glm::vec3(0, -30.f, -40.f), glm::vec3(-1000, 300, pos));
+	//scene->push_node({ glm::mat4(), shape }, white);
 }
 
 void putpixel(SDL_Surface *surface, int x, int y, Uint32 pixel)
@@ -182,13 +282,14 @@ void putpixel(SDL_Surface *surface, int x, int y, Uint32 pixel)
 }
 
 void test() {
+	{
 	Triangle a(glm::vec3(0, 0, 0), glm::vec3(0, 1, 0), glm::vec3(1, 0, 0));
 	rt::core::Intersection isect;
 	rt::core::Ray ray;
 	ray.origin = glm::vec3(0.1, 0.1, -1);
 	ray.direction = glm::vec3(0, 0, 1);
 	assert(a.intersect(ray, &isect));
-	assert(isect.normal == glm::vec3(0,0,-1));
+	assert(isect.normal == glm::vec3(0, 0, -1));
 	assert(isect.position == glm::vec3(0.1, 0.1, 0));
 
 	ray.origin = glm::vec3(1, 1, -1);
@@ -199,28 +300,53 @@ void test() {
 	assert(a.intersect(ray, &isect));
 	assert(isect.normal == glm::vec3(0, 0, -1));
 	assert(isect.position == glm::vec3(0.1, 0.1, 0));
+
+	float fa = -INFINITY;
+	float fb = 10;
+	assert(!(fa > fb));
+	assert((fa < fb));
+	}
+
+
+
+
+
+
+	glm::vec4 a(0, 0, 0, 1), b(1, 0, 0, 0), c(154, 1234, 132, 1);
+	glm::mat4 transform;
+	transform = glm::rotate(transform, 90.0f, glm::vec3(0, 1, 0));
+	transform = glm::translate(transform, glm::vec3(10, 0, 10));
+	glm::vec4 a1 = transform * a;
+	glm::vec4 b1 = transform * b;
+	glm::vec4 c1 = transform * c;
+
+	glm::mat4 inv(glm::inverse(transform));
+	glm::vec4 a2 = inv * a1;
+	glm::vec4 b2 = inv * b1;
+	glm::vec4 c2 = inv * c1;
 }
 
 int main(int argc, char* argv[]) {
 #ifdef _DEBUG
 	test();
 #endif
+	rt::core::ResourceManager manager;
 
 	rt::core::Surface2d film_surface(WND_SIZE_X, WND_SIZE_Y);
 
 	rt::core::Film film(&film_surface);
 
-	rt::core::Camera cam(glm::vec3(1, -0.1, -5), glm::vec3(1.5, -0.3, 0), 60, (float)WND_SIZE_X / (float)WND_SIZE_Y);
+	rt::core::Camera cam(glm::vec3(-2, -0.1, -5), glm::vec3(0, -0.3, 0), 60, (float)WND_SIZE_X / (float)WND_SIZE_Y);
 
 	rt::core::Scene scene;
-	build_scene(&scene);
+	build_scene(manager, &scene);
 
-	scene.accelerate_and_rebuild(new rt::core::DefaultAccelerator);
+	scene.accelerate_and_rebuild(new rt::core::DefaultAccelerator(scene.get_adapter()));
 
-	rt::core::Sampler sampler(1);
+	rt::core::Sampler sampler(4);
 	rt::core::Integrator integrator;
 
-	rt::core::Renderer renderer(sampler, cam, scene, integrator);
+	rt::core::Renderer renderer(sampler, cam, scene, integrator, manager);
 	renderer.film() = &film;
 
 	auto begin = std::chrono::high_resolution_clock::now();
@@ -262,7 +388,6 @@ int main(int argc, char* argv[]) {
 		}
 
 		SDL_LockSurface(surface);
-		uint32_t* pixels = (uint32_t*)surface->pixels;
 		for (int y = 0; y < h; ++y) {
 			for (int x = 0; x < w; ++x) {
 				putpixel(surface, x, y, *(Uint32*)&film_surface.pixel(x, y));

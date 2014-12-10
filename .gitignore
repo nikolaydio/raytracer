@@ -33,3 +33,6 @@ obj
 3rdparty
 *.suo
 *.user
+*.psess
+*.vsp
+doc

@@ -37,13 +37,12 @@ namespace rt {
 		}
 
 
-
-
 		Renderer::Renderer(const Sampler& sampler,
 			const Camera& camera,
 			const Scene& scene,
-			const Integrator& integrator) 
-		: _sampler(sampler), _camera(camera), _scene(scene), _integrator(integrator) {
+			const Integrator& integrator,
+			ResourceManager& manager)
+		: _sampler(sampler), _camera(camera), _scene(scene), _integrator(integrator), _manager(manager) {
 
 		}
 
@@ -55,6 +54,8 @@ namespace rt {
 			process_subsampler(sub_sampler);
 		}
 		void Renderer::process_subsampler(Sampler::SubSampler& sampler) {
+			printf("1");
+
 			Sampler::SubSampler& sub_sampler = sampler;
 
 			Sample* samples = new Sample[sub_sampler.max_samples()];
@@ -68,7 +69,7 @@ namespace rt {
 
 					Intersection intersection;
 					if (_scene.intersect(ray, &intersection)) {
-						glm::vec3 color = _integrator.calculate_radiance(_scene, ray, intersection);
+						glm::vec3 color = _integrator.calculate_radiance(_manager, _scene, ray, intersection);
 
 						_film->apply_radiance((int)original_position.x, (int)original_position.y, Color(color));
 					}

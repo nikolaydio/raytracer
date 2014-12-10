@@ -2,6 +2,9 @@
 #include "scene.h"
 #include "camera.h"
 #include "film.h"
+#include "resource_manager.h"
+#include <random>
+
 namespace rt {
 	namespace core {
 		class Sampler {
@@ -25,29 +28,46 @@ namespace rt {
 			};
 			SubSampler create_subsampler(glm::vec2 pos, glm::vec2 size) const;
 		};
-		
+	
 		class Integrator {
 		public:
-			glm::vec3 calculate_ray() {
+			glm::vec3 calculate_color(ResourceManager& man, const Scene& scene, Ray ray, Intersection isect, int depth) const {
+				if (depth > 1) {
+					return glm::vec3(0, 0, 0);
+				}
+				Material mat = man.material(isect.material);
+				Spectrum emitted = mat.emitted;
 
-			}
-			virtual Spectrum calculate_radiance(const Scene& scene, Ray ray, Intersection isect) const {
-				Spectrum emitted = scene.get_material(isect.material).emitted;
-
-				glm::vec3 BRDF = scene.get_material(isect.material).reflected;
+				glm::vec3 BRDF = mat.reflected;
 				Spectrum incident = glm::vec3(0, 0, 0);
 				Intersection nested;
 				Ray nray;
-				nray.origin = isect.position;
-				nray.direction = glm::normalize(glm::reflect(ray.direction, isect.normal));
-				if (scene.intersect(nray, &nested)) {
-					incident = scene.get_material(nested.material).emitted;
-				}
-				float coef = glm::dot(isect.normal, nray.direction);
+				Spectrum reflected(0, 0, 0);
 
-				Spectrum reflected = glm::clamp(BRDF * incident * coef, glm::vec3(0, 0, 0), glm::vec3(1, 1, 1));
+				std::random_device rd;
+				std::mt19937 gen(rd());
+				std::uniform_real_distribution<float> dis(-0.1, 0.1);
+
+				for (int i = 0; i < 3; ++i) {
+					nray.origin = isect.position;
+					nray.direction = glm::reflect(ray.direction, isect.normal);
+					nray.direction.x += dis(gen);
+					nray.direction.y += dis(gen);
+					nray.direction.z += dis(gen);
+					nray.direction = glm::normalize(nray.direction);
+					if (scene.intersect(nray, &nested)) {
+						incident = calculate_color(man, scene, nray, nested, depth + 1);
+						float coef = glm::dot(isect.normal, nray.direction);
+
+						reflected += glm::clamp(BRDF * incident * coef, glm::vec3(0, 0, 0), glm::vec3(1, 1, 1));
+					}
+				}
+				reflected /= 3.0f;
 
 				return glm::clamp(emitted + reflected, glm::vec3(0, 0, 0), glm::vec3(1, 1, 1));
+			}
+			virtual Spectrum calculate_radiance(ResourceManager& man, const Scene& scene, Ray ray, Intersection isect) const {
+				return calculate_color(man, scene, ray, isect, 0);
 			}
 		};
 
@@ -56,6 +76,7 @@ namespace rt {
 			const Camera& _camera;
 			const Scene& _scene;
 			const Integrator& _integrator;
+			ResourceManager& _manager;
 			
 			Film* _film;
 
@@ -64,7 +85,8 @@ namespace rt {
 			Renderer(const Sampler& sampler,
 				const Camera& camera,
 				const Scene& scene,
-				const Integrator& integrator);
+				const Integrator& integrator,
+				ResourceManager& manager);
 
 			~Renderer() {}
 

@@ -3,28 +3,6 @@
 namespace rt {
 	namespace core {
 
-		bool DefaultAccelerator::intersect(Ray ray, Intersection* result) const {
-			Intersection check;
-			check.d = 0;
-
-			result->d = 9999999999;
-			for (int i = 0; i < _scene->primitive_count(); ++i) {
-				if (_scene->get_primitive(i)->intersect(ray, &check)) {
-					if (check.d < result->d) {
-						*result = check;
-					}
-				}
-			}
-			if (result->d > 999999999) {
-				return false;
-			}
-			return true;
-		}
-		void DefaultAccelerator::build_from(const Scene& scene) {
-			_scene = &scene;
-		}
-
-
 
 
 		bool Scene::intersect(Ray ray, Intersection* result) const {
@@ -32,41 +10,132 @@ namespace rt {
 			return _accelerator->intersect(ray, result);
 		}
 
-		void Scene::add_primitive(Primitive* prim) {
-			assert(prim);
-			_primitives.push_back(prim);
+		uint32_t Scene::node_count() const {
+			return _node_count;
+		}
+		uint32_t Scene::node_capacity() const {
+			return _node_capacity;
+		}
+		uint32_t Scene::set_capacity(uint32_t new_total) {
+			Node* new_nodes = 0;
+			MaterialId* new_mats = 0;
+			int to_copy = glm::min(_node_count, new_total);
+			_node_count = to_copy;
+
+			if (new_total != 0) {
+				new_nodes = new Node[new_total];
+				new_mats = new MaterialId[new_total];
+			}
+			
+			if (_nodes != 0) {
+				memcpy(new_nodes, _nodes, sizeof(Node) * to_copy);
+				delete[] _nodes;
+			}
+			if (_materials != 0) {
+				memcpy(new_mats, _materials, sizeof(MaterialId) * to_copy);
+				delete[] _materials;
+			}
+			_nodes = new_nodes;
+			_materials = new_mats;
+			_node_capacity = new_total;
+			return _node_count;
+		}
+		uint32_t Scene::ensure_capacity(uint32_t at_least) {
+			if (at_least >= _node_capacity) {
+				set_capacity(((at_least / 16) + 1) * 16 );
+			}
+			return _node_count;
+		}
+		uint32_t Scene::push_node(Node node, MaterialId material) {
+			ensure_capacity(_node_count + 1);
+			_nodes[_node_count] = node;
+			_materials[_node_count] = material;
+			_node_count += 1;
+			return _node_count;
+		}
+		void Scene::erase_node(uint32_t index) {
+			_node_count -= 1;
+			_nodes[index] = _nodes[_node_count];
+			_materials[index] = _materials[index];
 		}
 
-		const Material& Scene::get_material(MaterialId id) const {
-			return _materials[id];
+		MaterialId Scene::material(uint32_t index) const {
+			return _materials[index];
 		}
-		MaterialId Scene::new_material(Material mat) {
-			_materials.push_back(mat);
-			return _materials.size() - 1;
+		Node Scene::node(uint32_t index) const {
+			return _nodes[index];
 		}
 
-		int Scene::primitive_count() const {
-			return _primitives.size();
-		}
-		const Primitive* Scene::get_primitive(int index) const {
-			return _primitives[index];
-		}
 
 		void Scene::accelerate_and_rebuild(Accelerator* pacc) {
-			//was thinking to add a case where the same object is passed
-			//to rebuild the scene, but it is too confusing
+
 
 			assert(pacc != _accelerator);
 			if (pacc != 0) {
 				delete _accelerator;
-				pacc->build_from(*this);
+				pacc->rebuild(_adapter);
 				_accelerator = pacc;
 			} else if (_accelerator != 0) {
-				_accelerator->build_from(*this);
+				_accelerator->rebuild(_adapter);
 			} else {
 				//old is 0, new is 0. Probably a mistake. Better tell the human.
 				assert(0);
 			}
 		}
+		ElementAdapter& Scene::get_adapter() {
+			return _adapter;
+		}
+
+
+		int Scene::SceneAccAdapter::count() {
+			return _scene.node_count();
+		}
+		AABB Scene::SceneAccAdapter::get_bounding_box(int index) const {
+			AABB bbox = _scene.node(index).shape->get_bounding_box();
+			glm::mat4 transform = _scene.node(index).transform;
+			bbox._min = glm::vec3(transform * glm::vec4(bbox._min, 1.0f));
+			bbox._max = glm::vec3(transform * glm::vec4(bbox._max, 1.0f));
+			glm::vec4 corners[8];
+			corners[0] = glm::vec4(bbox._min, 1.0f);
+			corners[1] = glm::vec4(bbox._max, 1.0f);
+
+			corners[2] = glm::vec4(bbox._max.x, bbox._min.y, bbox._min.z, 1.0f);
+			corners[3] = glm::vec4(bbox._max.x, bbox._max.y, bbox._min.z, 1.0f);
+			corners[4] = glm::vec4(bbox._min.x, bbox._max.y, bbox._min.z, 1.0f);
+
+			corners[5] = glm::vec4(bbox._min.x, bbox._max.y, bbox._max.z, 1.0f);
+			corners[6] = glm::vec4(bbox._min.x, bbox._min.y, bbox._max.z, 1.0f);
+			corners[7] = glm::vec4(bbox._max.x, bbox._min.y, bbox._max.z, 1.0f);
+
+			for (int i = 0; i < 8; ++i) {
+				corners[i] = transform * corners[i];
+			}
+
+			bbox = AABB(glm::vec3(corners[0]));
+			for (int i = 1; i < 8; ++i) {
+				bbox = bbox.union_point(glm::vec3(corners[i]));
+			}
+
+			return bbox;
+		}
+		bool Scene::SceneAccAdapter::intersect(int index, Ray ray, Intersection* result) const {
+			Node node = _scene.node(index);
+			//convert input from world to local space
+			//*** todo. Once transforms are changed this will stop working
+			ray.origin = glm::vec3(node.transform * glm::vec4(ray.origin, 1));
+			ray.direction = glm::vec3(node.transform * glm::vec4(ray.direction, 0));
+
+			result->d = INFINITY;
+			if (node.shape->intersect(ray, result)) {
+				//convert output from local to world space
+				glm::mat4 inv = glm::inverse(node.transform);
+				result->normal = glm::normalize(glm::vec3(inv * glm::vec4(result->normal, 0)));
+				result->position = glm::vec3(inv * glm::vec4(result->position, 1));
+				result->material = _scene.material(index);
+				return true;
+			}
+			return false;
+		}
+
 	}
 }
