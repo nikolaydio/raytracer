@@ -11,13 +11,12 @@ namespace rt {
 	
 
 
-#pragma pack(push, 128)
+
 		class Node {
 		public:
 			glm::mat4 transform;
 			Shape* shape;
 		};
-#pragma pack(pop)
 
 		class Scene {
 		public:
@@ -59,6 +58,9 @@ namespace rt {
 				virtual bool intersect(int index, Ray ray, Intersection* result) const;
 			private:
 				Scene& _scene;
+				SceneAccAdapter& operator=(const SceneAccAdapter&) {
+					return *this;
+				}
 			};
 			SceneAccAdapter _adapter;
 		};

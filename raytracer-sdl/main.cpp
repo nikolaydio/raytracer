@@ -198,8 +198,8 @@ rt::core::Shape* make_mesh(const char* filename) {
 
 		for (int i = 2; i >= 0; --i) {
 			glm::vec3 v(mesh->mVertices[face->mIndices[i]].x,
-				mesh->mVertices[face->mIndices[i]].y,
-				mesh->mVertices[face->mIndices[i]].z);
+				mesh->mVertices[face->mIndices[i]].z,
+				mesh->mVertices[face->mIndices[i]].y);
 
 
 			rtmesh->push_vert(v);
@@ -224,11 +224,13 @@ void build_scene(rt::core::ResourceManager& manager, rt::core::Scene* scene) {
 		manager.add_material({ glm::vec3(0, 0, 0), glm::vec3(1, 1, 1) });
 
 	//scene->push_node({ glm::mat4(), new Sphere(glm::vec3(0, 0, 0), 1) }, left_sph_mat);
-	glm::mat4 mesh_trans(1.);
-	mesh_trans = glm::rotate(mesh_trans, 140.0f, glm::vec3(1.f, 0.f, 0.f));
-	mesh_trans = glm::translate(mesh_trans, glm::vec3(1, -0, 0));
+	glm::mat4 mesh_trans;
+	mesh_trans = glm::rotate(mesh_trans, 45.0f, glm::vec3(1.f, 0.f, 0.f));
+	mesh_trans = glm::translate(mesh_trans, glm::vec3(-0.7, 1.4, 0));
 	scene->push_node({ mesh_trans, make_mesh("chasha.dae") }, left_sph_mat);
-	scene->push_node({ glm::mat4(), new Sphere(glm::vec3(2, -0.6, 0), 1.25) }, right_sph_mat);
+	glm::mat4 sph_trans;
+	sph_trans = glm::translate(sph_trans, glm::vec3(0.7, 0.0, 0.4));
+	scene->push_node({ sph_trans, new Sphere(glm::vec3(0, 0, 0), 0.6) }, right_sph_mat);
 
 
 
@@ -310,16 +312,18 @@ void test() {
 
 
 
-	glm::vec4 a(0, 0, 0, 1), b(1, 0, 0, 0), c(1, 1, 1, 0);
+	glm::vec4 a(0, 0, 0, 1), b(1, 0, 0, 0), c(154, 1234, 132, 1);
 	glm::mat4 transform;
 	transform = glm::rotate(transform, 90.0f, glm::vec3(0, 1, 0));
+	transform = glm::translate(transform, glm::vec3(10, 0, 10));
 	glm::vec4 a1 = transform * a;
 	glm::vec4 b1 = transform * b;
 	glm::vec4 c1 = transform * c;
 
-	glm::vec4 a2 = glm::inverse(transform) * a1;
-	glm::vec4 b2 = glm::inverse(transform) * b1;
-	glm::vec4 c2 = glm::inverse(transform) * c1;
+	glm::mat4 inv(glm::inverse(transform));
+	glm::vec4 a2 = inv * a1;
+	glm::vec4 b2 = inv * b1;
+	glm::vec4 c2 = inv * c1;
 }
 
 int main(int argc, char* argv[]) {
@@ -339,7 +343,7 @@ int main(int argc, char* argv[]) {
 
 	scene.accelerate_and_rebuild(new rt::core::DefaultAccelerator(scene.get_adapter()));
 
-	rt::core::Sampler sampler(1);
+	rt::core::Sampler sampler(4);
 	rt::core::Integrator integrator;
 
 	rt::core::Renderer renderer(sampler, cam, scene, integrator, manager);
@@ -384,7 +388,6 @@ int main(int argc, char* argv[]) {
 		}
 
 		SDL_LockSurface(surface);
-		uint32_t* pixels = (uint32_t*)surface->pixels;
 		for (int y = 0; y < h; ++y) {
 			for (int x = 0; x < w; ++x) {
 				putpixel(surface, x, y, *(Uint32*)&film_surface.pixel(x, y));

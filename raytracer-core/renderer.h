@@ -46,9 +46,9 @@ namespace rt {
 
 				std::random_device rd;
 				std::mt19937 gen(rd());
-				std::uniform_real_distribution<float> dis(-0.2, 0.2);
+				std::uniform_real_distribution<float> dis(-0.1, 0.1);
 
-				for (int i = 0; i < 6; ++i) {
+				for (int i = 0; i < 3; ++i) {
 					nray.origin = isect.position;
 					nray.direction = glm::reflect(ray.direction, isect.normal);
 					nray.direction.x += dis(gen);
@@ -62,7 +62,7 @@ namespace rt {
 						reflected += glm::clamp(BRDF * incident * coef, glm::vec3(0, 0, 0), glm::vec3(1, 1, 1));
 					}
 				}
-				reflected /= 6.0f;
+				reflected /= 3.0f;
 
 				return glm::clamp(emitted + reflected, glm::vec3(0, 0, 0), glm::vec3(1, 1, 1));
 			}

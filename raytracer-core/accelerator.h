@@ -18,6 +18,10 @@ namespace rt {
 			virtual void rebuild(ElementAdapter& adapter) = 0;
 		protected:
 			ElementAdapter& _adapter;
+		private:
+			Accelerator& operator=(const Accelerator&) {
+				return *this;
+			}
 		};
 
 		class DefaultAccelerator : public Accelerator {

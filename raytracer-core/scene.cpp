@@ -128,7 +128,7 @@ namespace rt {
 			result->d = INFINITY;
 			if (node.shape->intersect(ray, result)) {
 				//convert output from local to world space
-				glm::mat4 inv = glm::transpose(glm::inverse(node.transform));
+				glm::mat4 inv = glm::inverse(node.transform);
 				result->normal = glm::normalize(glm::vec3(inv * glm::vec4(result->normal, 0)));
 				result->position = glm::vec3(inv * glm::vec4(result->position, 1));
 				result->material = _scene.material(index);
