@@ -95,10 +95,10 @@
     <ClInclude Include="camera.h" />
     <ClInclude Include="config.h" />
     <ClInclude Include="film.h" />
-    <ClInclude Include="primitive.h" />
     <ClInclude Include="renderer.h" />
     <ClInclude Include="resource_manager.h" />
     <ClInclude Include="scene.h" />
+    <ClInclude Include="shape.h" />
     <ClInclude Include="surface.h" />
     <ClInclude Include="types.h" />
   </ItemGroup>
@@ -107,10 +107,10 @@
     <ClCompile Include="film.cpp" />
     <ClCompile Include="kdtree.cpp" />
     <ClCompile Include="murmurhash2.cpp" />
-    <ClCompile Include="primitive.cpp" />
     <ClCompile Include="renderer.cpp" />
     <ClCompile Include="resource_manager.cpp" />
     <ClCompile Include="scene.cpp" />
+    <ClCompile Include="shape.cpp" />
     <ClCompile Include="surface.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

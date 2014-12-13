@@ -16,9 +16,6 @@
     <ClInclude Include="scene.h">
       <Filter>Raytracer\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="primitive.h">
-      <Filter>Raytracer\Scene</Filter>
-    </ClInclude>
     <ClInclude Include="types.h">
       <Filter>Raytracer</Filter>
     </ClInclude>
@@ -30,6 +27,9 @@
     </ClInclude>
     <ClInclude Include="accelerator.h">
       <Filter>Raytracer\Accelerators</Filter>
+    </ClInclude>
+    <ClInclude Include="shape.h">
+      <Filter>Raytracer\Shape</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -48,9 +48,6 @@
     <ClCompile Include="scene.cpp">
       <Filter>Raytracer\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="primitive.cpp">
-      <Filter>Raytracer\Scene</Filter>
-    </ClCompile>
     <ClCompile Include="kdtree.cpp">
       <Filter>Raytracer\Accelerators</Filter>
     </ClCompile>
@@ -59,6 +56,9 @@
     </ClCompile>
     <ClCompile Include="murmurhash2.cpp">
       <Filter>Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="shape.cpp">
+      <Filter>Raytracer\Shape</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -85,6 +85,9 @@
     </Filter>
     <Filter Include="Raytracer\Resource">
       <UniqueIdentifier>{2ff4b4d8-a3cc-4459-ab50-92010e317650}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Raytracer\Shape">
+      <UniqueIdentifier>{a33e2e77-5870-4008-9d92-d87758bf2293}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

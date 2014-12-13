@@ -32,7 +32,7 @@ namespace rt {
 		class Integrator {
 		public:
 			glm::vec3 calculate_color(ResourceManager& man, const Scene& scene, Ray ray, Intersection isect, int depth) const {
-				if (depth > 1) {
+				if (depth > 3) {
 					return glm::vec3(0, 0, 0);
 				}
 				Material mat = man.material(isect.material);
@@ -46,9 +46,9 @@ namespace rt {
 
 				std::random_device rd;
 				std::mt19937 gen(rd());
-				std::uniform_real_distribution<float> dis(-0.1, 0.1);
+				std::uniform_real_distribution<float> dis(-0.175, 0.175);
 
-				for (int i = 0; i < 3; ++i) {
+				for (int i = 0; i < 2; ++i) {
 					nray.origin = isect.position;
 					nray.direction = glm::reflect(ray.direction, isect.normal);
 					nray.direction.x += dis(gen);
@@ -57,12 +57,12 @@ namespace rt {
 					nray.direction = glm::normalize(nray.direction);
 					if (scene.intersect(nray, &nested)) {
 						incident = calculate_color(man, scene, nray, nested, depth + 1);
-						float coef = glm::dot(isect.normal, nray.direction);
+						float coef = glm::abs(glm::dot(isect.normal, nray.direction));
 
 						reflected += glm::clamp(BRDF * incident * coef, glm::vec3(0, 0, 0), glm::vec3(1, 1, 1));
 					}
 				}
-				reflected /= 3.0f;
+				reflected /= 2.0f;
 
 				return glm::clamp(emitted + reflected, glm::vec3(0, 0, 0), glm::vec3(1, 1, 1));
 			}

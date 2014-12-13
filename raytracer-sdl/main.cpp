@@ -8,172 +8,15 @@
 #include <assimp/scene.h> // Output data structure
 #include <assimp/postprocess.h> // Post processing flags
 #include <assimp/mesh.h>
-
+#include "shape.h"
 
 #define WND_SIZE_X 640
 #define WND_SIZE_Y 480
 
 #define REQUIRE(cond) do { if(!(cond)) { printf("Cond failed %s: %s\n", __FILE__, __LINE__); exit(0); }  }while(0)
 
-bool IntersectSphere(glm::vec3 sphere_pos, float radius, glm::vec3 rpos, glm::vec3 rdir, float* dist_out) {
-	glm::vec3 L = sphere_pos - rpos;
-	float tca = glm::dot(L, rdir);
-	if (tca < 0) return false;
-	float d2 = glm::dot(L, L) - tca * tca;
-	if (d2 > radius) return false;
-	float thc = glm::sqrt(radius - d2);
-	float t0 = tca - thc;
-	float t1 = tca + thc;
 
 
-	if (t0 > t1) {
-		float temp = t0;
-		t0 = t1;
-		t1 = temp;
-	}
-
-	if (t1 < 0)
-		return false;
-
-	if (t0 < 0){
-		*dist_out = t1;
-		return true;
-	}
-	else{
-		*dist_out = t0;
-		return true;
-	}
-}
-
-class Sphere : public rt::core::Shape {
-	glm::vec3 _pos;
-	float _radius;
-public:
-	Sphere(glm::vec3 pos, float radius)
-		: _pos(pos), _radius(radius) {}
-	virtual bool intersect(rt::core::Ray ray, rt::core::Intersection* result) const {
-		if (IntersectSphere(_pos, _radius, ray.origin, ray.direction, &result->d)) {
-			result->position = (ray.origin + ray.direction * result->d);
-			result->normal = glm::normalize(result->position - _pos);
-			return true;
-		}
-		return false;
-	}
-	rt::core::AABB get_bounding_box() const {
-		return rt::core::AABB(_pos - _radius, _pos + _radius);
-	}
-};
-
-class Triangle : public rt::core::Shape {
-	glm::vec3 p0, p1, p2;
-public:
-	Triangle(glm::vec3 a, glm::vec3 b, glm::vec3 c) : p0(a), p1(b), p2(c) {}
-
-	bool intersect(rt::core::Ray ray, rt::core::Intersection* result) const {
-		glm::vec3 e1 = p1 - p0;
-		glm::vec3 e2 = p2 - p0;
-		glm::vec3 s1 = glm::cross(ray.direction, e2);
-		float divisor = glm::dot(s1, e1);
-
-		if (glm::abs(divisor) < 0.00000001) {
-			return false;
-		}
-		float invDivisor = 1.f / divisor;
-		//first barycentric coordinate
-		glm::vec3 d = ray.origin - p0;
-		float b1 = glm::dot(d, s1) * invDivisor;
-		if (b1 < 0. || b1 > 1.) {
-			return false;
-		}
-		//second
-		glm::vec3 s2 = glm::cross(d, e1);
-		float b2 = glm::dot(ray.direction, s2) * invDivisor;
-		if (b2 <0. || b1 + b2 > 1.) {
-			return false;
-		}
-		float t = glm::dot(e2, s2) * invDivisor;
-		
-		//this is a threashhold for not colliding with itself
-		if (t < 0.0001) {
-			return false;
-		}
-		result->d = t;
-		result->position = ray.origin + ray.direction * t;
-		result->normal = glm::normalize(glm::cross(e1, e2));
-		return true;
-	}
-	rt::core::AABB get_bounding_box() const {
-		return rt::core::AABB(p0, p1, p2);
-	}
-};
-
-class Mesh : public rt::core::Shape {
-	std::vector<glm::vec3> points;
-	class MeshAdapter : public rt::core::ElementAdapter {
-		std::vector<glm::vec3>& _mesh;
-
-	public:
-		MeshAdapter(std::vector<glm::vec3>& mesh) : _mesh(mesh) {}
-		virtual int count() {
-			return _mesh.size() / 3;
-		}
-		virtual rt::core::AABB get_bounding_box(int index) const {
-			rt::core::AABB aabb(
-				_mesh[index * 3], _mesh[index * 3 + 1], _mesh[index * 3 + 2]);
-
-			return aabb;
-		}
-		virtual bool intersect(int index, rt::core::Ray ray, rt::core::Intersection* result) const {
-			Triangle tri(_mesh[index * 3], _mesh[index * 3 + 1], _mesh[index * 3 + 2]);
-			return tri.intersect(ray, result);
-		}
-	};
-	MeshAdapter _adapter;
-	rt::core::Accelerator* _accelerator;
-	rt::core::AABB bbox;
-public:
-	Mesh() : _accelerator(0), _adapter(points) { }
-	rt::core::ElementAdapter& get_adapter() {
-		return _adapter;
-	}
-	void push_face(glm::vec3 a, glm::vec3 b, glm::vec3 c) {
-		points.push_back(a);
-		points.push_back(b);
-		points.push_back(c);
-	}
-	void push_vert(glm::vec3 a) {
-		points.push_back(a);
-	}
-	void set_accelerator(rt::core::Accelerator* acc) {
-		_accelerator = acc;
-		acc->rebuild(_adapter);
-		bbox = get_bounding_box();
-	}
-	bool intersect(rt::core::Ray ray, rt::core::Intersection* result) const {
-		if (!bbox.intersect(ray)) {
-			return false;
-		}
-		return _accelerator->intersect(ray, result);
-	}
-	rt::core::AABB get_bounding_box() const {
-		rt::core::AABB aabb(points[0]);
-		for (int i = 1; i < points.size(); ++i) {
-			aabb = aabb.union_point(points[i]);
-		}
-		return aabb;
-	}
-};
-
-#define MURMUR_STRING(str, seed) (rt::core::MurmurHash2(str, strlen(str), seed))
-rt::core::MaterialId make_material(const char* path, rt::core::ResourceManager& man, rt::core::Material mat) {
-	rt::core::Material* pmat = new rt::core::Material(mat);
-	rt::core::MaterialId hash = rt::core::MurmurHash2(path, strlen(path), 0);
-	uint32_t type_hash = MURMUR_STRING(".material", 0);
-
-	//man.add_resource({ hash, type_hash }, { pmat , sizeof(rt::core::Material) });
-	man.add_material(mat);
-	return hash;
-}
 
 rt::core::Shape* make_mesh(const char* filename) {
 	Assimp::Importer importer;
@@ -190,61 +33,64 @@ rt::core::Shape* make_mesh(const char* filename) {
 	{
 		return 0;
 	}
-	Mesh* rtmesh = new Mesh;;
-	const struct aiMesh* mesh = scene->mMeshes[0];;
-	for (unsigned int t = 0; t < mesh->mNumFaces; ++t)
-	{
-		const struct aiFace * face = &mesh->mFaces[t];
+	rt::core::Mesh* rtmesh = new rt::core::Mesh;;
+	for (int i = 0; i < scene->mNumMeshes; ++i) {
+		const struct aiMesh* mesh = scene->mMeshes[i];;
+		for (unsigned int t = 0; t < mesh->mNumFaces; ++t)
+		{
+			const struct aiFace * face = &mesh->mFaces[t];
 
-		for (int i = 2; i >= 0; --i) {
-			glm::vec3 v(mesh->mVertices[face->mIndices[i]].x,
-				mesh->mVertices[face->mIndices[i]].z,
-				mesh->mVertices[face->mIndices[i]].y);
+			for (int i = 2; i >= 0; --i) {
+				glm::vec3 v(mesh->mVertices[face->mIndices[i]].x,
+					mesh->mVertices[face->mIndices[i]].z,
+					mesh->mVertices[face->mIndices[i]].y);
 
 
-			rtmesh->push_vert(v);
+				rtmesh->push_vert(v);
+			}
+
+
 		}
-
-
 	}
 	rtmesh->set_accelerator(rt::core::create_kdtree(rtmesh->get_adapter()));
 	return rtmesh;
 }
 void build_scene(rt::core::ResourceManager& manager, rt::core::Scene* scene) {
 	rt::core::MaterialId left_sph_mat =
-		manager.add_material({ glm::vec3(1, 1, 1), glm::vec3(0.2, 0.86, 0.45) });
+		manager.add_material({ glm::vec3(0.76, 1, 0.7), glm::vec3(0.0, 0.0, 0.0) });
 
 	rt::core::MaterialId right_sph_mat =
-		manager.add_material({ glm::vec3(1, 1, 1), glm::vec3(0.9, 0.04, 0.7) });
+		manager.add_material({ glm::vec3(0.7, 0.49, 0.43), glm::vec3(0.0, 0.0, 0.0) });
 
 	rt::core::MaterialId right_tri_mat =
-		manager.add_material({ glm::vec3(1, 1, 1), glm::vec3(0.4, 0.4, 0.4) });
+		manager.add_material({ glm::vec3(0.72, 0.76, 0.73), glm::vec3(0.0, 0.0, 0.0) });
 
 	rt::core::MaterialId white =
-		manager.add_material({ glm::vec3(0, 0, 0), glm::vec3(1, 1, 1) });
+		manager.add_material({ glm::vec3(1, 1, 1), glm::vec3(1, 1, 1) });
 
 	//scene->push_node({ glm::mat4(), new Sphere(glm::vec3(0, 0, 0), 1) }, left_sph_mat);
 	glm::mat4 mesh_trans;
-	mesh_trans = glm::rotate(mesh_trans, 45.0f, glm::vec3(1.f, 0.f, 0.f));
+	//mesh_trans = glm::scale(mesh_trans, glm::vec3(5, 5, 5));
+	mesh_trans = glm::rotate(mesh_trans, 55.0f, glm::vec3(1.f, 0.f, 0.f));
 	mesh_trans = glm::translate(mesh_trans, glm::vec3(-0.7, 1.4, 0));
 	scene->push_node({ mesh_trans, make_mesh("chasha.dae") }, left_sph_mat);
 	glm::mat4 sph_trans;
-	sph_trans = glm::translate(sph_trans, glm::vec3(0.7, 0.0, 0.4));
-	scene->push_node({ sph_trans, new Sphere(glm::vec3(0, 0, 0), 0.6) }, right_sph_mat);
+	sph_trans = glm::translate(sph_trans, glm::vec3(0.8, 0.0, 0.4));
+	scene->push_node({ sph_trans, new rt::core::Sphere(glm::vec3(0, 0, 0), 0.6) }, right_sph_mat);
 
 
 
 	float height = -5.0f;
-	rt::core::Shape* shape = new Triangle(glm::vec3(-3000, height, -300), glm::vec3(0, height, 300), glm::vec3(3000, height, -300));
+	rt::core::Shape* shape = new rt::core::Triangle(glm::vec3(-3000, height, -300), glm::vec3(0, height, 300), glm::vec3(3000, height, -300));
 	scene->push_node({ glm::mat4(), shape }, right_tri_mat);
 
 	float pos = 15;
-	shape = new Triangle(glm::vec3(-300, -300, pos), glm::vec3(0, 200, pos), glm::vec3(300, -300, pos));
+	shape = new rt::core::Triangle(glm::vec3(-300, -300, pos), glm::vec3(0, 200, pos), glm::vec3(300, -300, pos));
 	scene->push_node({ glm::mat4(), shape }, right_tri_mat);
 
 	pos = 15;
-	shape = new Triangle(glm::vec3(1000, 300, pos), glm::vec3(0, -30.f, -40.f), glm::vec3(-1000, 300, pos));
-	//scene->push_node({ glm::mat4(), shape }, white);
+	shape = new rt::core::Triangle(glm::vec3(100000, 10000, pos), glm::vec3(0, -10000, -100.f), glm::vec3(-100000, 10000, pos));
+	scene->push_node({ glm::mat4(), shape }, white);
 }
 
 void putpixel(SDL_Surface *surface, int x, int y, Uint32 pixel)
@@ -283,28 +129,28 @@ void putpixel(SDL_Surface *surface, int x, int y, Uint32 pixel)
 
 void test() {
 	{
-	Triangle a(glm::vec3(0, 0, 0), glm::vec3(0, 1, 0), glm::vec3(1, 0, 0));
-	rt::core::Intersection isect;
-	rt::core::Ray ray;
-	ray.origin = glm::vec3(0.1, 0.1, -1);
-	ray.direction = glm::vec3(0, 0, 1);
-	assert(a.intersect(ray, &isect));
-	assert(isect.normal == glm::vec3(0, 0, -1));
-	assert(isect.position == glm::vec3(0.1, 0.1, 0));
+		rt::core::Triangle a(glm::vec3(0, 0, 0), glm::vec3(0, 1, 0), glm::vec3(1, 0, 0));
+		rt::core::Intersection isect;
+		rt::core::Ray ray;
+		ray.origin = glm::vec3(0.1, 0.1, -1);
+		ray.direction = glm::vec3(0, 0, 1);
+		assert(a.intersect(ray, &isect));
+		assert(isect.normal == glm::vec3(0, 0, -1));
+		assert(isect.position == glm::vec3(0.1, 0.1, 0));
 
-	ray.origin = glm::vec3(1, 1, -1);
-	assert(!a.intersect(ray, &isect));
+		ray.origin = glm::vec3(1, 1, -1);
+		assert(!a.intersect(ray, &isect));
 
-	ray.origin = glm::vec3(0.1, 0.1, 1);
-	ray.direction = glm::vec3(0, 0, -1);
-	assert(a.intersect(ray, &isect));
-	assert(isect.normal == glm::vec3(0, 0, -1));
-	assert(isect.position == glm::vec3(0.1, 0.1, 0));
+		ray.origin = glm::vec3(0.1, 0.1, 1);
+		ray.direction = glm::vec3(0, 0, -1);
+		assert(a.intersect(ray, &isect));
+		assert(isect.normal == glm::vec3(0, 0, -1));
+		assert(isect.position == glm::vec3(0.1, 0.1, 0));
 
-	float fa = -INFINITY;
-	float fb = 10;
-	assert(!(fa > fb));
-	assert((fa < fb));
+		float fa = -INFINITY;
+		float fb = 10;
+		assert(!(fa > fb));
+		assert((fa < fb));
 	}
 
 
@@ -343,7 +189,7 @@ int main(int argc, char* argv[]) {
 
 	scene.accelerate_and_rebuild(new rt::core::DefaultAccelerator(scene.get_adapter()));
 
-	rt::core::Sampler sampler(4);
+	rt::core::Sampler sampler(1);
 	rt::core::Integrator integrator;
 
 	rt::core::Renderer renderer(sampler, cam, scene, integrator, manager);

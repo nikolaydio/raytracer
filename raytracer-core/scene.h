@@ -1,9 +1,9 @@
 #pragma once
 #include <vector>
 #include <glm\glm.hpp>
-#include "primitive.h"
 #include "types.h"
 #include "accelerator.h"
+#include "shape.h"
 
 namespace rt {
 	namespace core {

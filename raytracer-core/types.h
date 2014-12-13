@@ -103,11 +103,6 @@ namespace rt {
 			glm::vec3 _max;
 
 		};
-		class Shape {
-		public:
-			virtual bool intersect(Ray ray, Intersection* result) const = 0;
-			virtual AABB get_bounding_box() const = 0;
-		};
 
 	}
 }
