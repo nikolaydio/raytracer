@@ -57,7 +57,7 @@ rt::core::Shape* make_mesh(const char* filename) {
 }
 void build_scene(rt::core::ResourceManager& manager, rt::core::Scene* scene) {
 	rt::core::MaterialId left_sph_mat =
-		manager.add_material({ glm::vec3(0.76, 1, 0.7), glm::vec3(0.0, 0.0, 0.0) });
+		manager.add_material({ glm::vec3(1, 1, 1), glm::vec3(0.0, 0.0, 0.0) });
 
 	rt::core::MaterialId right_sph_mat =
 		manager.add_material({ glm::vec3(0.7, 0.49, 0.43), glm::vec3(0.0, 0.0, 0.0) });
@@ -128,48 +128,7 @@ void putpixel(SDL_Surface *surface, int x, int y, Uint32 pixel)
 }
 
 void test() {
-	{
-		rt::core::Triangle a(glm::vec3(0, 0, 0), glm::vec3(0, 1, 0), glm::vec3(1, 0, 0));
-		rt::core::Intersection isect;
-		rt::core::Ray ray;
-		ray.origin = glm::vec3(0.1, 0.1, -1);
-		ray.direction = glm::vec3(0, 0, 1);
-		assert(a.intersect(ray, &isect));
-		assert(isect.normal == glm::vec3(0, 0, -1));
-		assert(isect.position == glm::vec3(0.1, 0.1, 0));
 
-		ray.origin = glm::vec3(1, 1, -1);
-		assert(!a.intersect(ray, &isect));
-
-		ray.origin = glm::vec3(0.1, 0.1, 1);
-		ray.direction = glm::vec3(0, 0, -1);
-		assert(a.intersect(ray, &isect));
-		assert(isect.normal == glm::vec3(0, 0, -1));
-		assert(isect.position == glm::vec3(0.1, 0.1, 0));
-
-		float fa = -INFINITY;
-		float fb = 10;
-		assert(!(fa > fb));
-		assert((fa < fb));
-	}
-
-
-
-
-
-
-	glm::vec4 a(0, 0, 0, 1), b(1, 0, 0, 0), c(154, 1234, 132, 1);
-	glm::mat4 transform;
-	transform = glm::rotate(transform, 90.0f, glm::vec3(0, 1, 0));
-	transform = glm::translate(transform, glm::vec3(10, 0, 10));
-	glm::vec4 a1 = transform * a;
-	glm::vec4 b1 = transform * b;
-	glm::vec4 c1 = transform * c;
-
-	glm::mat4 inv(glm::inverse(transform));
-	glm::vec4 a2 = inv * a1;
-	glm::vec4 b2 = inv * b1;
-	glm::vec4 c2 = inv * c1;
 }
 
 int main(int argc, char* argv[]) {
