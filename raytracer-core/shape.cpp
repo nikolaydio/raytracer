@@ -5,6 +5,23 @@
 
 namespace rt {
 	namespace core {
+		glm::vec3 spherical_direction(float sintheta, float costheta, float phi,
+			const glm::vec3 x, const glm::vec3 y, const glm::vec3 z) {
+			return sintheta * glm::cos(phi) * x + sintheta * glm::sin(phi) * y + costheta * z;
+		}
+		glm::vec3 spherical_direction(float sintheta, float costheta, float phi) {
+			return glm::vec3(sintheta * glm::cos(phi),
+				sintheta * glm::sin(phi),
+				costheta);
+		}
+		glm::vec2 spherical_angles(const glm::vec3 dir) {
+			return glm::vec2(glm::acos(dir.z), glm::atan(dir.y / dir.z));
+		}
+		glm::vec3 spherical_angles_tri(const glm::vec3 dir) {
+
+		}
+
+
 		static bool IntersectSphere(glm::vec3 sphere_pos, float radius, glm::vec3 rpos, glm::vec3 rdir, float* dist_out) {
 			glm::vec3 L = sphere_pos - rpos;
 			float tca = glm::dot(L, rdir);
