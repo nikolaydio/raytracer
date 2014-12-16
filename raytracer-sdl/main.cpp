@@ -9,6 +9,7 @@
 #include <assimp/postprocess.h> // Post processing flags
 #include <assimp/mesh.h>
 #include "shape.h"
+#include "scene_loader.h"
 
 #define WND_SIZE_X 640
 #define WND_SIZE_Y 480
@@ -56,6 +57,11 @@ rt::core::Shape* make_mesh(const char* filename) {
 	return rtmesh;
 }
 void build_scene(rt::core::ResourceManager& manager, rt::core::Scene* scene) {
+	bool a = rt::sdl::SceneLoader::load_from("../scenes/scene.txt", manager, *scene);
+	if (!a) {
+		std::cout << "Failed to load the scene\n";
+	}
+	return;
 	rt::core::MaterialId left_sph_mat =
 		manager.add_material({ glm::vec3(1, 1, 1), glm::vec3(0.0, 0.0, 0.0) });
 
@@ -128,7 +134,9 @@ void putpixel(SDL_Surface *surface, int x, int y, Uint32 pixel)
 }
 
 void test() {
-
+	glm::mat4 mesh_trans;;
+	mesh_trans = glm::rotate(mesh_trans, 55.0f, glm::vec3(1.f, 0.f, 0.f));
+	mesh_trans = glm::translate(mesh_trans, glm::vec3(-0.7, 1.4, 0));
 }
 
 int main(int argc, char* argv[]) {

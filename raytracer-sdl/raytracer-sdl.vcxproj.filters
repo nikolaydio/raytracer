@@ -1,6 +1,30 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="main.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="scene_loader.cpp">
+      <Filter>Else</Filter>
+    </ClCompile>
+    <ClCompile Include="sjson_compiler.cpp">
+      <Filter>Else</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="scene_loader.h">
+      <Filter>Else</Filter>
+    </ClInclude>
+    <ClInclude Include="sjson_compiler.h">
+      <Filter>Else</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Main">
+      <UniqueIdentifier>{2b5a469a-da1f-469b-b93c-d65525a86c4f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Else">
+      <UniqueIdentifier>{eabb1469-bd0c-4379-9eed-55d858ca39d1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>

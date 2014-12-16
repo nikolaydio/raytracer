@@ -91,6 +91,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="scene_loader.cpp" />
+    <ClCompile Include="sjson_compiler.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="scene_loader.h" />
+    <ClInclude Include="sjson_compiler.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
