@@ -1,5 +1,5 @@
 #include "scene.h"
-
+#include <cstring> //memcpy
 namespace rt {
 	namespace core {
 

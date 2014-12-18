@@ -1,5 +1,5 @@
 #include "shape.h"
-#include <glm\glm.hpp>
+#include <glm/glm.hpp>
 #include "accelerator.h"
 #include <vector>
 

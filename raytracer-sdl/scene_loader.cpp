@@ -2,6 +2,7 @@
 #include "sjson_compiler.h"
 
 #include <string>
+#include <cstring>
 #include <fstream>
 #include <streambuf>
 #include <iostream>

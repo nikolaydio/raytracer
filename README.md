@@ -21,9 +21,21 @@
 
 
 
-### Compilling ###
+### Building ###
+
+#### Windows - Visual Studio ####
  * Download SDL2 into 3rdparty/
  * Download GLM into 3rdparty/
  * Download Google Test into 3rdparty/ (if you want to run the unit tests)
- * Download Open Asset Importer into 3rdparty/
+ * Download Open Asset Importer into 3rdparty/ (you need to build it)
  * Visual studio 2013 open .sln
+
+
+#### Linux(Ubuntu) - Makefile ####
+ * apt-get install libsdl2-dev
+ * apt-get install libassimp-dev
+ * Download GLM into 3rdparty/
+ * make
+ * if you still get compile time errors, try to
+  * apt-get install linux-libc-dev
+  * apt-get install g++-4.8-multilib (your gcc version here)

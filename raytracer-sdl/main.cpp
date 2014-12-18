@@ -1,5 +1,5 @@
 #include "renderer.h"
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <chrono>
 #include <iostream>
@@ -22,6 +22,7 @@
 rt::core::Shape* make_mesh(const char* filename) {
 	Assimp::Importer importer;
 
+
 	// And have it read the given file with some example postprocessing
 	// Usually - if speed is not the most important aspect for you - you'll
 	// propably to request more postprocessing than we do in this example.
@@ -32,6 +33,7 @@ rt::core::Shape* make_mesh(const char* filename) {
 	// If the import failed, report it
 	if (!scene)
 	{
+		printf("Failed to load mesh\n");
 		return 0;
 	}
 	rt::core::Mesh* rtmesh = new rt::core::Mesh;;
@@ -57,11 +59,11 @@ rt::core::Shape* make_mesh(const char* filename) {
 	return rtmesh;
 }
 void build_scene(rt::core::ResourceManager& manager, rt::core::Scene* scene) {
-	bool a = rt::sdl::SceneLoader::load_from("../scenes/scene.txt", manager, *scene);
-	if (!a) {
-		std::cout << "Failed to load the scene\n";
-	}
-	return;
+	//bool a = rt::sdl::SceneLoader::load_from("../scenes/scene.txt", manager, *scene);
+	//if (!a) {
+//		std::cout << "Failed to load the scene\n";
+//	}
+//	return;
 	rt::core::MaterialId left_sph_mat =
 		manager.add_material({ glm::vec3(1, 1, 1), glm::vec3(0.0, 0.0, 0.0) });
 
@@ -79,7 +81,7 @@ void build_scene(rt::core::ResourceManager& manager, rt::core::Scene* scene) {
 	//mesh_trans = glm::scale(mesh_trans, glm::vec3(5, 5, 5));
 	mesh_trans = glm::rotate(mesh_trans, 55.0f, glm::vec3(1.f, 0.f, 0.f));
 	mesh_trans = glm::translate(mesh_trans, glm::vec3(-0.7, 1.4, 0));
-	scene->push_node({ mesh_trans, make_mesh("chasha.dae") }, left_sph_mat);
+	scene->push_node({ mesh_trans, make_mesh("./scenes/mug.dae") }, left_sph_mat);
 	glm::mat4 sph_trans;
 	sph_trans = glm::translate(sph_trans, glm::vec3(0.8, 0.0, 0.4));
 	scene->push_node({ sph_trans, new rt::core::Sphere(glm::vec3(0, 0, 0), 0.6) }, right_sph_mat);
@@ -97,6 +99,9 @@ void build_scene(rt::core::ResourceManager& manager, rt::core::Scene* scene) {
 	pos = 15;
 	shape = new rt::core::Triangle(glm::vec3(100000, 10000, pos), glm::vec3(0, -10000, -100.f), glm::vec3(-100000, 10000, pos));
 	scene->push_node({ glm::mat4(), shape }, white);
+
+	printf("Scene loaded");
+	std::cout << "Done!" << std::endl;
 }
 
 void putpixel(SDL_Surface *surface, int x, int y, Uint32 pixel)

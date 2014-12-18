@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 #include <assert.h>
-
+#include <cstring>
 
 #define SJSON_LEX_ERROR_HANDLE(error_line)  { printf("Lex error at line %i...\n", error_line); assert(0); }
 #define SJSON_PARSE_ERROR_HANDLE(error_line)  { printf("Parse error at line %i...\n", error_line); assert(0); }

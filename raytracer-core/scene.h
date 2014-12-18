@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include <glm\glm.hpp>
+#include <glm/glm.hpp>
 #include "types.h"
 #include "accelerator.h"
 #include "shape.h"
@@ -20,7 +20,12 @@ namespace rt {
 
 		class Scene {
 		public:
-			Scene() : _accelerator(0), _adapter(*this) {}
+			Scene() : _accelerator(0), _adapter(*this) {
+				_node_count = 0;
+				_node_capacity = 0;
+				_nodes = 0;
+				_materials = 0;
+			}
 			~Scene() {
 				delete _accelerator;
 			}

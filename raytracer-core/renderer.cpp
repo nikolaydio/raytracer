@@ -1,5 +1,6 @@
 #include "renderer.h"
 
+#include <iostream>
 
 namespace rt {
 	namespace core {
@@ -54,7 +55,7 @@ namespace rt {
 			process_subsampler(sub_sampler);
 		}
 		void Renderer::process_subsampler(Sampler::SubSampler& sampler) {
-			printf("1");
+			//std::cout << "1";
 
 			Sampler::SubSampler& sub_sampler = sampler;
 
