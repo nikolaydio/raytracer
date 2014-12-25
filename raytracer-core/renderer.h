@@ -4,6 +4,7 @@
 #include "film.h"
 #include "resource_manager.h"
 #include <random>
+#include "material.h"
 
 namespace rt {
 	namespace core {
@@ -31,44 +32,7 @@ namespace rt {
 	
 		class Integrator {
 		public:
-			glm::vec3 calculate_color(ResourceManager& man, const Scene& scene, Ray ray, Intersection isect, int depth) const {
-				if (depth > 1) {
-					return glm::vec3(0, 0, 0);
-				}
-				Material mat = man.material(isect.material);
-				Spectrum emitted = mat.emitted;
-
-				glm::vec3 BRDF = mat.reflected;
-				Spectrum incident = glm::vec3(0, 0, 0);
-				Intersection nested;
-				Ray nray;
-				Spectrum reflected(0, 0, 0);
-
-				std::random_device rd;
-				std::mt19937 gen(rd());
-				std::uniform_real_distribution<float> dis(-1, 1);
-
-				for (int i = 0; i < 1; ++i) {
-					nray.origin = isect.position;
-					nray.direction = glm::reflect(ray.direction, isect.normal);
-					nray.direction.x += dis(gen);
-					nray.direction.y += dis(gen);
-					nray.direction.z += dis(gen);
-					nray.direction = glm::normalize(nray.direction);
-					if (scene.intersect(nray, &nested)) {
-						incident = calculate_color(man, scene, nray, nested, depth + 1);
-						float coef = glm::abs(glm::dot(isect.normal, nray.direction));
-
-						reflected += glm::clamp(BRDF * incident * coef, glm::vec3(0, 0, 0), glm::vec3(1, 1, 1));
-					}
-				}
-				reflected /= 1.0f;
-
-				return glm::clamp(emitted + reflected, glm::vec3(0, 0, 0), glm::vec3(1, 1, 1));
-			}
-			virtual Spectrum calculate_radiance(ResourceManager& man, const Scene& scene, Ray ray, Intersection isect) const {
-				return calculate_color(man, scene, ray, isect, 0);
-			}
+			virtual Spectrum calculate_radiance(ResourceManager& man, const Scene& scene, Ray ray, Intersection isect, MemoryArena& arena) const = 0;
 		};
 
 		class Renderer {
@@ -79,8 +43,9 @@ namespace rt {
 			ResourceManager& _manager;
 			
 			Film* _film;
+			Film* _normals;
 
-			void process_subsampler(Sampler::SubSampler& sampler);
+			void process_subsampler(Sampler::SubSampler& sampler, MemoryArena& arena);
 		public:
 			Renderer(const Sampler& sampler,
 				const Camera& camera,
@@ -91,6 +56,7 @@ namespace rt {
 			~Renderer() {}
 
 			Film*& film();
+			void normal_film(Film* film);
 
 			void run_multithreaded(int chunk_size = 16);
 			void run_singlethreaded();

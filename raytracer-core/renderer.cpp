@@ -1,6 +1,8 @@
 #include "renderer.h"
 
 #include <iostream>
+#include "material.h"
+#include <omp.h>
 
 namespace rt {
 	namespace core {
@@ -44,18 +46,18 @@ namespace rt {
 			const Integrator& integrator,
 			ResourceManager& manager)
 		: _sampler(sampler), _camera(camera), _scene(scene), _integrator(integrator), _manager(manager) {
-
+			_normals = 0;
 		}
 
 		void Renderer::run_singlethreaded() {
 			Sampler::SubSampler sub_sampler =
 				_sampler.create_subsampler(glm::vec2(0, 0),
 										_film->get_surface()->get_size());
-
-			process_subsampler(sub_sampler);
+			MemoryArena arena(64*8*1024);
+			process_subsampler(sub_sampler, arena);
 		}
-		void Renderer::process_subsampler(Sampler::SubSampler& sampler) {
-			//std::cout << "1";
+		void Renderer::process_subsampler(Sampler::SubSampler& sampler, MemoryArena& arena) {
+			std::cout << "1";
 
 			Sampler::SubSampler& sub_sampler = sampler;
 
@@ -70,14 +72,20 @@ namespace rt {
 
 					Intersection intersection;
 					if (_scene.intersect(ray, &intersection)) {
-						glm::vec3 color = _integrator.calculate_radiance(_manager, _scene, ray, intersection);
+						glm::vec3 color = _integrator.calculate_radiance(_manager, _scene, ray, intersection, arena);
+						arena.free_all();
 
 						_film->apply_radiance((int)original_position.x, (int)original_position.y, Color(color));
+						
+						if (_normals) {
+							_normals->apply_radiance((int)original_position.x, (int)original_position.y, Color(glm::abs(intersection.normal)));
+						}
 					}
 				}
 			}
 			delete[] samples;
 		}
+
 		void Renderer::run_multithreaded(int chunk_size) {
 			int size_x = _film->get_surface()->get_size().x;
 			int size_y = _film->get_surface()->get_size().y;
@@ -94,18 +102,30 @@ namespace rt {
 				glm::vec2 size(end_pos - pos);
 				samplers[i] = _sampler.create_subsampler(pos, size);
 			}
+			std::vector<MemoryArena*> arenas;
+			int threads = omp_get_max_threads();
+			for (int i = 0; i < threads; ++i) {
+				arenas.push_back(new MemoryArena(64 * 1024));
+			}
 
 			//run the rendering process
 			#pragma omp parallel for
 			for (int i = 0; i < chunks; ++i) {
-				process_subsampler(samplers[i]);
+				int tid = omp_get_thread_num();
+				process_subsampler(samplers[i], *arenas[tid]);
+				arenas[tid]->free_all();
 			}
 
-
+			for (int i = 0; i < arenas.size(); ++i) {
+				delete arenas[i];
+			}
 			delete[] samplers;
 		}
 		Film*& Renderer::film() {
 			return _film;
+		}
+		void Renderer::normal_film(Film* film) {
+			_normals = film;
 		}
 	}
 }

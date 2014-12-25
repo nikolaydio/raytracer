@@ -449,6 +449,9 @@ float sjson_list_float(json_file* file, int list, int id) {
 	if(entry && entry->value_type == AT_FLOAT) {
 		return entry->value_data.val_float;
 	}
+	else if (entry && entry->value_type == AT_INT) {
+		return (float)entry->value_data.val_float;
+	}
 	SJSON_ACCESS_ERROR_HANDLE();
 	return 0;
 }

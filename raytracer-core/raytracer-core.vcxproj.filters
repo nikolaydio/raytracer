@@ -31,6 +31,15 @@
     <ClInclude Include="shape.h">
       <Filter>Raytracer\Shape</Filter>
     </ClInclude>
+    <ClInclude Include="material.h">
+      <Filter>Raytracer\Material</Filter>
+    </ClInclude>
+    <ClInclude Include="bsdf.h">
+      <Filter>Raytracer\Material</Filter>
+    </ClInclude>
+    <ClInclude Include="path.h">
+      <Filter>Raytracer\Renderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="renderer.cpp">
@@ -60,6 +69,15 @@
     <ClCompile Include="shape.cpp">
       <Filter>Raytracer\Shape</Filter>
     </ClCompile>
+    <ClCompile Include="bsdf.cpp">
+      <Filter>Raytracer\Material</Filter>
+    </ClCompile>
+    <ClCompile Include="path.cpp">
+      <Filter>Raytracer\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="material.cpp">
+      <Filter>Raytracer\Material</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Utility">
@@ -88,6 +106,9 @@
     </Filter>
     <Filter Include="Raytracer\Shape">
       <UniqueIdentifier>{a33e2e77-5870-4008-9d92-d87758bf2293}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Raytracer\Material">
+      <UniqueIdentifier>{04343d60-3bb8-4455-8de2-babb2fb742da}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

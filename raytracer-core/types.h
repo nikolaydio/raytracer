@@ -10,7 +10,6 @@ namespace rt {
 			glm::vec3 origin;
 			glm::vec3 direction;
 		};
-		struct Material;
 		struct Intersection{
 			//D is the distance from the ray origin to the intersection point.
 			//most algorithms calculate this first and it is easier to do some other checks with it
@@ -19,10 +18,7 @@ namespace rt {
 			glm::vec3 normal;
 			MaterialId material;
 		};
-		struct Material {
-			glm::vec3 reflected;
-			glm::vec3 emitted;
-		};
+
 		struct Sample {
 			glm::vec2 position;
 		};

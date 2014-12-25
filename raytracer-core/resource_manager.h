@@ -4,6 +4,7 @@
 #include <functional>
 #include <vector>
 #include "types.h"
+#include "material.h"
 
 namespace rt {
 	namespace core {

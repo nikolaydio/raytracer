@@ -18,7 +18,7 @@ namespace rt {
 			return glm::vec2(glm::acos(dir.z), glm::atan(dir.y / dir.z));
 		}
 		glm::vec3 spherical_angles_tri(const glm::vec3 dir) {
-
+			return glm::vec3(0, 0, 0);
 		}
 
 
@@ -138,6 +138,7 @@ namespace rt {
 			if (!bbox.intersect(ray)) {
 				return false;
 			}
+			assert(_accelerator);
 			return _accelerator->intersect(ray, result);
 		}
 		AABB Mesh::get_bounding_box() const {

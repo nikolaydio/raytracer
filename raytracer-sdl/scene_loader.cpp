@@ -47,8 +47,24 @@ namespace rt {
 
 				int shape_id = sjson_table_int(file, node_id, "shape");
 				if (strcmp(sjson_table_string(file, shape_id, "type"), "mesh") == 0) {
-					node.shape = make_mesh(sjson_table_string(file, shape_id, "source"));
+					if (sjson_table_lookup(file, shape_id, "verts") == AT_LIST) {
+						rt::core::Mesh* mesh = new rt::core::Mesh;
+						int vert_list = sjson_table_int(file, shape_id, "verts");
+						int vert_count = sjson_list_entry_count(file, vert_list) / 3;
+						for (int i = 0; i < vert_count; ++i) {
+							glm::vec3 vert(sjson_list_float(file, vert_list, i * 3),
+								sjson_list_float(file, vert_list, i * 3 + 1),
+								sjson_list_float(file, vert_list, i * 3 + 2));
+							mesh->push_vert(vert);
+						}
+						mesh->set_accelerator(rt::core::create_kdtree(mesh->get_adapter()));
+						node.shape = mesh;
+					}
+					else{
+						node.shape = make_mesh(sjson_table_string(file, shape_id, "source"));
+					}
 				}else{
+					sjson_free_file(file);
 					return false;
 				}
 
@@ -62,6 +78,7 @@ namespace rt {
 				}
 				scene.push_node(node, manager.add_material(mat));
 			}
+			sjson_free_file(file);
 			return true;
 		}
 	}
