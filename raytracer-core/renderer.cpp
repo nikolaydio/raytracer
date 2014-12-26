@@ -47,6 +47,7 @@ namespace rt {
 			ResourceManager& manager)
 		: _sampler(sampler), _camera(camera), _scene(scene), _integrator(integrator), _manager(manager) {
 			_normals = 0;
+			continue_rendering = false;
 		}
 
 		void Renderer::run_singlethreaded() {
@@ -57,7 +58,6 @@ namespace rt {
 			process_subsampler(sub_sampler, arena);
 		}
 		void Renderer::process_subsampler(Sampler::SubSampler& sampler, MemoryArena& arena) {
-			std::cout << "1";
 
 			Sampler::SubSampler& sub_sampler = sampler;
 
@@ -87,6 +87,7 @@ namespace rt {
 		}
 
 		void Renderer::run_multithreaded(int chunk_size) {
+
 			int size_x = _film->get_surface()->get_size().x;
 			int size_y = _film->get_surface()->get_size().y;
 
@@ -108,13 +109,18 @@ namespace rt {
 				arenas.push_back(new MemoryArena(64 * 1024));
 			}
 
+			continue_rendering = true;
 			//run the rendering process
 			#pragma omp parallel for
 			for (int i = 0; i < chunks; ++i) {
+				if (!continue_rendering) {
+					continue;
+				}
 				int tid = omp_get_thread_num();
 				process_subsampler(samplers[i], *arenas[tid]);
 				arenas[tid]->free_all();
 			}
+			
 
 			for (int i = 0; i < arenas.size(); ++i) {
 				delete arenas[i];
@@ -126,6 +132,10 @@ namespace rt {
 		}
 		void Renderer::normal_film(Film* film) {
 			_normals = film;
+		}
+
+		void Renderer::stop_rendering() {
+			continue_rendering = false;
 		}
 	}
 }

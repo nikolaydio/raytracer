@@ -45,6 +45,7 @@ namespace rt {
 			Film* _film;
 			Film* _normals;
 
+			bool continue_rendering;
 			void process_subsampler(Sampler::SubSampler& sampler, MemoryArena& arena);
 		public:
 			Renderer(const Sampler& sampler,
@@ -62,6 +63,7 @@ namespace rt {
 			void run_singlethreaded();
 
 			void generate_tasks() {}
+			void stop_rendering();
 		};
 	}
 }

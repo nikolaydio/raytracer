@@ -45,6 +45,7 @@ namespace rt {
 		class BSDF : public BxDF {
 			static const int MAX_BRDFs = 8;
 			BRDF* _brdfs[MAX_BRDFs];
+			float _brdf_scales[MAX_BRDFs];
 			int _brdf_count;
 
 			glm::vec3 _normal;
@@ -52,7 +53,7 @@ namespace rt {
 			glm::vec3 world_to_local(glm::vec3 world) const;
 		public:
 			BSDF(glm::vec3 normal);
-			void add_brdf(BRDF* brdf);
+			void add_brdf(BRDF* brdf, float scale);
 
 			virtual Spectrum evaluate_f(glm::vec3 outgoing_w, glm::vec3 incident_w) const;
 			Spectrum evaluate_sample_f(glm::vec3 outgoing_w, glm::vec3* incident_w, float u1, float u2, float* pdf) const;

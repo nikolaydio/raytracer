@@ -37,8 +37,9 @@ namespace rt {
 			_normal = normal;
 			_brdf_count = 0;
 		}
-		void BSDF::add_brdf(BRDF* brdf) {
+		void BSDF::add_brdf(BRDF* brdf, float scale) {
 			assert(_brdf_count < MAX_BRDFs);
+			_brdf_scales[_brdf_count] = scale;
 			_brdfs[_brdf_count++] = brdf;
 		}
 		glm::vec3 BSDF::world_to_local(glm::vec3 world) const {
@@ -55,7 +56,7 @@ namespace rt {
 
 			Spectrum f;
 			for (int i = 0; i < _brdf_count; ++i) {
-				f += _brdfs[i]->evaluate_f(local_outgoing, local_incident);
+				f += _brdfs[i]->evaluate_f(local_outgoing, local_incident) * _brdf_scales[i];
 			}
 			return f;
 		}
@@ -63,7 +64,7 @@ namespace rt {
 			assert(u1 < 1.0);
 			int brdf_num = glm::round(u1 * (_brdf_count-1));
 			BRDF* brdf = _brdfs[brdf_num];
-			return brdf->evaluate_sample_f(outgoing_w, incident_w, u1, u2, pdf);
+			return brdf->evaluate_sample_f(outgoing_w, incident_w, u1, u2, pdf) * _brdf_scales[brdf_num];
 		}
 
 		float BSDF::calc_pdf(const glm::vec3 &outgoing_w, const glm::vec3 &incident_w) const {
@@ -71,7 +72,7 @@ namespace rt {
 			glm::vec3 local_outgoing = world_to_local(outgoing_w);
 			float pdf = 0;
 			for (int i = 0; i < _brdf_count; ++i) {
-				pdf += _brdfs[i]->calc_pdf(local_outgoing, local_incident);
+				pdf += _brdfs[i]->calc_pdf(local_outgoing, local_incident) * _brdf_scales[i];
 			}
 			return pdf / _brdf_count;
 		}

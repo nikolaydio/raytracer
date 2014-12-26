@@ -5,7 +5,7 @@ nodelist = [
 		transform = [3. 0. 0. 0.
 					 0. 1.7207 2.4574 0.
 					 0. -2.4574 1.7207 0.
-					 0. 0. 0. 1.]
+					 -0.75 0.7 1.9 1.]
 		shape = {
 			type = "mesh"
 			source = "./scenes/mug.dae"
@@ -13,6 +13,20 @@ nodelist = [
 		material = {
 			emit = [0.1 0.1 0.1]
 			reflect = [1. 1. 1.]
+		}
+	}
+	{
+		transform = [1. 0. 0. 0.
+					 0. 1. 0. 0.
+					 0. 0. 1. 0.
+					 0.4 0.6 0. 1.]
+		shape = {
+			type = "sphere"
+			radius = 0.115
+		}
+		material = {
+			emit = [0.1 0.01 0.01]
+			reflect = [1. 0.5 0.5]
 		}
 	}
 
@@ -51,7 +65,7 @@ nodelist = [
 		}
 		material = {
 			emit = [0.1 0.01 0.01]
-			reflect = [1. 0.1 0.1]
+			reflect = [1. 0.5 0.5]
 		}
 	}
 	{
@@ -70,7 +84,7 @@ nodelist = [
 		}
 		material = {
 			emit = [0.01 0.1 0.01]
-			reflect = [0.1 1. 0.1]
+			reflect = [0.5 1. 0.5]
 		}
 	}
 

@@ -11,6 +11,7 @@
 #include "shape.h"
 #include "scene_loader.h"
 #include "path.h"
+#include <thread>
 
 #define WND_SIZE_X 640
 #define WND_SIZE_Y 480
@@ -146,6 +147,18 @@ void test() {
 	mesh_trans = glm::translate(mesh_trans, glm::vec3(-0.7, 1.4, 0));
 }
 
+
+void* rendering_thread(rt::core::Renderer* renderer) {
+	auto begin = std::chrono::high_resolution_clock::now();
+	renderer->run_multithreaded();
+	auto end = std::chrono::high_resolution_clock::now();
+	auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
+	double seconds = (double)duration / 1000.0 / 1000.0 / 1000.0;
+	std::cout << "Render time: " << seconds << std::endl;
+
+	return 0;
+}
+
 int main(int argc, char* argv[]) {
 #ifdef _DEBUG
 	test();
@@ -159,27 +172,22 @@ int main(int argc, char* argv[]) {
 	rt::core::Film film(&film_surface);
 	rt::core::Film normal_film(&normal_surface);
 
-	rt::core::Camera cam(glm::vec3(0, 0, -3), glm::vec3(0, 0, 0), 60, (float)WND_SIZE_X / (float)WND_SIZE_Y);
+	rt::core::Camera cam(glm::vec3(0, 0.5, -3), glm::vec3(0, 0, 0), 60, (float)WND_SIZE_X / (float)WND_SIZE_Y);
 
 	rt::core::Scene scene;
 	build_scene(manager, &scene);
 
 	scene.accelerate_and_rebuild(new rt::core::DefaultAccelerator(scene.get_adapter()));
 
-	rt::core::Sampler sampler(4);
+	rt::core::Sampler sampler(64);
 	rt::core::Path integrator;
 
 	rt::core::Renderer renderer(sampler, cam, scene, integrator, manager);
 	renderer.film() = &film;
 	renderer.normal_film(&normal_film);
 
+	std::thread render_thread(rendering_thread, &renderer);
 
-	auto begin = std::chrono::high_resolution_clock::now();
-	renderer.run_multithreaded();
-	auto end = std::chrono::high_resolution_clock::now();
-	auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count();
-	double seconds = (double)duration / 1000.0 / 1000.0 / 1000.0;
-	std::cout << "Render time: " << seconds << std::endl;
 
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 		printf("Failed to init SDL");
@@ -235,5 +243,8 @@ int main(int argc, char* argv[]) {
 
 	SDL_DestroyWindow(window);
 	SDL_Quit();
+
+	renderer.stop_rendering();
+	render_thread.join();
 	return 0;
 }
