@@ -19,7 +19,25 @@ namespace rt {
 				BSDF* bsdf = mat.get_brdf(isect, arena);
 
 				glm::vec3 outgoing = -ray.direction;
-	
+				Spectrum direct;
+				for (int i = 0; i < 10; ++i) {
+					glm::vec3 light(dis(gen)*2.f - 1., 1, dis(gen)*2.0f - 1.);
+					glm::vec3 light_incident = light - isect.position;
+					float light_distance = glm::length(light_incident);
+					light_incident = glm::normalize(light_incident);
+
+					Intersection temp;
+					Ray tray; tray.origin = isect.position; tray.direction = light_incident;
+					if (!scene.intersect(tray, &temp)) {
+						continue;
+					}
+					if (temp.d + 0.0001 < light_distance) {
+						continue;
+					}
+					direct += path_throughput * bsdf->evaluate_f(outgoing, light_incident) * glm::abs(glm::dot(light_incident, isect.normal));
+
+				}
+				L += direct / 10.f;
 
 				glm::vec3 incident;
 				float pdf;

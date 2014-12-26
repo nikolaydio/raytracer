@@ -11,7 +11,7 @@ nodelist = [
 			source = "./scenes/mug.dae"
 		}
 		material = {
-			emit = [0.1 0.1 0.1]
+			emit = [0.01 0.01 0.01]
 			reflect = [1. 1. 1.]
 		}
 	}
@@ -25,7 +25,7 @@ nodelist = [
 			radius = 0.115
 		}
 		material = {
-			emit = [0.1 0.01 0.01]
+			emit = [0.01 0.01 0.01]
 			reflect = [1. 0.5 0.5]
 		}
 	}
@@ -64,7 +64,7 @@ nodelist = [
 					 -1. 1. -1.]
 		}
 		material = {
-			emit = [0.1 0.01 0.01]
+			emit = [0.01 0.01 0.01]
 			reflect = [1. 0.5 0.5]
 		}
 	}
@@ -83,7 +83,7 @@ nodelist = [
 					 1. -1. 1.]
 		}
 		material = {
-			emit = [0.01 0.1 0.01]
+			emit = [0.01 0.01 0.01]
 			reflect = [0.5 1. 0.5]
 		}
 	}
@@ -124,7 +124,7 @@ nodelist = [
 					 -1. -1. -1.]
 		}
 		material = {
-			emit = [0.1 0.1 0.1]
+			emit = [0.01 0.01 0.01]
 			reflect = [1. 1. 1.]
 		}
 	}

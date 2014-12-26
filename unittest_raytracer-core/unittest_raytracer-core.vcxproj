@@ -93,6 +93,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="unittest_camera.cpp" />
+    <ClCompile Include="unittest_kdtree.cpp" />
     <ClCompile Include="unittest_shape.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

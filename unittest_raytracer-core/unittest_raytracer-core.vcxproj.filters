@@ -3,5 +3,6 @@
   <ItemGroup>
     <ClCompile Include="unittest_camera.cpp" />
     <ClCompile Include="unittest_shape.cpp" />
+    <ClCompile Include="unittest_kdtree.cpp" />
   </ItemGroup>
 </Project>
