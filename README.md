@@ -1,11 +1,10 @@
 # RayTracer #
 
 ### Tasks ###
- * BRDF Interface with Lambertian(diffuse), specular and compound implementations. (high priority)
- * Stratified Sampling support
- * Makefile for building under linux. (high priority)
+ * Stratified Sampling support(+integrate it in the codebase)
  * Texture support. Linear filtering may be required if the result is looking too bad.
  * Fresnel reflectance and support for surface transmission(transparent objects) (optional)
+ * Area light sampling(high priority)
 
 ### Not exactly defined tasks ###
  * Research how to build a proper path integrator(ongoing)
@@ -18,7 +17,8 @@
  * Multithreaded using OpenMP
  * Triangle Shape
  * Basic Image Sampling
-
+ * Makefile for building under linux
+ * BRDF Interface with Lambertian(diffuse) & specular implementations. (specular class done but require more testing)
 
 
 ### Building ###
