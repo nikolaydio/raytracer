@@ -2,6 +2,8 @@
 
 #include "types.h"
 #include <glm/gtx/constants.hpp>
+#include <glm/glm.hpp>
+
 namespace rt {
 	namespace core {
 
@@ -38,7 +40,8 @@ namespace rt {
 			Spectrum evaluate_sample_f(glm::vec3 outgoing_w, glm::vec3* incident_w, float u1, float u2, float* pdf) const {
 				*incident_w = glm::vec3(-outgoing_w.x, -outgoing_w.y, outgoing_w.z);
 				*pdf = 1;
-				return _R / glm::abs(incident_w->z);
+
+				return _R / glm::abs(outgoing_w.z);
 			}
 		};
 
@@ -51,6 +54,7 @@ namespace rt {
 			glm::vec3 _normal;
 			
 			glm::vec3 world_to_local(glm::vec3 world) const;
+			glm::vec3 local_to_world(glm::vec3 local) const;
 		public:
 			BSDF(glm::vec3 normal);
 			void add_brdf(BRDF* brdf, float scale);

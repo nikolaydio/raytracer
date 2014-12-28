@@ -20,7 +20,7 @@ namespace rt {
 
 				glm::vec3 outgoing = -ray.direction;
 				Spectrum direct;
-				for (int i = 0; i < 10; ++i) {
+				for (int i = 0; i < 1; ++i) {
 					glm::vec3 light(dis(gen)*2.f - 1., 1, dis(gen)*2.0f - 1.);
 					glm::vec3 light_incident = light - isect.position;
 					float light_distance = glm::length(light_incident);
@@ -31,13 +31,13 @@ namespace rt {
 					if (!scene.intersect(tray, &temp)) {
 						continue;
 					}
-					if (temp.d + 0.0001 < light_distance) {
+					if (temp.d + 0.0000001 < light_distance) {
 						continue;
 					}
 					direct += path_throughput * bsdf->evaluate_f(outgoing, light_incident) * glm::abs(glm::dot(light_incident, isect.normal));
 
 				}
-				L += direct / 10.f;
+				L += direct / 1.f;
 
 				glm::vec3 incident;
 				float pdf;

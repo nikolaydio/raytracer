@@ -65,7 +65,7 @@ namespace rt{
 					return false;
 				} else {
 					Intersection check;
-					result->d = 99999999999;
+					result->d = INFINITY;
 					Intersection before = *result;
 					for (int i = 0; i < node->elements.size(); ++i) {
 						if (_adapter.intersect(node->elements[i], ray, &check)) {
@@ -99,7 +99,7 @@ namespace rt{
 			KdTreeNode* build_tree(AABB nodeBounds, int* elements, int nPrims, int depth) {
 				KdTreeNode* node = new KdTreeNode;
 				node->self_aabb = nodeBounds;
-				if (depth >= 6 || nPrims <= 50) {
+				if (depth >= 15 || nPrims <= 100) {
 					node->node_type = KdTreeNode::NT_LEAF;
 					node->elements.resize(nPrims);
 					for (int i = 0; i < nPrims; ++i) {

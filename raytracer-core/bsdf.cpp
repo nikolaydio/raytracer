@@ -49,10 +49,19 @@ namespace rt {
 
 			return glm::vec3(glm::dot(world, sn), glm::dot(world, tn), glm::dot(world, _normal));
 		}
+		glm::vec3 BSDF::local_to_world(glm::vec3 local) const {
+			glm::vec3 random_vec(0.85577678, 0.503440032, 0.119139549);
+			glm::vec3 tn = glm::normalize(glm::cross(_normal, random_vec));
+			glm::vec3 sn = glm::normalize(glm::cross(_normal, tn));
+
+			return glm::vec3(sn.x * local.x + tn.x * local.y + _normal.x * local.z,
+							sn.y * local.x + tn.y * local.y + _normal.y * local.z,
+							sn.z * local.x + tn.z * local.y + _normal.z * local.z);
+		}
 		Spectrum BSDF::evaluate_f(glm::vec3 outgoing_w, glm::vec3 incident_w) const {
 			//translate world coords to local hemisphere coords
-			glm::vec3 local_incident = world_to_local(incident_w);
 			glm::vec3 local_outgoing = world_to_local(outgoing_w);
+			glm::vec3 local_incident = world_to_local(incident_w);
 
 			Spectrum f;
 			for (int i = 0; i < _brdf_count; ++i) {
@@ -64,12 +73,18 @@ namespace rt {
 			assert(u1 < 1.0);
 			int brdf_num = glm::round(u1 * (_brdf_count-1));
 			BRDF* brdf = _brdfs[brdf_num];
-			return brdf->evaluate_sample_f(outgoing_w, incident_w, u1, u2, pdf) * _brdf_scales[brdf_num];
+
+			glm::vec3 local_outgoing = world_to_local(outgoing_w);
+			glm::vec3 local_incident;
+			Spectrum f = brdf->evaluate_sample_f(local_outgoing, &local_incident, u1, u2, pdf) * _brdf_scales[brdf_num];
+
+			*incident_w = local_to_world(local_incident);
+			return f;
 		}
 
 		float BSDF::calc_pdf(const glm::vec3 &outgoing_w, const glm::vec3 &incident_w) const {
-			glm::vec3 local_incident = world_to_local(incident_w);
 			glm::vec3 local_outgoing = world_to_local(outgoing_w);
+			glm::vec3 local_incident = world_to_local(incident_w);
 			float pdf = 0;
 			for (int i = 0; i < _brdf_count; ++i) {
 				pdf += _brdfs[i]->calc_pdf(local_outgoing, local_incident) * _brdf_scales[i];

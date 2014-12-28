@@ -79,6 +79,9 @@ namespace rt {
 					mat.emitted[i] = sjson_list_float(file, emit_id, i);
 					mat.reflected[i] = sjson_list_float(file, reflect_id, i);
 				}
+				if (sjson_table_lookup(file, mat_id, "specular") == AT_INT) {
+					mat.specular = true;
+				}
 				scene.push_node(node, manager.add_material(mat));
 			}
 			sjson_free_file(file);

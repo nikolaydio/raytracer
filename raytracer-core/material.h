@@ -19,10 +19,12 @@ namespace rt {
 		};
 		class Material {
 		public:
+			Material() : specular(false) {}
 			BSDF* get_brdf(Intersection& isect, MemoryArena& arena) const;
 
 			glm::vec3 reflected;
 			glm::vec3 emitted;
+			bool specular;
 		};
 	}
 }

@@ -1,32 +1,72 @@
 name = "Test Scene"
 
+images = [
+	{
+		method = "path"
+		camera = {
+			type = "pinhole"
+			eye = [-0.7 0.8 -3]
+			lookat = [0 0 0]
+			fov = 60
+		}
+		take = ["radiance" "normals"]
+	}
+	{
+		method = "path"
+		camera = {
+			type = "pinhole"
+			eye = [-0.4 0.9 -3]
+			lookat = [0 0 0]
+			fov = 30
+		}
+		take = ["radiance" "normals"]
+	}
+]
+
+
 nodelist = [
 	{
-		transform = [3. 0. 0. 0.
-					 0. 1.7207 2.4574 0.
-					 0. -2.4574 1.7207 0.
-					 -0.75 0.7 1.9 1.]
+		transform = [2.801 0.463 -0.968 0.
+					 0.463 1.919 2.258 0.
+					 0.968 -2.258 1.7207 0.
+					 -0.685 -0.401 2.0737 1.]
 		shape = {
 			type = "mesh"
-			source = "./scenes/mug.dae"
+			source = "./scenes/box.dae"
 		}
 		material = {
-			emit = [0.01 0.01 0.01]
-			reflect = [1. 1. 1.]
+			emit = [0. 0. 0.]
+			reflect = [0.6 0.94 1.]
+		}
+	}
+	{
+		transform = [3. 0. 0. 0.
+					 0. 1. 0. 0.
+					 0. 0. 3. 0.
+					 -1.5 0.5 -1.5 1.]
+		shape = {
+			type = "mesh"
+			source = "./scenes/box.dae"
+		}
+		material = {
+			emit = [0. 0. 0.]
+			reflect = [0.6 0.4 1.]
+			specular = 1
 		}
 	}
 	{
 		transform = [1. 0. 0. 0.
 					 0. 1. 0. 0.
 					 0. 0. 1. 0.
-					 0.4 0.6 0. 1.]
+					 0.4 0.5 -0.5 1.]
 		shape = {
 			type = "sphere"
 			radius = 0.115
 		}
 		material = {
-			emit = [0.01 0.01 0.01]
+			emit = [0. 0. 0.]
 			reflect = [1. 0.5 0.5]
+			specular = 1
 		}
 	}
 
@@ -45,7 +85,7 @@ nodelist = [
 					 -1. -1. 1.]
 		}
 		material = {
-			emit = [0.1 0.1 0.1]
+			emit = [0. 0. 0.]
 			reflect = [1. 1. 1.]
 		}
 	}
@@ -64,7 +104,7 @@ nodelist = [
 					 -1. 1. -1.]
 		}
 		material = {
-			emit = [0.01 0.01 0.01]
+			emit = [0. 0. 0.]
 			reflect = [1. 0.5 0.5]
 		}
 	}
@@ -83,7 +123,7 @@ nodelist = [
 					 1. -1. 1.]
 		}
 		material = {
-			emit = [0.01 0.01 0.01]
+			emit = [0. 0. 0.]
 			reflect = [0.5 1. 0.5]
 		}
 	}
@@ -124,7 +164,7 @@ nodelist = [
 					 -1. -1. -1.]
 		}
 		material = {
-			emit = [0.01 0.01 0.01]
+			emit = [0. 0. 0.]
 			reflect = [1. 1. 1.]
 		}
 	}

@@ -61,50 +61,8 @@ rt::core::Shape* make_mesh(const char* filename) {
 	return rtmesh;
 }
 void build_scene(rt::core::ResourceManager& manager, rt::core::Scene* scene) {
-	bool a = rt::sdl::SceneLoader::load_from("./scenes/scene.txt", manager, *scene);
-	if (!a) {
-		std::cout << "Failed to load the scene\n";
-	}
-	return;
-	rt::core::MaterialId left_sph_mat =
-		manager.add_material({ glm::vec3(0.4, 1, 0.5), glm::vec3(0.0, 0.0, 0.0) });
-
-	rt::core::MaterialId right_sph_mat =
-		manager.add_material({ glm::vec3(0.7, 0.49, 0.43), glm::vec3(1, 1, 1) });
-
-	rt::core::MaterialId right_tri_mat =
-		manager.add_material({ glm::vec3(0.72, 0.76, 0.73), glm::vec3(0.0, 0.0, 0.0) });
-
-	rt::core::MaterialId white =
-		manager.add_material({ glm::vec3(1, 1, 1), glm::vec3(1, 1, 1) });
-
-	//scene->push_node({ glm::mat4(), new Sphere(glm::vec3(0, 0, 0), 1) }, left_sph_mat);
-	glm::mat4 mesh_trans;
-	//mesh_trans = glm::scale(mesh_trans, glm::vec3(5, 5, 5));
-	mesh_trans = glm::rotate(mesh_trans, 55.0f, glm::vec3(1.f, 0.f, 0.f));
-	mesh_trans = glm::scale(mesh_trans, glm::vec3(3, 3, 3));
-	//mesh_trans = glm::translate(mesh_trans, glm::vec3(-0.7, 1.4, 0));
-	scene->push_node({ mesh_trans, make_mesh("./scenes/mug.dae") }, left_sph_mat);
-	glm::mat4 sph_trans;
-	sph_trans = glm::translate(sph_trans, glm::vec3(0.8, 0.0, 0.4));
-	scene->push_node({ sph_trans, new rt::core::Sphere(glm::vec3(0, 0, 0), 0.5) }, right_sph_mat);
 
 
-
-	float height = -5.0f;
-	rt::core::Shape* shape = new rt::core::Triangle(glm::vec3(-3000, height, -300), glm::vec3(0, height, 300), glm::vec3(3000, height, -300));
-	scene->push_node({ glm::mat4(), shape }, right_tri_mat);
-
-	float pos = 15;
-	shape = new rt::core::Triangle(glm::vec3(-300, -300, pos), glm::vec3(0, 200, pos), glm::vec3(300, -300, pos));
-	scene->push_node({ glm::mat4(), shape }, right_tri_mat);
-
-	pos = 15;
-	shape = new rt::core::Triangle(glm::vec3(100000, 10000, pos), glm::vec3(0, -10000, -100.f), glm::vec3(-100000, 10000, pos));
-	scene->push_node({ glm::mat4(), shape }, white);
-
-	printf("Scene loaded");
-	std::cout << "Done!" << std::endl;
 }
 
 void putpixel(SDL_Surface *surface, int x, int y, Uint32 pixel)
@@ -161,8 +119,13 @@ void* rendering_thread(rt::core::Renderer* renderer) {
 
 int main(int argc, char* argv[]) {
 #ifdef _DEBUG
-	test();
+	std::cout << "Warning: This is a debug build\n" << std::endl;
 #endif
+	glm::mat4 test;
+	test = glm::scale(test, glm::vec3(3, 3, 3));
+	test = glm::rotate(test, 55.0f, glm::normalize(glm::vec3(0.7, 0.3, 0)));
+	test = glm::translate(test, glm::vec3(-0.5, 0.5, 0.5));
+
 	rt::core::ResourceManager manager;
 
 	rt::core::Surface2d film_surface(WND_SIZE_X, WND_SIZE_Y);
@@ -172,10 +135,13 @@ int main(int argc, char* argv[]) {
 	rt::core::Film film(&film_surface);
 	rt::core::Film normal_film(&normal_surface);
 
-	rt::core::Camera cam(glm::vec3(0, 0.5, -3), glm::vec3(0, 0, 0), 60, (float)WND_SIZE_X / (float)WND_SIZE_Y);
+	rt::core::Camera cam(glm::vec3(-0.7, 0.8, -3), glm::vec3(0, 0, 0), 30, (float)WND_SIZE_X / (float)WND_SIZE_Y);
 
 	rt::core::Scene scene;
-	build_scene(manager, &scene);
+	bool a = rt::sdl::SceneLoader::load_from("./scenes/scene.txt", manager, scene);
+	if (!a) {
+		std::cout << "Failed to load the scene\n";
+	}
 
 	scene.accelerate_and_rebuild(new rt::core::DefaultAccelerator(scene.get_adapter()));
 
