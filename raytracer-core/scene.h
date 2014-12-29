@@ -4,11 +4,11 @@
 #include "types.h"
 #include "accelerator.h"
 #include "shape.h"
+#include "material.h"
 
 namespace rt {
 	namespace core {
 
-	
 
 
 
@@ -45,6 +45,9 @@ namespace rt {
 			MaterialId material(uint32_t index) const;
 			Node node(uint32_t index) const;
 
+			Material material_by_id(int id) const;
+			void set_material_bucket(std::vector<Material>& mat_bucket);
+
 			void accelerate_and_rebuild(Accelerator* pacc);
 			ElementAdapter& get_adapter();
 		private:
@@ -55,6 +58,7 @@ namespace rt {
 			uint32_t _node_capacity;
 
 			Accelerator* _accelerator;
+			std::vector<Material> _material_bucket;
 			class SceneAccAdapter : public ElementAdapter {
 			public:
 				SceneAccAdapter(Scene& scene) : _scene(scene) {}

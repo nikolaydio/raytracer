@@ -27,8 +27,6 @@ namespace rt {
 			_allocated = 0;
 		}
 
-#define ARENA_NEW(arena, type) ( new (arena.allocate(sizeof(type))) (type) )
-#define ARENA_NEW(arena, type, params) ( new (arena.allocate(sizeof(type))) (type)(params) )
 
 		BSDF* Material::get_brdf(Intersection& isect, MemoryArena& arena) const {
 			BSDF* bsdf = ARENA_NEW(arena, BSDF, isect.normal);

@@ -1,29 +1,30 @@
-name = "Test Scene"
-
 images = [
 	{
 		method = "path"
+		samples = 64
 		camera = {
 			type = "pinhole"
 			eye = [-0.7 0.8 -3]
 			lookat = [0 0 0]
 			fov = 60
 		}
-		take = ["radiance" "normals"]
+		take_normals = 1
 	}
 	{
 		method = "path"
+		samples = 16
 		camera = {
 			type = "pinhole"
 			eye = [-0.4 0.9 -3]
 			lookat = [0 0 0]
 			fov = 30
 		}
-		take = ["radiance" "normals"]
+		take_normals = 0
 	}
 ]
 
-
+name = "Test Scene"
+accelerator = "kdtree"
 nodelist = [
 	{
 		transform = [2.801 0.463 -0.968 0.
@@ -32,7 +33,7 @@ nodelist = [
 					 -0.685 -0.401 2.0737 1.]
 		shape = {
 			type = "mesh"
-			source = "./scenes/box.dae"
+			source = "/box.dae"
 		}
 		material = {
 			emit = [0. 0. 0.]
@@ -46,7 +47,7 @@ nodelist = [
 					 -1.5 0.5 -1.5 1.]
 		shape = {
 			type = "mesh"
-			source = "./scenes/box.dae"
+			source = "/box.dae"
 		}
 		material = {
 			emit = [0. 0. 0.]

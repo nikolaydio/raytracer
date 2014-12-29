@@ -4,7 +4,7 @@
 namespace rt {
 	namespace core {
 
-		Spectrum Path::calculate_color(ResourceManager& man, const Scene& scene, Ray ray, Intersection isect, int depth, MemoryArena& arena) const {
+		Spectrum Path::calculate_color(const Scene& scene, Ray ray, Intersection isect, int depth, MemoryArena& arena) const {
 			std::random_device rd;
 			std::mt19937 gen(rd());
 			std::uniform_real_distribution<float> dis(0, 1); 
@@ -14,7 +14,7 @@ namespace rt {
 			const int max_depth = 2;
 			for (int bounces = 0; ; ++bounces) {
 
-				Material& mat = man.material(isect.material);
+				Material& mat = scene.material_by_id(isect.material);
 				L += mat.emitted * path_throughput;
 				BSDF* bsdf = mat.get_brdf(isect, arena);
 
@@ -63,8 +63,8 @@ namespace rt {
 			}
 			return L;
 		}
-		Spectrum Path::calculate_radiance(ResourceManager& man, const Scene& scene, Ray ray, Intersection isect, MemoryArena& arena) const {
-			return calculate_color(man, scene, ray, isect, 0, arena);
+		Spectrum Path::calculate_radiance(const Scene& scene, Ray ray, Intersection isect, MemoryArena& arena) const {
+			return calculate_color(scene, ray, isect, 0, arena);
 		}
 	}
 }

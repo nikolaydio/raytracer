@@ -22,9 +22,6 @@
     <ClInclude Include="config.h">
       <Filter>Raytracer</Filter>
     </ClInclude>
-    <ClInclude Include="resource_manager.h">
-      <Filter>Raytracer\Resource</Filter>
-    </ClInclude>
     <ClInclude Include="accelerator.h">
       <Filter>Raytracer\Accelerators</Filter>
     </ClInclude>
@@ -59,9 +56,6 @@
     </ClCompile>
     <ClCompile Include="kdtree.cpp">
       <Filter>Raytracer\Accelerators</Filter>
-    </ClCompile>
-    <ClCompile Include="resource_manager.cpp">
-      <Filter>Raytracer\Resource</Filter>
     </ClCompile>
     <ClCompile Include="murmurhash2.cpp">
       <Filter>Utility</Filter>
@@ -100,9 +94,6 @@
     </Filter>
     <Filter Include="Raytracer\Scene">
       <UniqueIdentifier>{5ba28398-b473-4fb6-9650-6e66d93001fd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Raytracer\Resource">
-      <UniqueIdentifier>{2ff4b4d8-a3cc-4459-ab50-92010e317650}</UniqueIdentifier>
     </Filter>
     <Filter Include="Raytracer\Shape">
       <UniqueIdentifier>{a33e2e77-5870-4008-9d92-d87758bf2293}</UniqueIdentifier>

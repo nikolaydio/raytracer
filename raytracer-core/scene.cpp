@@ -65,7 +65,12 @@ namespace rt {
 		Node Scene::node(uint32_t index) const {
 			return _nodes[index];
 		}
-
+		Material Scene::material_by_id(int id) const {
+			return _material_bucket[id];
+		}
+		void Scene::set_material_bucket(std::vector<Material>& mat_bucket) {
+			_material_bucket = mat_bucket;
+		}
 
 		void Scene::accelerate_and_rebuild(Accelerator* pacc) {
 

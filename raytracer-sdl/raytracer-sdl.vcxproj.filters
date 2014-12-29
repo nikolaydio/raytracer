@@ -4,27 +4,48 @@
     <ClCompile Include="main.cpp">
       <Filter>Main</Filter>
     </ClCompile>
-    <ClCompile Include="scene_loader.cpp">
-      <Filter>Else</Filter>
+    <ClCompile Include="presentation_sdl2.cpp">
+      <Filter>Presentation</Filter>
     </ClCompile>
     <ClCompile Include="sjson_compiler.cpp">
-      <Filter>Else</Filter>
+      <Filter>Scene &amp; Config Loading</Filter>
+    </ClCompile>
+    <ClCompile Include="scene_loader.cpp">
+      <Filter>Scene &amp; Config Loading</Filter>
+    </ClCompile>
+    <ClCompile Include="file_loader.cpp">
+      <Filter>Scene &amp; Config Loading</Filter>
+    </ClCompile>
+    <ClCompile Include="resource_manager.cpp">
+      <Filter>Scene &amp; Config Loading</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="scene_loader.h">
-      <Filter>Else</Filter>
+    <ClInclude Include="presentation_sdl2.h">
+      <Filter>Presentation</Filter>
     </ClInclude>
     <ClInclude Include="sjson_compiler.h">
-      <Filter>Else</Filter>
+      <Filter>Scene &amp; Config Loading</Filter>
+    </ClInclude>
+    <ClInclude Include="scene_loader.h">
+      <Filter>Scene &amp; Config Loading</Filter>
+    </ClInclude>
+    <ClInclude Include="file_loader.h">
+      <Filter>Scene &amp; Config Loading</Filter>
+    </ClInclude>
+    <ClInclude Include="resource_manager.h">
+      <Filter>Scene &amp; Config Loading</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Main">
       <UniqueIdentifier>{2b5a469a-da1f-469b-b93c-d65525a86c4f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Else">
-      <UniqueIdentifier>{eabb1469-bd0c-4379-9eed-55d858ca39d1}</UniqueIdentifier>
+    <Filter Include="Presentation">
+      <UniqueIdentifier>{f39b12e9-c9f8-44bc-ad57-de9b450b88d6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene &amp; Config Loading">
+      <UniqueIdentifier>{c788fc97-92e2-49d1-bcc3-d1239770d133}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

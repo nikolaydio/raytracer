@@ -2,7 +2,6 @@
 #include "scene.h"
 #include "camera.h"
 #include "film.h"
-#include "resource_manager.h"
 #include <random>
 #include "material.h"
 
@@ -32,15 +31,14 @@ namespace rt {
 	
 		class Integrator {
 		public:
-			virtual Spectrum calculate_radiance(ResourceManager& man, const Scene& scene, Ray ray, Intersection isect, MemoryArena& arena) const = 0;
+			virtual Spectrum calculate_radiance(const Scene& scene, Ray ray, Intersection isect, MemoryArena& arena) const = 0;
 		};
 
 		class Renderer {
 			const Sampler& _sampler;
 			const Camera& _camera;
 			const Scene& _scene;
-			const Integrator& _integrator;
-			ResourceManager& _manager;
+			const Integrator& _integrator;;
 			
 			Film* _film;
 			Film* _normals;
@@ -52,12 +50,13 @@ namespace rt {
 				const Camera& camera,
 				const Scene& scene,
 				const Integrator& integrator,
-				ResourceManager& manager);
+				Film* radiance_film_, Film* normal_film_ = 0);
 
 			~Renderer() {}
 
-			Film*& film();
-			void normal_film(Film* film);
+			Film* radiance_film();
+			Film* normal_film();
+
 
 			void run_multithreaded(int chunk_size = 16);
 			void run_singlethreaded();

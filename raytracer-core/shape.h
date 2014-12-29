@@ -59,6 +59,7 @@ namespace rt {
 			AABB bbox;
 		public:
 			Mesh() : _accelerator(0), _adapter(points) { }
+			~Mesh() { delete _accelerator; }
 			ElementAdapter& get_adapter();
 			void push_face(glm::vec3 a, glm::vec3 b, glm::vec3 c);
 			void push_vert(glm::vec3 a);

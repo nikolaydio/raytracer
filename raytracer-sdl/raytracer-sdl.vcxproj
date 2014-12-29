@@ -90,11 +90,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="file_loader.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="presentation_sdl2.cpp" />
+    <ClCompile Include="resource_manager.cpp" />
     <ClCompile Include="scene_loader.cpp" />
     <ClCompile Include="sjson_compiler.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="file_loader.h" />
+    <ClInclude Include="presentation_sdl2.h" />
+    <ClInclude Include="resource_manager.h" />
     <ClInclude Include="scene_loader.h" />
     <ClInclude Include="sjson_compiler.h" />
   </ItemGroup>

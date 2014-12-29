@@ -53,6 +53,8 @@ static bool is_char(char ch) {
 		return true;
 	if(ch >= 'a' && ch <= 'z')
 		return true;
+	if (ch == '_')
+		return true;
 	return false;
 }
 static bool is_white(char ch) {
@@ -404,6 +406,8 @@ float sjson_table_float(json_file* file, int table, const char* key) {
 	json_value* entry = sjson_table_search(file, table, key);
 	if(entry && entry->value_type == AT_FLOAT) {
 		return entry->value_data.val_float;
+	} else if (entry && entry->value_type == AT_INT) {
+		return (float)entry->value_data.val_int;
 	}
 	SJSON_ACCESS_ERROR_HANDLE();
 	return 0;
@@ -450,7 +454,7 @@ float sjson_list_float(json_file* file, int list, int id) {
 		return entry->value_data.val_float;
 	}
 	else if (entry && entry->value_type == AT_INT) {
-		return (float)entry->value_data.val_float;
+		return (float)entry->value_data.val_int;
 	}
 	SJSON_ACCESS_ERROR_HANDLE();
 	return 0;

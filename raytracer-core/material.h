@@ -4,6 +4,8 @@
 
 namespace rt {
 	namespace core {
+#define ARENA_NEW(arena, type) ( new (arena.allocate(sizeof(type))) (type) )
+#define ARENA_NEW(arena, type, ...) ( new (arena.allocate(sizeof(type))) (type)(##__VA_ARGS__) )
 		class MemoryArena {
 		public:
 			MemoryArena(int size);

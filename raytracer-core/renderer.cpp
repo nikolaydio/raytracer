@@ -44,10 +44,17 @@ namespace rt {
 			const Camera& camera,
 			const Scene& scene,
 			const Integrator& integrator,
-			ResourceManager& manager)
-		: _sampler(sampler), _camera(camera), _scene(scene), _integrator(integrator), _manager(manager) {
-			_normals = 0;
+			Film* radiance_film_, Film* normal_film_)
+		: _sampler(sampler), _camera(camera), _scene(scene), _integrator(integrator) {
+			_normals = normal_film_;
+			_film = radiance_film_;
 			continue_rendering = false;
+		}
+		Film* Renderer::radiance_film() {
+			return _film;
+		}
+		Film* Renderer::normal_film() {
+			return _normals;
 		}
 
 		void Renderer::run_singlethreaded() {
@@ -72,7 +79,7 @@ namespace rt {
 
 					Intersection intersection;
 					if (_scene.intersect(ray, &intersection)) {
-						glm::vec3 color = _integrator.calculate_radiance(_manager, _scene, ray, intersection, arena);
+						glm::vec3 color = _integrator.calculate_radiance(_scene, ray, intersection, arena);
 						arena.free_all();
 
 						_film->apply_radiance((int)original_position.x, (int)original_position.y, Color(color));
@@ -126,12 +133,6 @@ namespace rt {
 				delete arenas[i];
 			}
 			delete[] samplers;
-		}
-		Film*& Renderer::film() {
-			return _film;
-		}
-		void Renderer::normal_film(Film* film) {
-			_normals = film;
 		}
 
 		void Renderer::stop_rendering() {
