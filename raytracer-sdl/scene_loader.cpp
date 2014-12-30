@@ -14,7 +14,11 @@
 rt::core::Shape* make_mesh(const char* filename);
 namespace rt {
 	namespace sdl {
-		config_file load_config_file(const char* fn, FileLoader& loader) {
+		void ConfigFileDeleter::operator()(ConfigFile* p) {
+			sjson_free_file((json_file*)p);
+		}
+
+		std::unique_ptr<ConfigFile, ConfigFileDeleter> load_config_file(const char* fn, FileLoader& loader) {
 			std::string str;
 			bool success = loader.load_string_file(fn, &str);
 			if (!success) {
@@ -26,16 +30,16 @@ namespace rt {
 			if (!file) {
 				std::cout << "Failed to compile " << fn << std::endl;
 			}
-			return file;
+			return std::unique_ptr<ConfigFile, ConfigFileDeleter>((ConfigFile*)file);
 		}
-		void free_config_file(config_file f) {
+		void free_config_file(ConfigFile* f) {
 			sjson_free_file((json_file*)f);
 		}
 
-		bool load_scene_and_accelerate(config_file f, rt::core::Scene& scene, ResourceManager& manager) {
+		bool load_scene_and_accelerate(const ConfigFile& f, rt::core::Scene& scene, ResourceManager& manager) {
 			std::vector<rt::core::Material> material_list;
 
-			json_file* file = (json_file*)f;
+			json_file* file = (json_file*)&f;
 			std::cout << "Loading " << sjson_table_string(file, SJSON_ROOT_TABLE_ID, "name") << "\n";
 			int node_list = sjson_table_int(file, SJSON_ROOT_TABLE_ID, "nodelist");
 			int node_count = sjson_list_entry_count(file, node_list);
@@ -115,8 +119,8 @@ namespace rt {
 			scene.set_material_bucket(material_list);
 			return true;
 		}
-		bool load_images(config_file f, std::vector<rt::core::Renderer>& renderers, rt::core::Scene& scene, std::vector<rt::core::Film*>& films, core::MemoryArena& arena) {
-			json_file* file = (json_file*)f;
+		bool load_images(const ConfigFile& f, std::vector<rt::core::Renderer>& renderers, rt::core::Scene& scene, std::vector<rt::core::Film*>& films, core::MemoryArena& arena) {
+			json_file* file = (json_file*)&f;
 			int images_id = sjson_table_int(file, SJSON_ROOT_TABLE_ID, "images");
 			for (int i = 0; i < sjson_list_entry_count(file, images_id); ++i) {
 				int current_image_id = sjson_list_int(file, images_id, i);

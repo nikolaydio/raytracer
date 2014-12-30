@@ -2,14 +2,20 @@
 #include "scene.h"
 #include "renderer.h"
 #include "resource_manager.h"
+#include <memory>
 
 namespace rt {
 	namespace sdl {
-		typedef void* config_file;
-		config_file load_config_file(const char* fn, FileLoader& loader);
-		void free_config_file(config_file f);
+		struct ConfigFile;
+		class ConfigFileDeleter {
+		public:
+			void operator()(ConfigFile* p);
+		};
 
-		bool load_scene_and_accelerate(config_file f, rt::core::Scene& scene, ResourceManager& manager);
-		bool load_images(config_file f, std::vector<rt::core::Renderer>& renderers, rt::core::Scene& scene, std::vector<rt::core::Film*>& films, core::MemoryArena& arena);
+		std::unique_ptr<ConfigFile, ConfigFileDeleter> load_config_file(const char* fn, FileLoader& loader);
+		void free_config_file(ConfigFile* f);
+
+		bool load_scene_and_accelerate(const ConfigFile& f, rt::core::Scene& scene, ResourceManager& manager);
+		bool load_images(const ConfigFile& f, std::vector<rt::core::Renderer>& renderers, rt::core::Scene& scene, std::vector<rt::core::Film*>& films, core::MemoryArena& arena);
 	}
 }

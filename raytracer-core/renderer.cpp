@@ -3,6 +3,7 @@
 #include <iostream>
 #include "material.h"
 #include <omp.h>
+#include <memory>
 
 namespace rt {
 	namespace core {
@@ -103,17 +104,18 @@ namespace rt {
 			int chunks = columns * rows;
 
 			//generate subsamplers
-			Sampler::SubSampler* samplers = new Sampler::SubSampler[columns * rows];
+			std::vector<Sampler::SubSampler> samplers;
+			samplers.reserve(columns*rows);
 			for (int i = 0; i < chunks; ++i) {
 				glm::vec2 pos((i % columns) * chunk_size, (i / columns) * chunk_size);
 				glm::vec2 end_pos = glm::min(glm::vec2(pos.x + chunk_size, pos.y + chunk_size), glm::vec2(size_x, size_y));
 				glm::vec2 size(end_pos - pos);
-				samplers[i] = _sampler.create_subsampler(pos, size);
+				samplers.push_back(_sampler.create_subsampler(pos, size));
 			}
-			std::vector<MemoryArena*> arenas;
+			std::vector<std::unique_ptr<MemoryArena>> arenas;
 			int threads = omp_get_max_threads();
 			for (int i = 0; i < threads; ++i) {
-				arenas.push_back(new MemoryArena(64 * 1024));
+				arenas.push_back(std::unique_ptr<MemoryArena>(new MemoryArena(MATERIAL_MEMORY_ARENA_SIZE)));
 			}
 
 			//run the rendering process
@@ -126,12 +128,6 @@ namespace rt {
 				process_subsampler(samplers[i], *arenas[tid]);
 				arenas[tid]->free_all();
 			}
-			
-
-			for (int i = 0; i < arenas.size(); ++i) {
-				delete arenas[i];
-			}
-			delete[] samplers;
 		}
 
 		void Renderer::do_not_render() {

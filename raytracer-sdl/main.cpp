@@ -12,7 +12,7 @@
 #include "film.h"
 #include "presentation_sdl2.h"
 
-
+#include <memory>
 
 
 void* rendering_thread(std::vector<rt::core::Renderer>* renderers) {
@@ -39,26 +39,24 @@ int raytracer_entry_point(int argc, char* argv[]) {
 	
 	rt::sdl::FileLoader loader;
 	loader.add_directory("./scenes");
-	rt::sdl::config_file file = rt::sdl::load_config_file(scene_fn, loader);
+	auto&& file = rt::sdl::load_config_file(scene_fn, loader);
 	if (!file) {
 		return 0;
 	}
 
 	rt::sdl::ResourceManager manager(loader);
-	if (!rt::sdl::load_scene_and_accelerate(file, scene, manager)) {
+	if (!rt::sdl::load_scene_and_accelerate(*file.get(), scene, manager)) {
 		std::cout << "Failed to load scene " << scene_fn << std::endl;
-		rt::sdl::free_config_file(file);
 		return 0;
 	}
 	
 	std::vector<rt::core::Renderer> renderers;
 	std::vector<rt::core::Film*> films;
 	rt::core::MemoryArena arena(RENDER_CONTEXT_MEMORY_ARENA_SIZE);
-	if (!rt::sdl::load_images(file, renderers, scene, films, arena)) {
-		rt::sdl::free_config_file(file);
+	if (!rt::sdl::load_images(*file.get(), renderers, scene, films, arena)) {
 		return 0;
 	}
-	rt::sdl::free_config_file(file);
+	file.reset();
 
 
 	std::thread render_thread(rendering_thread, &renderers);

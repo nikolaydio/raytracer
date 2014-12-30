@@ -19,6 +19,8 @@ namespace rt {
 			int _size;
 			int _allocated;
 		};
+		//the size of the memory arena passed to the material so it can create its BSDFs;
+#define MATERIAL_MEMORY_ARENA_SIZE 64*1024
 		class Material {
 		public:
 			Material() : specular(false) {}

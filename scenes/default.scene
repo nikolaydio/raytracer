@@ -8,7 +8,18 @@ images = [
 			lookat = [0 0 0]
 			fov = 60
 		}
-		take_normals = 1
+		take_normals = 0
+	}
+	{
+		method = "path"
+		samples = 16
+		camera = {
+			type = "pinhole"
+			eye = [0 0 -3]
+			lookat = [0 0 0]
+			fov = 60
+		}
+		take_normals = 0
 	}
 ]
 
