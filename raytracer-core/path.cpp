@@ -14,7 +14,7 @@ namespace rt {
 			const int max_depth = 2;
 			for (int bounces = 0; ; ++bounces) {
 
-				Material& mat = scene.material_by_id(isect.material);
+				const Material& mat = scene.material_by_id(isect.material);
 				L += mat.emitted * path_throughput;
 				BSDF* bsdf = mat.get_brdf(isect, arena);
 

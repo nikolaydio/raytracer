@@ -1,6 +1,6 @@
 #include "presentation_sdl2.h"
 #include "config.h"
-#include <SDL2\SDL.h>
+#include <SDL2/SDL.h>
 
 
 #define REQUIRE(cond) do { if(!(cond)) { printf("Cond failed %s: %s\n", __FILE__, __LINE__); exit(0); }  }while(0)

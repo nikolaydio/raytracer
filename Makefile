@@ -1,7 +1,8 @@
 # 64 bit
 MARCH=-m64
-# change this to -g3 for debug builds
-OPT=-O2
+# release vs debug build
+OPT=-g3 -O1
+#OPT=-O3 -DNDEBUG
 
 
 INCLUDE=-Iraytracer-core -I3rdparty/glm

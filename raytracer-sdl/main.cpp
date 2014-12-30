@@ -29,12 +29,8 @@ void* rendering_thread(std::vector<rt::core::Renderer>* renderers) {
 
 #define RENDER_CONTEXT_MEMORY_ARENA_SIZE 64*1024
 
-int main(int argc, char* argv[]) {
-#ifdef _DEBUG
-	std::cout << "Warning: This is a debug build\n" << std::endl;
-#endif
 
-
+int run(int argc, char* argv[]) {
 	rt::core::Scene scene;
 	const char* scene_fn = "/default.scene";
 	if (argc > 1) {
@@ -51,6 +47,7 @@ int main(int argc, char* argv[]) {
 	rt::sdl::ResourceManager manager(loader);
 	if (!rt::sdl::load_scene_and_accelerate(file, scene, manager)) {
 		std::cout << "Failed to load scene " << scene_fn << std::endl;
+		rt::sdl::free_config_file(file);
 		return 0;
 	}
 	
@@ -58,8 +55,10 @@ int main(int argc, char* argv[]) {
 	std::vector<rt::core::Surface2d*> surfaces;
 	rt::core::MemoryArena arena(RENDER_CONTEXT_MEMORY_ARENA_SIZE);
 	if (!rt::sdl::load_images(file, renderers, scene, surfaces, arena)) {
+		rt::sdl::free_config_file(file);
 		return 0;
 	}
+	rt::sdl::free_config_file(file);
 
 
 	std::thread render_thread(rendering_thread, &renderers);
@@ -74,5 +73,11 @@ int main(int argc, char* argv[]) {
 		delete surf;
 	}
 	manager.cleanup();
-	return 0;
+}
+
+int main(int argc, char* argv[]) {
+#ifdef _DEBUG
+	std::cout << "Warning: This is a debug build\n" << std::endl;
+#endif
+	return run(argc, argv);
 }

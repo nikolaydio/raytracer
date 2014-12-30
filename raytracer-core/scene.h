@@ -28,6 +28,7 @@ namespace rt {
 			}
 			~Scene() {
 				delete _accelerator;
+				set_capacity(0);
 			}
 
 			bool intersect(Ray ray, Intersection* result) const;

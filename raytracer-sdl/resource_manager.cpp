@@ -12,7 +12,7 @@ namespace rt {
 			_resource_map[path] = resource;
 		}
 		Resource* ResourceCache::get_resource(const char* path) {
-			auto& iter = _resource_map.find(path);
+			auto iter = _resource_map.find(path);
 			if (iter != _resource_map.end()) {
 				return &iter->second;
 			}
@@ -42,7 +42,7 @@ namespace rt {
 			}
 
 			//otherwise, try to load it and parse it
-			void* buffer = _file_loader.load_raw_file(path, size);
+			char* buffer = _file_loader.load_raw_file(path, size);
 			if (!buffer) {
 				return 0;
 			}

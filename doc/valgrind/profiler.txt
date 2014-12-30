@@ -1,0 +1,200 @@
+--------------------------------------------------------------------------------
+Profile data file 'callgrind.out.7410' (creator: callgrind-3.10.0.SVN)
+--------------------------------------------------------------------------------
+I1 cache: 
+D1 cache: 
+LL cache: 
+Timerange: Basic block 0 - 256013854
+Trigger: Program termination
+Profiled target:  ./bin/raytracer (PID 7410, part 1)
+Events recorded:  Ir
+Events shown:     Ir
+Event sort order: Ir
+Thresholds:       99
+Include dirs:     
+User annotated:   
+Auto-annotation:  off
+
+--------------------------------------------------------------------------------
+           Ir 
+--------------------------------------------------------------------------------
+2,070,385,057  PROGRAM TOTALS
+
+--------------------------------------------------------------------------------
+         Ir  file:function
+--------------------------------------------------------------------------------
+572,551,767  raytracer-sdl/presentation_sdl2.cpp:rt::sdl::present_rendering(std::vector<rt::core::Surface2d*, std::allocator<rt::core::Surface2d*> >&) [/home/nickie/raytracer/bin/raytracer]
+267,690,338  /usr/include/c++/4.8/bits/random.tcc:std::mersenne_twister_engine<unsigned long, 32ul, 624ul, 397ul, 31ul, 2567483615ul, 11ul, 4294967295ul, 7ul, 2636928640ul, 15ul, 4022730752ul, 18ul, 1812433253ul>::operator()() [/home/nickie/raytracer/bin/raytracer]
+146,822,858  /usr/include/c++/4.8/bits/random.h:rt::core::Path::calculate_color(rt::core::Scene const&, rt::core::Ray, rt::core::Intersection, int, rt::core::MemoryArena&) const
+132,189,736  3rdparty/glm/glm/detail/type_vec4.inl:rt::core::Scene::SceneAccAdapter::intersect(int, rt::core::Ray, rt::core::Intersection*) const
+128,302,560  raytracer-core/surface.cpp:rt::core::Surface2d::pixel(int, int) [/home/nickie/raytracer/bin/raytracer]
+116,522,820  /usr/include/c++/4.8/bits/random.tcc:rt::core::Path::calculate_color(rt::core::Scene const&, rt::core::Ray, rt::core::Intersection, int, rt::core::MemoryArena&) const
+ 75,730,640  3rdparty/glm/glm/detail/type_vec4.inl:rt::core::Scene::node(unsigned int) const
+ 43,566,440  raytracer-core/scene.cpp:rt::core::Scene::SceneAccAdapter::intersect(int, rt::core::Ray, rt::core::Intersection*) const [/home/nickie/raytracer/bin/raytracer]
+ 31,476,909  3rdparty/glm/glm/detail/type_vec3.inl:rt::core::Triangle::intersect(rt::core::Ray, rt::core::Intersection*) const
+ 27,260,696  3rdparty/glm/glm/detail/type_vec3.inl:rt::core::Scene::SceneAccAdapter::intersect(int, rt::core::Ray, rt::core::Intersection*) const
+ 27,199,120  3rdparty/glm/glm/detail/func_geometric.inl:rt::core::Triangle::intersect(rt::core::Ray, rt::core::Intersection*) const
+ 24,981,612  raytracer-core/kdtree.cpp:rt::core::KdTreeAccelerator::intersect(rt::core::Ray, rt::core::Intersection*) const [/home/nickie/raytracer/bin/raytracer]
+ 23,085,660  3rdparty/glm/glm/detail/type_vec3.inl:rt::core::Mesh::MeshAdapter::intersect(int, rt::core::Ray, rt::core::Intersection*) const
+ 22,504,608  raytracer-core/types.h:rt::core::Mesh::intersect(rt::core::Ray, rt::core::Intersection*) const
+ 22,277,616  3rdparty/glm/glm/detail/type_vec3.inl:rt::core::KdTreeAccelerator::intersect(rt::core::Ray, rt::core::Intersection*) const
+ 20,004,096  3rdparty/glm/glm/detail/func_common.inl:rt::core::Mesh::intersect(rt::core::Ray, rt::core::Intersection*) const
+ 19,534,854  raytracer-core/shape.cpp:rt::core::Triangle::intersect(rt::core::Ray, rt::core::Intersection*) const [/home/nickie/raytracer/bin/raytracer]
+ 18,493,728  3rdparty/glm/glm/detail/type_mat4x4.inl:rt::core::Scene::SceneAccAdapter::intersect(int, rt::core::Ray, rt::core::Intersection*) const
+ 17,603,934  3rdparty/glm/glm/detail/type_vec3.inl:rt::core::Mesh::intersect(rt::core::Ray, rt::core::Intersection*) const [/home/nickie/raytracer/bin/raytracer]
+ 14,700,395  ???:0x0000000000009da0 [/usr/lib/x86_64-linux-gnu/libgomp.so.1.0.0]
+ 11,431,040  raytracer-core/scene.cpp:rt::core::Scene::node(unsigned int) const [/home/nickie/raytracer/bin/raytracer]
+ 11,431,040  3rdparty/glm/glm/detail/type_mat4x4.inl:rt::core::Scene::node(unsigned int) const
+ 11,268,244  raytracer-core/accelerator.h:rt::core::DefaultAccelerator::intersect(rt::core::Ray, rt::core::Intersection*) const [/home/nickie/raytracer/bin/raytracer]
+  9,815,925  /build/buildd/eglibc-2.19/malloc/malloc.c:_int_malloc [/lib/x86_64-linux-gnu/libc-2.19.so]
+  9,234,264  raytracer-core/shape.cpp:rt::core::Mesh::MeshAdapter::intersect(int, rt::core::Ray, rt::core::Intersection*) const [/home/nickie/raytracer/bin/raytracer]
+  8,332,478  3rdparty/glm/glm/detail/func_geometric.inl:rt::core::BSDF::world_to_local(glm::detail::tvec3<float, (glm::precision)0>) const
+  7,760,898  3rdparty/glm/glm/detail/type_vec3.inl:rt::core::Path::calculate_color(rt::core::Scene const&, rt::core::Ray, rt::core::Intersection, int, rt::core::MemoryArena&) const
+  7,340,579  3rdparty/glm/glm/detail/type_vec3.inl:rt::core::DefaultAccelerator::intersect(rt::core::Ray, rt::core::Intersection*) const
+  6,736,588  /build/buildd/eglibc-2.19/malloc/malloc.c:_int_free [/lib/x86_64-linux-gnu/libc-2.19.so]
+  6,429,888  /usr/include/c++/4.8/bits/stl_vector.h:rt::core::KdTreeAccelerator::intersect(rt::core::Ray, rt::core::Intersection*) const
+  6,187,114  raytracer-core/kdtree.cpp:rt::core::KdTreeAccelerator::intersect(rt::core::Ray, rt::core::Intersection*) const'2 [/home/nickie/raytracer/bin/raytracer]
+  6,156,176  /usr/include/c++/4.8/bits/stl_vector.h:rt::core::Mesh::MeshAdapter::intersect(int, rt::core::Ray, rt::core::Intersection*) const
+  5,960,253  raytracer-core/shape.cpp:rt::core::Mesh::intersect(rt::core::Ray, rt::core::Intersection*) const
+  5,423,820  3rdparty/glm/glm/detail/type_vec3.inl:rt::core::KdTreeAccelerator::intersect(rt::core::Ray, rt::core::Intersection*) const'2
+  4,507,734  3rdparty/glm/glm/detail/type_vec3.inl:rt::core::BSDF::world_to_local(glm::detail::tvec3<float, (glm::precision)0>) const
+  4,494,336  3rdparty/glm/glm/detail/type_vec4.inl:rt::core::Camera::find_ray(rt::core::Sample, rt::core::Ray*) const
+  4,069,710  raytracer-core/path.cpp:rt::core::Path::calculate_color(rt::core::Scene const&, rt::core::Ray, rt::core::Intersection, int, rt::core::MemoryArena&) const [/home/nickie/raytracer/bin/raytracer]
+  3,950,080  /build/buildd/eglibc-2.19/elf/dl-lookup.c:do_lookup_x [/lib/x86_64-linux-gnu/ld-2.19.so]
+  3,872,994  raytracer-core/shape.cpp:rt::core::Sphere::intersect(rt::core::Ray, rt::core::Intersection*) const [/home/nickie/raytracer/bin/raytracer]
+  3,738,672  raytracer-core/types.h:rt::core::KdTreeAccelerator::intersect(rt::core::Ray, rt::core::Intersection*) const
+  3,692,460  raytracer-core/film.cpp:rt::core::Film::apply_radiance(int, int, rt::core::Color) [/home/nickie/raytracer/bin/raytracer]
+  3,686,400  raytracer-core/surface.h:rt::core::Surface2d::Surface2d(int, int)
+  3,477,048  /usr/include/c++/4.8/bits/stl_vector.h:rt::core::Mesh::MeshAdapter::count()
+  3,345,425  /build/buildd/eglibc-2.19/libio/genops.c:_IO_un_link [/lib/x86_64-linux-gnu/libc-2.19.so]
+  3,207,309  /build/buildd/eglibc-2.19/malloc/malloc.c:malloc_consolidate [/lib/x86_64-linux-gnu/libc-2.19.so]
+  3,176,030  3rdparty/glm/glm/detail/func_geometric.inl:rt::core::BSDF::local_to_world(glm::detail::tvec3<float, (glm::precision)0>) const
+  3,072,068  raytracer-core/film.cpp:rt::core::Film::Film(rt::core::Surface2d*) [/home/nickie/raytracer/bin/raytracer]
+  3,046,237  /build/buildd/eglibc-2.19/math/../sysdeps/x86_64/fpu/s_sincosf.S:sincosf [/lib/x86_64-linux-gnu/libm-2.19.so]
+  2,949,742  3rdparty/glm/glm/detail/func_common.inl:rt::core::Triangle::intersect(rt::core::Ray, rt::core::Intersection*) const
+  2,945,046  raytracer-core/bsdf.cpp:rt::core::BSDF::evaluate_sample_f(glm::detail::tvec3<float, (glm::precision)0>, glm::detail::tvec3<float, (glm::precision)0>*, float, float, float*) const [/home/nickie/raytracer/bin/raytracer]
+  2,898,866  /build/buildd/eglibc-2.19/malloc/malloc.c:malloc [/lib/x86_64-linux-gnu/libc-2.19.so]
+  2,897,540  raytracer-core/shape.cpp:rt::core::Mesh::MeshAdapter::count() [/home/nickie/raytracer/bin/raytracer]
+  2,857,760  raytracer-core/scene.h:rt::core::Scene::node(unsigned int) const
+  2,857,728  3rdparty/glm/glm/detail/func_common.inl:rt::core::KdTreeAccelerator::intersect(rt::core::Ray, rt::core::Intersection*) const
+  2,707,972  3rdparty/glm/glm/detail/type_vec3.inl:rt::core::Sphere::intersect(rt::core::Ray, rt::core::Intersection*) const
+  2,602,190  3rdparty/glm/glm/detail/type_vec3.inl:rt::core::Renderer::process_subsampler(rt::core::Sampler::SubSampler&, rt::core::MemoryArena&)
+  2,525,996  /build/buildd/eglibc-2.19/libio/genops.c:_IO_link_in [/lib/x86_64-linux-gnu/libc-2.19.so]
+  2,309,840  /usr/include/c++/4.8/bits/random.tcc:float std::generate_canonical<float, 24ul, std::mersenne_twister_engine<unsigned long, 32ul, 624ul, 397ul, 31ul, 2567483615ul, 11ul, 4294967295ul, 7ul, 2636928640ul, 15ul, 4022730752ul, 18ul, 1812433253ul> >(std::mersenne_twister_engine<unsigned long, 32ul, 624ul, 397ul, 31ul, 2567483615ul, 11ul, 4294967295ul, 7ul, 2636928640ul, 15ul, 4022730752ul, 18ul, 1812433253ul>&) [/home/nickie/raytracer/bin/raytracer]
+  2,253,055  raytracer-core/material.cpp:rt::core::Material::get_brdf(rt::core::Intersection&, rt::core::MemoryArena&) const [/home/nickie/raytracer/bin/raytracer]
+  2,177,475  ???:0x0000000000009bc0 [/usr/lib/x86_64-linux-gnu/libgomp.so.1.0.0]
+  2,143,296  3rdparty/glm/glm/detail/type_vec3.inl:rt::core::Scene::intersect(rt::core::Ray, rt::core::Intersection*) const
+  2,136,602  3rdparty/glm/glm/detail/type_vec3.inl:rt::core::BSDF::evaluate_sample_f(glm::detail::tvec3<float, (glm::precision)0>, glm::detail::tvec3<float, (glm::precision)0>*, float, float, float*) const
+  2,106,148  ???:0x000000000004caa0 [/usr/lib/x86_64-linux-gnu/libX11.so.6.3.0]
+  2,059,560  ???:0x00000000001e0810 [/usr/lib/x86_64-linux-gnu/dri/i965_dri.so]
+  2,032,620  raytracer-core/renderer.cpp:rt::core::Renderer::process_subsampler(rt::core::Sampler::SubSampler&, rt::core::MemoryArena&) [/home/nickie/raytracer/bin/raytracer]
+  2,021,110  raytracer-core/bsdf.cpp:rt::core::BSDF::local_to_world(glm::detail::tvec3<float, (glm::precision)0>) const [/home/nickie/raytracer/bin/raytracer]
+  2,014,548  raytracer-core/bsdf.cpp:rt::core::BxDF::evaluate_sample_f(glm::detail::tvec3<float, (glm::precision)0>, glm::detail::tvec3<float, (glm::precision)0>*, float, float, float*) const [/home/nickie/raytracer/bin/raytracer]
+  2,009,888  ???:0x00000000001e06c0 [/usr/lib/x86_64-linux-gnu/dri/i965_dri.so]
+  1,917,728  /build/buildd/eglibc-2.19/libio/fileops.c:_IO_file_fopen@@GLIBC_2.2.5 [/lib/x86_64-linux-gnu/libc-2.19.so]
+  1,830,300  raytracer-core/material.cpp:rt::core::MemoryArena::allocate(int) [/home/nickie/raytracer/bin/raytracer]
+  1,786,080  raytracer-core/scene.cpp:rt::core::Scene::intersect(rt::core::Ray, rt::core::Intersection*) const [/home/nickie/raytracer/bin/raytracer]
+  1,775,774  raytracer-core/bsdf.cpp:rt::core::BSDF::world_to_local(glm::detail::tvec3<float, (glm::precision)0>) const [/home/nickie/raytracer/bin/raytracer]
+  1,724,896  3rdparty/glm/glm/detail/type_vec3.inl:rt::core::BSDF::evaluate_f(glm::detail::tvec3<float, (glm::precision)0>, glm::detail::tvec3<float, (glm::precision)0>) const
+  1,660,464  /usr/include/c++/4.8/bits/stl_vector.h:rt::core::KdTreeAccelerator::intersect(rt::core::Ray, rt::core::Intersection*) const'2
+  1,655,808  3rdparty/glm/glm/detail/type_vec3.inl:rt::core::Camera::find_ray(rt::core::Sample, rt::core::Ray*) const
+  1,633,414  raytracer-core/bsdf.cpp:rt::core::uniform_sample_hemisphere(float, float) [/home/nickie/raytracer/bin/raytracer]
+  1,600,445  raytracer-core/renderer.cpp:rt::core::Sampler::SubSampler::next_samples(rt::core::Sample*) [/home/nickie/raytracer/bin/raytracer]
+  1,520,285  /build/buildd/eglibc-2.19/libio/iofclose.c:fclose@@GLIBC_2.2.5 [/lib/x86_64-linux-gnu/libc-2.19.so]
+  1,444,712  ???:0x0000000000080a60 [/usr/lib/x86_64-linux-gnu/dri/i965_dri.so]
+  1,426,898  /build/buildd/eglibc-2.19/libio/fileops.c:_IO_file_xsgetn [/lib/x86_64-linux-gnu/libc-2.19.so]
+  1,299,045  3rdparty/glm/glm/detail/func_common.inl:rt::core::Renderer::process_subsampler(rt::core::Sampler::SubSampler&, rt::core::MemoryArena&)
+  1,295,802  /build/buildd/eglibc-2.19/string/../sysdeps/x86_64/memset.S:memset [/lib/x86_64-linux-gnu/libc-2.19.so]
+  1,288,409  /build/buildd/eglibc-2.19/libio/genops.c:_IO_setb [/lib/x86_64-linux-gnu/libc-2.19.so]
+  1,285,518  raytracer-core/bsdf.cpp:rt::core::BSDF::evaluate_f(glm::detail::tvec3<float, (glm::precision)0>, glm::detail::tvec3<float, (glm::precision)0>) const [/home/nickie/raytracer/bin/raytracer]
+  1,262,615  /build/buildd/eglibc-2.19/libio/filedoalloc.c:_IO_file_doallocate [/lib/x86_64-linux-gnu/libc-2.19.so]
+  1,230,949  /build/buildd/eglibc-2.19/malloc/malloc.c:free [/lib/x86_64-linux-gnu/libc-2.19.so]
+  1,228,862  raytracer-core/surface.cpp:rt::core::Surface2d::Surface2d(int, int) [/home/nickie/raytracer/bin/raytracer]
+  1,147,820  /build/buildd/eglibc-2.19/elf/../sysdeps/x86_64/dl-machine.h:_dl_relocate_object
+  1,122,672  /build/buildd/eglibc-2.19/libio/fileops.c:_IO_file_close_it@@GLIBC_2.2.5 [/lib/x86_64-linux-gnu/libc-2.19.so]
+  1,120,832  3rdparty/glm/glm/detail/func_geometric.inl:rt::core::Scene::SceneAccAdapter::intersect(int, rt::core::Ray, rt::core::Intersection*) const
+  1,112,691  /build/buildd/eglibc-2.19/elf/dl-lookup.c:_dl_lookup_symbol_x [/lib/x86_64-linux-gnu/ld-2.19.so]
+  1,039,428  3rdparty/glm/glm/detail/type_vec3.inl:rt::core::BSDF::local_to_world(glm::detail::tvec3<float, (glm::precision)0>) const
+  1,034,137  /build/buildd/eglibc-2.19/string/../sysdeps/x86_64/multiarch/../memcpy.S:__GI_memcpy [/lib/x86_64-linux-gnu/libc-2.19.so]
+  1,029,958  /build/buildd/eglibc-2.19/libio/iofread.c:fread [/lib/x86_64-linux-gnu/libc-2.19.so]
+    994,058  /build/buildd/eglibc-2.19/nptl/../nptl/pthread_mutex_lock.c:pthread_mutex_lock [/lib/x86_64-linux-gnu/libpthread-2.19.so]
+    980,046  3rdparty/glm/glm/detail/type_vec3.inl:rt::core::BxDF::evaluate_sample_f(glm::detail::tvec3<float, (glm::precision)0>, glm::detail::tvec3<float, (glm::precision)0>*, float, float, float*) const
+    961,037  3rdparty/glm/glm/detail/type_vec2.inl:rt::core::Renderer::process_subsampler(rt::core::Sampler::SubSampler&, rt::core::MemoryArena&)
+    939,051  /build/buildd/eglibc-2.19/string/../sysdeps/x86_64/multiarch/../strcmp.S:strcmp'2 [/lib/x86_64-linux-gnu/ld-2.19.so]
+    938,274  /build/buildd/eglibc-2.19/libio/fileops.c:_IO_file_underflow@@GLIBC_2.2.5 [/lib/x86_64-linux-gnu/libc-2.19.so]
+    935,564  /build/buildd/eglibc-2.19/libio/iofopen.c:__fopen_internal [/lib/x86_64-linux-gnu/libc-2.19.so]
+    882,780  ???:0x00000000001e0710 [/usr/lib/x86_64-linux-gnu/dri/i965_dri.so]
+    874,246  3rdparty/glm/glm/detail/func_geometric.inl:rt::core::Sphere::intersect(rt::core::Ray, rt::core::Intersection*) const
+    873,312  /build/buildd/eglibc-2.19/string/../sysdeps/x86_64/strlen.S:strlen [/lib/x86_64-linux-gnu/libc-2.19.so]
+    867,328  3rdparty/glm/glm/detail/type_vec2.inl:rt::core::Camera::find_ray(rt::core::Sample, rt::core::Ray*) const
+    844,857  3rdparty/glm/glm/detail/type_vec3.inl:rt::core::LambertianBRDF::evaluate_f(glm::detail::tvec3<float, (glm::precision)0>, glm::detail::tvec3<float, (glm::precision)0>) const
+    843,550  ???:char* std::string::_S_construct<char const*>(char const*, char const*, std::allocator<char> const&, std::forward_iterator_tag) [/usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.19]
+    825,908  /build/buildd/eglibc-2.19/string/../sysdeps/x86_64/multiarch/memcpy-ssse3-back.S:__memmove_ssse3_back [/lib/x86_64-linux-gnu/libc-2.19.so]
+    819,588  /usr/include/c++/4.8/cmath:rt::core::BSDF::world_to_local(glm::detail::tvec3<float, (glm::precision)0>) const
+    796,976  ???:std::string::compare(char const*) const [/usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.19]
+    794,580  raytracer-core/surface.h:rt::core::Renderer::process_subsampler(rt::core::Sampler::SubSampler&, rt::core::MemoryArena&)
+    774,103  /build/buildd/eglibc-2.19/libio/genops.c:_IO_no_init [/lib/x86_64-linux-gnu/libc-2.19.so]
+    771,218  ???:std::random_device::_M_init(std::string const&) [/usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.19]
+    769,522  raytracer-core/shape.h:rt::core::Mesh::MeshAdapter::intersect(int, rt::core::Ray, rt::core::Intersection*) const
+    755,253  /build/buildd/eglibc-2.19/malloc/malloc.c:calloc [/lib/x86_64-linux-gnu/libc-2.19.so]
+    719,044  3rdparty/glm/glm/detail/type_vec3.inl:rt::core::Material::get_brdf(rt::core::Intersection&, rt::core::MemoryArena&) const
+    714,058  3rdparty/glm/glm/detail/func_geometric.inl:rt::core::Path::calculate_color(rt::core::Scene const&, rt::core::Ray, rt::core::Intersection, int, rt::core::MemoryArena&) const
+    709,632  raytracer-core/camera.cpp:rt::core::Camera::find_ray(rt::core::Sample, rt::core::Ray*) const [/home/nickie/raytracer/bin/raytracer]
+    709,332  raytracer-core/types.h:rt::core::KdTreeAccelerator::intersect(rt::core::Ray, rt::core::Intersection*) const'2
+    709,003  /build/buildd/eglibc-2.19/string/../sysdeps/x86_64/multiarch/../strcmp.S:__strcmp_ssse3 [/lib/x86_64-linux-gnu/libc-2.19.so]
+    692,952  3rdparty/glm/glm/detail/type_vec3.inl:rt::core::Scene::material_by_id(int) const
+    682,990  3rdparty/glm/glm/detail/func_exponential.inl:rt::core::BSDF::world_to_local(glm::detail::tvec3<float, (glm::precision)0>) const
+    654,906  /build/buildd/eglibc-2.19/nptl/cleanup_defer_compat.c:_pthread_cleanup_push_defer [/lib/x86_64-linux-gnu/libpthread-2.19.so]
+    625,104  /build/buildd/eglibc-2.19/nptl/../nptl/sysdeps/unix/sysv/linux/x86_64/cancellation.S:__libc_disable_asynccancel [/lib/x86_64-linux-gnu/libc-2.19.so]
+    622,269  /build/buildd/eglibc-2.19/string/../sysdeps/x86_64/multiarch/memcpy-sse2-unaligned.S:__memcpy_sse2_unaligned [/lib/x86_64-linux-gnu/libc-2.19.so]
+    608,496  ???:0x00000000001e0570 [/usr/lib/x86_64-linux-gnu/dri/i965_dri.so]
+    601,793  /build/buildd/eglibc-2.19/elf/do-rel.h:_dl_relocate_object
+    596,196  /build/buildd/eglibc-2.19/nptl/pthread_mutex_unlock.c:pthread_mutex_unlock [/lib/x86_64-linux-gnu/libpthread-2.19.so]
+    592,271  ???:0x000000000000b910 [/usr/lib/x86_64-linux-gnu/libxcb.so.1.1.0]
+    586,991  /build/buildd/eglibc-2.19/libio/genops.c:_IO_old_init [/lib/x86_64-linux-gnu/libc-2.19.so]
+    585,833  ???:std::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string(char const*, std::allocator<char> const&) [/usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.19]
+    585,767  /build/buildd/eglibc-2.19/libio/getc.c:getc [/lib/x86_64-linux-gnu/libc-2.19.so]
+    584,761  /build/buildd/eglibc-2.19/string/../string/strstr.c:__GI_strstr [/lib/x86_64-linux-gnu/libc-2.19.so]
+    584,352  /build/buildd/eglibc-2.19/libio/genops.c:__underflow [/lib/x86_64-linux-gnu/libc-2.19.so]
+    578,421  raytracer-core/bsdf.cpp:rt::core::BSDF::add_brdf(rt::core::BRDF*, float) [/home/nickie/raytracer/bin/raytracer]
+    577,460  3rdparty/glm/glm/detail/type_vec3.inl:rt::core::BSDF::BSDF(glm::detail::tvec3<float, (glm::precision)0>)
+    573,012  /build/buildd/eglibc-2.19/nptl/../nptl/sysdeps/unix/sysv/linux/x86_64/cancellation.S:__libc_enable_asynccancel [/lib/x86_64-linux-gnu/libc-2.19.so]
+    560,880  3rdparty/glm/glm/detail/type_vec3.inl:rt::core::Path::calculate_radiance(rt::core::Scene const&, rt::core::Ray, rt::core::Intersection, rt::core::MemoryArena&) const
+    556,311  /build/buildd/eglibc-2.19/elf/dl-misc.c:_dl_name_match_p [/lib/x86_64-linux-gnu/ld-2.19.so]
+    514,911  /build/buildd/eglibc-2.19/malloc/malloc.c:realloc [/lib/x86_64-linux-gnu/libc-2.19.so]
+    510,912  3rdparty/glm/glm/detail/func_common.inl:rt::core::KdTreeAccelerator::intersect(rt::core::Ray, rt::core::Intersection*) const'2
+    503,950  ???:0x0000000000008960 [/usr/lib/x86_64-linux-gnu/libXi.so.6.1.0]
+    503,438  ???:_XrmInternalStringToQuark [/usr/lib/x86_64-linux-gnu/libX11.so.6.3.0]
+    503,097  /build/buildd/eglibc-2.19/libio/iogetline.c:_IO_getline_info [/lib/x86_64-linux-gnu/libc-2.19.so]
+    502,451  /build/buildd/eglibc-2.19/malloc/malloc.c:_int_realloc [/lib/x86_64-linux-gnu/libc-2.19.so]
+    502,376  3rdparty/glm/glm/detail/type_vec2.inl:rt::core::Surface2d::get_size()
+    494,945  /build/buildd/eglibc-2.19/string/../sysdeps/x86_64/multiarch/memcmp-sse4.S:__memcmp_sse4_1 [/lib/x86_64-linux-gnu/libc-2.19.so]
+    493,126  ???:std::string::_Rep::_S_create(unsigned long, unsigned long, std::allocator<char> const&) [/usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.19]
+    473,088  3rdparty/glm/glm/detail/func_geometric.inl:rt::core::Camera::find_ray(rt::core::Sample, rt::core::Ray*) const
+    469,100  /build/buildd/eglibc-2.19/libio/genops.c:_IO_switch_to_get_mode [/lib/x86_64-linux-gnu/libc-2.19.so]
+    463,323  3rdparty/glm/glm/detail/func_exponential.inl:rt::core::Triangle::intersect(rt::core::Ray, rt::core::Intersection*) const
+    463,323  /usr/include/c++/4.8/cmath:rt::core::Triangle::intersect(rt::core::Ray, rt::core::Intersection*) const
+    461,968  /usr/include/c++/4.8/cmath:rt::core::Path::calculate_color(rt::core::Scene const&, rt::core::Ray, rt::core::Intersection, int, rt::core::MemoryArena&) const
+    453,293  /build/buildd/eglibc-2.19/libio/iofgets.c:fgets [/lib/x86_64-linux-gnu/libc-2.19.so]
+    452,898  ???:0x000000000002a960 [/lib/x86_64-linux-gnu/libdbus-1.so.3.7.6]
+    451,132  ???:0x000000000004aaf0 [/usr/lib/x86_64-linux-gnu/libX11.so.6.3.0]
+    434,564  ???:operator new(unsigned long) [/usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.19]
+    420,930  /build/buildd/eglibc-2.19/libio/genops.c:_IO_doallocbuf [/lib/x86_64-linux-gnu/libc-2.19.so]
+    420,312  /usr/include/c++/4.8/cmath:rt::core::Scene::SceneAccAdapter::intersect(int, rt::core::Ray, rt::core::Intersection*) const
+    420,312  3rdparty/glm/glm/detail/func_exponential.inl:rt::core::Scene::SceneAccAdapter::intersect(int, rt::core::Ray, rt::core::Intersection*) const
+    415,640  /build/buildd/eglibc-2.19/malloc/arena.c:_int_free
+    412,943  ???:0x0000000000064430 [/usr/lib/x86_64-linux-gnu/libX11.so.6.3.0]
+    378,516  ???:0x00000000000643d0 [/usr/lib/x86_64-linux-gnu/libX11.so.6.3.0]
+    374,232  /build/buildd/eglibc-2.19/nptl/cleanup_defer_compat.c:_pthread_cleanup_pop_restore [/lib/x86_64-linux-gnu/libpthread-2.19.so]
+    362,474  /build/buildd/eglibc-2.19/string/../sysdeps/x86_64/multiarch/../strcmp.S:strcmp [/lib/x86_64-linux-gnu/ld-2.19.so]
+    355,836  ???:0x000000000003e170 [/usr/lib/x86_64-linux-gnu/mesa/libGL.so.1.2.0]
+    352,281  /build/buildd/eglibc-2.19/io/../sysdeps/unix/syscall-template.S:read [/lib/x86_64-linux-gnu/libc-2.19.so]
+    352,206  /build/buildd/eglibc-2.19/io/../sysdeps/unix/syscall-template.S:open [/lib/x86_64-linux-gnu/libc-2.19.so]
+    350,550  /build/buildd/eglibc-2.19/termios/../sysdeps/unix/sysv/linux/tcgetattr.c:tcgetattr [/lib/x86_64-linux-gnu/libc-2.19.so]
+    346,476  3rdparty/glm/glm/detail/func_common.inl:rt::core::BSDF::evaluate_sample_f(glm::detail::tvec3<float, (glm::precision)0>, glm::detail::tvec3<float, (glm::precision)0>*, float, float, float*) const
+    346,476  /usr/include/c++/4.8/cmath:rt::core::BSDF::local_to_world(glm::detail::tvec3<float, (glm::precision)0>) const
+    338,085  raytracer-core/types.h:rt::core::DefaultAccelerator::intersect(rt::core::Ray, rt::core::Intersection*) const
+    335,377  ???:0x000000000026c840 [/usr/lib/x86_64-linux-gnu/dri/i965_dri.so]
+    327,446  /build/buildd/eglibc-2.19/libio/genops.c:_IO_default_finish [/lib/x86_64-linux-gnu/libc-2.19.so]
+    326,682  3rdparty/glm/glm/detail/func_common.inl:rt::core::uniform_sample_hemisphere(float, float)
+

@@ -3,16 +3,18 @@
 
 namespace rt {
 	namespace sdl {
-		void* FileLoader::load_raw_file(const char* file_name, int* file_size) {
-			std::ifstream file;
+		char* FileLoader::load_raw_file(const char* file_name, int* file_size) {
 
+			std::string target_name;
 			for (auto& dir : _lookup_directories) {
-				std::string new_name = dir + file_name;
-				file = std::ifstream(new_name);
-				if (file.is_open()) {
+				target_name = dir + file_name;
+				std::ifstream test_file(target_name);
+				if (test_file.is_open()) {
+					test_file.close();
 					break;
 				}
 			}
+			std::ifstream file(target_name);
 
 			if (!file.is_open()) {
 				return 0;
@@ -29,18 +31,19 @@ namespace rt {
 			return data;
 		}
 		bool FileLoader::load_string_file(const char* file_name, std::string* str) {
-			std::ifstream file;
-
+			std::string target_name;
 			for (auto& dir : _lookup_directories) {
-				std::string new_name = dir + file_name;
-				file = std::ifstream(new_name);
-				if (file.is_open()) {
+				target_name = dir + file_name;
+				std::ifstream test_file(target_name);
+				if (test_file.is_open()) {
+					test_file.close();
 					break;
 				}
 			}
+			std::ifstream file(target_name);
 
 			if (!file.is_open()) {
-				return false;
+				return 0;
 			}
 
 			file.seekg(0, std::ios::end);
@@ -55,21 +58,16 @@ namespace rt {
 			return true;
 		}
 		bool FileLoader::file_exists(const char* file_name) {
-			std::ifstream file;
-
+			std::string target_name;
 			for (auto& dir : _lookup_directories) {
-				std::string new_name = dir + file_name;
-				file = std::ifstream(new_name);
-				if (file.is_open()) {
-					break;
+				target_name = dir + file_name;
+				std::ifstream test_file(target_name);
+				if (test_file.is_open()) {
+					test_file.close();
+					return true;
 				}
 			}
-
-			if (!file.is_open()) {
-				return false;
-			}
-			file.close();
-			return true;
+			return false;
 		}
 
 		void FileLoader::add_directory(const char* directory) {

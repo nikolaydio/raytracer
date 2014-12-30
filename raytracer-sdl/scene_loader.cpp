@@ -147,18 +147,18 @@ namespace rt {
 					take_normals = sjson_table_int(file, current_image_id, "take_normals") == 1;
 				}
 
-				rt::core::Sampler* sampler = ARENA_NEW(arena, rt::core::Sampler, samples);
+				rt::core::Sampler* sampler = ARENA_NEWV(arena, rt::core::Sampler, samples);
 				rt::core::Integrator* path = ARENA_NEW(arena, rt::core::Path);
-				rt::core::Camera* camera = ARENA_NEW(arena, rt::core::Camera, cam_eye, lookat, fov, ((float)WND_SIZE_X / (float)WND_SIZE_Y));
+				rt::core::Camera* camera = ARENA_NEWV(arena, rt::core::Camera, cam_eye, lookat, fov, ((float)WND_SIZE_X / (float)WND_SIZE_Y));
 				
 				
 				surfaces.push_back(new rt::core::Surface2d(WND_SIZE_X, WND_SIZE_Y));
-				rt::core::Film* radiance_film = ARENA_NEW(arena, rt::core::Film, surfaces.back());
+				rt::core::Film* radiance_film = ARENA_NEWV(arena, rt::core::Film, surfaces.back());
 
 				rt::core::Film* normals_film = 0;
 				if (take_normals) {
 					surfaces.push_back(new rt::core::Surface2d(WND_SIZE_X, WND_SIZE_Y));
-					normals_film = ARENA_NEW(arena, rt::core::Film, surfaces.back());;
+					normals_film = ARENA_NEWV(arena, rt::core::Film, surfaces.back());;
 				}
 
 				rt::core::Renderer renderer(*sampler, *camera, scene, *path, radiance_film, normals_film);

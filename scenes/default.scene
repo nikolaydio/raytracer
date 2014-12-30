@@ -1,7 +1,7 @@
 images = [
 	{
 		method = "path"
-		samples = 64
+		samples = 4
 		camera = {
 			type = "pinhole"
 			eye = [-0.7 0.8 -3]
@@ -9,17 +9,6 @@ images = [
 			fov = 60
 		}
 		take_normals = 1
-	}
-	{
-		method = "path"
-		samples = 16
-		camera = {
-			type = "pinhole"
-			eye = [-0.4 0.9 -3]
-			lookat = [0 0 0]
-			fov = 30
-		}
-		take_normals = 0
 	}
 ]
 

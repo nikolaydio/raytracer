@@ -13,7 +13,8 @@ namespace rt {
 		class Accelerator {
 		public:
 			Accelerator(ElementAdapter& adapter) : _adapter(adapter) {}
-			
+			virtual ~Accelerator() {}
+
 			virtual bool intersect(Ray ray, Intersection* result) const = 0;
 			virtual void rebuild(ElementAdapter& adapter) = 0;
 		protected:

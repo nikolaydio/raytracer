@@ -1,0 +1,134 @@
+==6831== Memcheck, a memory error detector
+==6831== Copyright (C) 2002-2013, and GNU GPL'd, by Julian Seward et al.
+==6831== Using Valgrind-3.10.0.SVN and LibVEX; rerun with -h for copyright info
+==6831== Command: ./bin/raytracer
+==6831== Parent PID: 2652
+==6831== 
+==6831== Thread 2:
+==6831== Mismatched free() / delete / delete []
+==6831==    at 0x4C2C2BC: operator delete(void*) (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==6831==    by 0x41419F: rt::core::MemoryArena::~MemoryArena() (material.cpp:12)
+==6831==    by 0x411724: rt::core::Renderer::run_multithreaded(int) (renderer.cpp:133)
+==6831==    by 0x404675: rendering_thread(std::vector<rt::core::Renderer, std::allocator<rt::core::Renderer> >*) (main.cpp:21)
+==6831==    by 0x404F65: std::thread::_Impl<std::_Bind_simple<void* (*(std::vector<rt::core::Renderer, std::allocator<rt::core::Renderer> >*))(std::vector<rt::core::Renderer, std::allocator<rt::core::Renderer> >*)> >::_M_run() (functional:1732)
+==6831==    by 0x5C72BEF: ??? (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.19)
+==6831==    by 0x8AB9181: start_thread (pthread_create.c:312)
+==6831==    by 0x64DBEFC: clone (clone.S:111)
+==6831==  Address 0xc0313c0 is 0 bytes inside a block of size 65,536 alloc'd
+==6831==    at 0x4C2B800: operator new[](unsigned long) (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==6831==    by 0x414186: rt::core::MemoryArena::MemoryArena(int) (material.cpp:8)
+==6831==    by 0x411673: rt::core::Renderer::run_multithreaded(int) (renderer.cpp:116)
+==6831==    by 0x404675: rendering_thread(std::vector<rt::core::Renderer, std::allocator<rt::core::Renderer> >*) (main.cpp:21)
+==6831==    by 0x404F65: std::thread::_Impl<std::_Bind_simple<void* (*(std::vector<rt::core::Renderer, std::allocator<rt::core::Renderer> >*))(std::vector<rt::core::Renderer, std::allocator<rt::core::Renderer> >*)> >::_M_run() (functional:1732)
+==6831==    by 0x5C72BEF: ??? (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.19)
+==6831==    by 0x8AB9181: start_thread (pthread_create.c:312)
+==6831==    by 0x64DBEFC: clone (clone.S:111)
+==6831== 
+==6831== Thread 1:
+==6831== Mismatched free() / delete / delete []
+==6831==    at 0x4C2C2BC: operator delete(void*) (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==6831==    by 0x41419F: rt::core::MemoryArena::~MemoryArena() (material.cpp:12)
+==6831==    by 0x404BDF: run(int, char**) (main.cpp:56)
+==6831==    by 0x404EF3: main (main.cpp:82)
+==6831==  Address 0xba37e70 is 0 bytes inside a block of size 65,536 alloc'd
+==6831==    at 0x4C2B800: operator new[](unsigned long) (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==6831==    by 0x414186: rt::core::MemoryArena::MemoryArena(int) (material.cpp:8)
+==6831==    by 0x4049B0: run(int, char**) (main.cpp:56)
+==6831==    by 0x404EF3: main (main.cpp:82)
+==6831== 
+==6831== 
+==6831== HEAP SUMMARY:
+==6831==     in use at exit: 2,529,127 bytes in 524 blocks
+==6831==   total heap usage: 56,568 allocs, 56,044 frees, 59,963,233 bytes allocated
+==6831== 
+==6831== 20 bytes in 2 blocks are definitely lost in loss record 7 of 101
+==6831==    at 0x4C2AB80: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==6831==    by 0x646A2B9: strdup (strdup.c:42)
+==6831==    by 0x714DE56: ??? (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+==6831==    by 0x714EC64: _XimSetICValueData (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+==6831==    by 0x714A259: _XimLocalCreateIC (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+==6831==    by 0x7130884: XCreateIC (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+==6831==    by 0x4EF0D62: ??? (in /usr/lib/x86_64-linux-gnu/libSDL2-2.0.so.0.2.0)
+==6831==    by 0x4EF1187: ??? (in /usr/lib/x86_64-linux-gnu/libSDL2-2.0.so.0.2.0)
+==6831==    by 0x4EE467F: ??? (in /usr/lib/x86_64-linux-gnu/libSDL2-2.0.so.0.2.0)
+==6831==    by 0x4EE448F: ??? (in /usr/lib/x86_64-linux-gnu/libSDL2-2.0.so.0.2.0)
+==6831==    by 0x4E4F4FE: ??? (in /usr/lib/x86_64-linux-gnu/libSDL2-2.0.so.0.2.0)
+==6831==    by 0x4053BA: rt::sdl::present_rendering(std::vector<rt::core::Surface2d*, std::allocator<rt::core::Surface2d*> >&) (presentation_sdl2.cpp:48)
+==6831== 
+==6831== 20 bytes in 2 blocks are definitely lost in loss record 8 of 101
+==6831==    at 0x4C2AB80: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==6831==    by 0x646A2B9: strdup (strdup.c:42)
+==6831==    by 0x714DE56: ??? (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+==6831==    by 0x714EC64: _XimSetICValueData (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+==6831==    by 0x714A259: _XimLocalCreateIC (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+==6831==    by 0x7130884: XCreateIC (in /usr/lib/x86_64-linux-gnu/libX11.so.6.3.0)
+==6831==    by 0x4EF0D62: ??? (in /usr/lib/x86_64-linux-gnu/libSDL2-2.0.so.0.2.0)
+==6831==    by 0x4EF1187: ??? (in /usr/lib/x86_64-linux-gnu/libSDL2-2.0.so.0.2.0)
+==6831==    by 0x4EE467F: ??? (in /usr/lib/x86_64-linux-gnu/libSDL2-2.0.so.0.2.0)
+==6831==    by 0x405401: rt::sdl::present_rendering(std::vector<rt::core::Surface2d*, std::allocator<rt::core::Surface2d*> >&) (presentation_sdl2.cpp:53)
+==6831==    by 0x404ED9: run(int, char**) (main.cpp:66)
+==6831==    by 0x404EF3: main (main.cpp:82)
+==6831== 
+==6831== 24 bytes in 1 blocks are definitely lost in loss record 14 of 101
+==6831==    at 0x4C2B0E0: operator new(unsigned long) (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==6831==    by 0x40665A: rt::sdl::load_scene_and_accelerate(void*, rt::core::Scene&, rt::sdl::ResourceManager&) (scene_loader.cpp:80)
+==6831==    by 0x404899: run(int, char**) (main.cpp:48)
+==6831==    by 0x404EF3: main (main.cpp:82)
+==6831== 
+==6831== 104 bytes in 1 blocks are definitely lost in loss record 58 of 101
+==6831==    at 0x4C2AB80: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==6831==    by 0x10218B41: ??? (in /usr/lib/x86_64-linux-gnu/mesa/libGL.so.1.2.0)
+==6831==    by 0x101F169C: ??? (in /usr/lib/x86_64-linux-gnu/mesa/libGL.so.1.2.0)
+==6831==    by 0x101EDF3A: ??? (in /usr/lib/x86_64-linux-gnu/mesa/libGL.so.1.2.0)
+==6831==    by 0x101EE6CF: glXChooseVisual (in /usr/lib/x86_64-linux-gnu/mesa/libGL.so.1.2.0)
+==6831==    by 0x4EEDD9E: ??? (in /usr/lib/x86_64-linux-gnu/libSDL2-2.0.so.0.2.0)
+==6831==    by 0x4EEDFD0: ??? (in /usr/lib/x86_64-linux-gnu/libSDL2-2.0.so.0.2.0)
+==6831==    by 0x4EE2BE5: ??? (in /usr/lib/x86_64-linux-gnu/libSDL2-2.0.so.0.2.0)
+==6831==    by 0x4EE477B: ??? (in /usr/lib/x86_64-linux-gnu/libSDL2-2.0.so.0.2.0)
+==6831==    by 0x4EE448F: ??? (in /usr/lib/x86_64-linux-gnu/libSDL2-2.0.so.0.2.0)
+==6831==    by 0x4E4F4FE: ??? (in /usr/lib/x86_64-linux-gnu/libSDL2-2.0.so.0.2.0)
+==6831==    by 0x4053BA: rt::sdl::present_rendering(std::vector<rt::core::Surface2d*, std::allocator<rt::core::Surface2d*> >&) (presentation_sdl2.cpp:48)
+==6831== 
+==6831== 640 bytes in 2 blocks are possibly lost in loss record 79 of 101
+==6831==    at 0x4C2CC70: calloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==6831==    by 0x4012E54: _dl_allocate_tls (dl-tls.c:296)
+==6831==    by 0x8AB9DA0: pthread_create@@GLIBC_2.2.5 (allocatestack.c:589)
+==6831==    by 0x59BA905: ??? (in /usr/lib/x86_64-linux-gnu/libgomp.so.1.0.0)
+==6831==    by 0x4116DF: rt::core::Renderer::run_multithreaded(int) (renderer.cpp:121)
+==6831==    by 0x404675: rendering_thread(std::vector<rt::core::Renderer, std::allocator<rt::core::Renderer> >*) (main.cpp:21)
+==6831==    by 0x404F65: std::thread::_Impl<std::_Bind_simple<void* (*(std::vector<rt::core::Renderer, std::allocator<rt::core::Renderer> >*))(std::vector<rt::core::Renderer, std::allocator<rt::core::Renderer> >*)> >::_M_run() (functional:1732)
+==6831==    by 0x5C72BEF: ??? (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.19)
+==6831==    by 0x8AB9181: start_thread (pthread_create.c:312)
+==6831==    by 0x64DBEFC: clone (clone.S:111)
+==6831== 
+==6831== 960 (400 direct, 560 indirect) bytes in 5 blocks are definitely lost in loss record 86 of 101
+==6831==    at 0x4C2B0E0: operator new(unsigned long) (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==6831==    by 0x406483: rt::sdl::load_scene_and_accelerate(void*, rt::core::Scene&, rt::sdl::ResourceManager&) (scene_loader.cpp:55)
+==6831==    by 0x404899: run(int, char**) (main.cpp:48)
+==6831==    by 0x404EF3: main (main.cpp:82)
+==6831== 
+==6831== 1,228,800 bytes in 1 blocks are possibly lost in loss record 100 of 101
+==6831==    at 0x4C2B800: operator new[](unsigned long) (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==6831==    by 0x40A457: rt::core::Film::Film(rt::core::Surface2d*) (film.cpp:8)
+==6831==    by 0x406DF3: rt::sdl::load_images(void*, std::vector<rt::core::Renderer, std::allocator<rt::core::Renderer> >&, rt::core::Scene&, std::vector<rt::core::Surface2d*, std::allocator<rt::core::Surface2d*> >&, rt::core::MemoryArena&) (scene_loader.cpp:161)
+==6831==    by 0x4049D2: run(int, char**) (main.cpp:57)
+==6831==    by 0x404EF3: main (main.cpp:82)
+==6831== 
+==6831== 1,228,800 bytes in 1 blocks are definitely lost in loss record 101 of 101
+==6831==    at 0x4C2B800: operator new[](unsigned long) (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==6831==    by 0x40A457: rt::core::Film::Film(rt::core::Surface2d*) (film.cpp:8)
+==6831==    by 0x406D87: rt::sdl::load_images(void*, std::vector<rt::core::Renderer, std::allocator<rt::core::Renderer> >&, rt::core::Scene&, std::vector<rt::core::Surface2d*, std::allocator<rt::core::Surface2d*> >&, rt::core::MemoryArena&) (scene_loader.cpp:156)
+==6831==    by 0x4049D2: run(int, char**) (main.cpp:57)
+==6831==    by 0x404EF3: main (main.cpp:82)
+==6831== 
+==6831== LEAK SUMMARY:
+==6831==    definitely lost: 1,229,368 bytes in 12 blocks
+==6831==    indirectly lost: 560 bytes in 10 blocks
+==6831==      possibly lost: 1,229,440 bytes in 3 blocks
+==6831==    still reachable: 69,759 bytes in 499 blocks
+==6831==         suppressed: 0 bytes in 0 blocks
+==6831== Reachable blocks (those to which a pointer was found) are not shown.
+==6831== To see them, rerun with: --leak-check=full --show-leak-kinds=all
+==6831== 
+==6831== For counts of detected and suppressed errors, rerun with: -v
+==6831== ERROR SUMMARY: 17 errors from 10 contexts (suppressed: 6 from 1)

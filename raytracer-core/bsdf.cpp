@@ -1,5 +1,5 @@
 #include "bsdf.h"
-#include <glm\glm.hpp>
+#include <glm/glm.hpp>
 
 namespace rt {
 	namespace core {
