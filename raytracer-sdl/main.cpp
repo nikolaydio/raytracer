@@ -1,3 +1,10 @@
+#if defined(_DEBUG) && defined(WIN32)
+#define _CRTDBG_MAP_ALLOC
+#include <cstdlib>
+#include <crtdbg.h>
+#endif
+
+
 #include "renderer.h"
 #include <SDL2/SDL.h>
 #include <glm/gtc/matrix_transform.hpp>
@@ -13,6 +20,7 @@
 #include "presentation_sdl2.h"
 
 #include <memory>
+
 
 
 void* rendering_thread(std::vector<rt::core::Renderer>* renderers) {
@@ -81,5 +89,9 @@ int main(int argc, char* argv[]) {
 #ifdef _DEBUG
 	std::cout << "Warning: This is a debug build\n" << std::endl;
 #endif
-	return raytracer_entry_point(argc, argv);
+	int result = raytracer_entry_point(argc, argv);
+#if defined(_DEBUG) && defined(WIN32)
+	_CrtDumpMemoryLeaks();
+#endif
+	return result;
 }

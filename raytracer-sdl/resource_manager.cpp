@@ -8,8 +8,15 @@
 
 namespace rt {
 	namespace sdl {
+		ResourceCache::~ResourceCache() {
+			release_all();
+		}
 		void ResourceCache::add_resource(const char* path, Resource resource) {
-			_resource_map[path] = resource;
+			if (!path) {
+				_unnamed_resouces.push_back(resource);
+			}else{
+				_resource_map[path] = resource;
+			}
 		}
 		Resource* ResourceCache::get_resource(const char* path) {
 			auto iter = _resource_map.find(path);
@@ -19,18 +26,24 @@ namespace rt {
 			return 0;
 		}
 
-		void ResourceCache::cleanup() {
+		void ResourceCache::release_all() {
 			for (auto& pair : _resource_map) {
 				if (pair.second.release_func) {
 					pair.second.release_func(&pair.second);
 				}
 			}
 			_resource_map.clear();
+			for (auto& res : _unnamed_resouces) {
+				if (res.release_func) {
+					res.release_func(&res);
+				}
+			}
+			_unnamed_resouces.clear();
 		}
 
-		void release_mesh_callback(Resource* res) {
-			rt::core::Mesh* mesh = (rt::core::Mesh*)res->data;
-			delete mesh;
+		void release_shape_callback(Resource* res) {
+			rt::core::Shape* shape = (rt::core::Shape*)res->data;
+			delete shape;
 		}
 
 		void* ResourceManager::get_resource(const char* path, ResourceType type, int* size) {
@@ -53,7 +66,7 @@ namespace rt {
 				void* mesh_object = parse_mesh((const char*)buffer, size);
 				resource.data = mesh_object;
 				resource.size = *size;
-				resource.release_func = release_mesh_callback;
+				resource.release_func = release_shape_callback;
 				resource.type = ResourceType::MESH;
 			}
 			delete[] buffer;
@@ -67,9 +80,20 @@ namespace rt {
 			*size = resource.size;
 			return resource.data;
 		}
+		void ResourceManager::add_unnamed_resource(Resource res) {
+			_cache.add_resource(0, res);
+		}
+		void ResourceManager::add_unnamed_shape(rt::core::Shape* shape) {
+			Resource res;
+			res.data = shape;
+			res.size = sizeof(rt::core::Mesh);
+			res.release_func = release_shape_callback;
+			res.type = ResourceType::MESH;
+			add_unnamed_resource(res);
+		}
 
 		void ResourceManager::cleanup() {
-			_cache.cleanup();
+			_cache.release_all();
 		}
 
 

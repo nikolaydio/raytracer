@@ -67,6 +67,7 @@ namespace rt {
 						}
 						mesh->set_accelerator(new rt::core::DefaultAccelerator(mesh->get_adapter()));
 						node.shape = mesh;
+						manager.add_unnamed_shape(mesh);
 					}
 					else{
 						const char* filename = sjson_table_string(file, shape_id, "source");
@@ -82,6 +83,7 @@ namespace rt {
 				else if (strcmp(sjson_table_string(file, shape_id, "type"), "sphere") == 0){
 					float radius = sjson_table_float(file, shape_id, "radius");
 					node.shape = new rt::core::Sphere(glm::vec3(0, 0, 0), radius);
+					manager.add_unnamed_shape(node.shape);
 				}
 				else{
 					sjson_free_file(file);

@@ -2,6 +2,7 @@
 #include "file_loader.h"
 #include <unordered_map>
 #include <string>
+#include <shape.h>
 
 namespace rt {
 	namespace sdl {
@@ -26,11 +27,14 @@ namespace rt {
 		};
 		class ResourceCache {
 			std::unordered_map<std::string, Resource> _resource_map;
+			std::vector<Resource> _unnamed_resouces;
 		public:
+			~ResourceCache();
+
 			void add_resource(const char* path, Resource resource);
 			Resource* get_resource(const char* path);
 
-			void cleanup();
+			void release_all();
 		};
 
 		class ResourceManager {
@@ -42,6 +46,8 @@ namespace rt {
 			ResourceManager(FileLoader& fl) : _file_loader(fl) {}
 			~ResourceManager() { cleanup(); }
 			void* get_resource(const char* path, ResourceType type, int* size);
+			void add_unnamed_resource(Resource res);
+			void add_unnamed_shape(rt::core::Shape* shape);
 
 			void cleanup();
 		};
