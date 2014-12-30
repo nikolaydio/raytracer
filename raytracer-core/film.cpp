@@ -12,6 +12,7 @@ namespace rt {
 		}
 		Film::~Film() {
 			delete[] samples;
+			delete _surface;
 		}
 		void Film::apply_radiance(int x, int y, Color value) {
 			int width = (int)_surface->get_size().x;

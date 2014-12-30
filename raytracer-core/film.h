@@ -11,6 +11,7 @@ namespace rt {
 			void apply_radiance(int x, int y, Color value);
 			Surface2d* get_surface();
 
+			//The surface2d is destroyed, when the film is.
 			Film(Surface2d* target);
 			~Film();
 		};

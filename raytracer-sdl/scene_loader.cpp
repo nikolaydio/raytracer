@@ -115,7 +115,7 @@ namespace rt {
 			scene.set_material_bucket(material_list);
 			return true;
 		}
-		bool load_images(config_file f, std::vector<rt::core::Renderer>& renderers, rt::core::Scene& scene, std::vector<rt::core::Surface2d*>& surfaces, core::MemoryArena& arena) {
+		bool load_images(config_file f, std::vector<rt::core::Renderer>& renderers, rt::core::Scene& scene, std::vector<rt::core::Film*>& films, core::MemoryArena& arena) {
 			json_file* file = (json_file*)f;
 			int images_id = sjson_table_int(file, SJSON_ROOT_TABLE_ID, "images");
 			for (int i = 0; i < sjson_list_entry_count(file, images_id); ++i) {
@@ -152,13 +152,15 @@ namespace rt {
 				rt::core::Camera* camera = ARENA_NEWV(arena, rt::core::Camera, cam_eye, lookat, fov, ((float)WND_SIZE_X / (float)WND_SIZE_Y));
 				
 				
-				surfaces.push_back(new rt::core::Surface2d(WND_SIZE_X, WND_SIZE_Y));
-				rt::core::Film* radiance_film = ARENA_NEWV(arena, rt::core::Film, surfaces.back());
+				rt::core::Surface2d* radiance_surf = new rt::core::Surface2d(WND_SIZE_X, WND_SIZE_Y);
+				rt::core::Film* radiance_film = new rt::core::Film(radiance_surf);
+				films.push_back(radiance_film);
 
 				rt::core::Film* normals_film = 0;
 				if (take_normals) {
-					surfaces.push_back(new rt::core::Surface2d(WND_SIZE_X, WND_SIZE_Y));
-					normals_film = ARENA_NEWV(arena, rt::core::Film, surfaces.back());;
+					rt::core::Surface2d* normals_surf = new rt::core::Surface2d(WND_SIZE_X, WND_SIZE_Y);
+					normals_film = new rt::core::Film(normals_surf);
+					films.push_back(normals_film);
 				}
 
 				rt::core::Renderer renderer(*sampler, *camera, scene, *path, radiance_film, normals_film);

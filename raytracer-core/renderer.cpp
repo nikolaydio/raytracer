@@ -48,7 +48,7 @@ namespace rt {
 		: _sampler(sampler), _camera(camera), _scene(scene), _integrator(integrator) {
 			_normals = normal_film_;
 			_film = radiance_film_;
-			continue_rendering = false;
+			do_not_render_flag = false;
 		}
 		Film* Renderer::radiance_film() {
 			return _film;
@@ -116,11 +116,10 @@ namespace rt {
 				arenas.push_back(new MemoryArena(64 * 1024));
 			}
 
-			continue_rendering = true;
 			//run the rendering process
 			#pragma omp parallel for
 			for (int i = 0; i < chunks; ++i) {
-				if (!continue_rendering) {
+				if (do_not_render_flag) {
 					continue;
 				}
 				int tid = omp_get_thread_num();
@@ -135,8 +134,8 @@ namespace rt {
 			delete[] samplers;
 		}
 
-		void Renderer::stop_rendering() {
-			continue_rendering = false;
+		void Renderer::do_not_render() {
+			do_not_render_flag = true;
 		}
 	}
 }

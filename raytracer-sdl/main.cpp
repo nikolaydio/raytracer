@@ -30,7 +30,7 @@ void* rendering_thread(std::vector<rt::core::Renderer>* renderers) {
 #define RENDER_CONTEXT_MEMORY_ARENA_SIZE 64*1024
 
 
-int run(int argc, char* argv[]) {
+int raytracer_entry_point(int argc, char* argv[]) {
 	rt::core::Scene scene;
 	const char* scene_fn = "/default.scene";
 	if (argc > 1) {
@@ -52,9 +52,9 @@ int run(int argc, char* argv[]) {
 	}
 	
 	std::vector<rt::core::Renderer> renderers;
-	std::vector<rt::core::Surface2d*> surfaces;
+	std::vector<rt::core::Film*> films;
 	rt::core::MemoryArena arena(RENDER_CONTEXT_MEMORY_ARENA_SIZE);
-	if (!rt::sdl::load_images(file, renderers, scene, surfaces, arena)) {
+	if (!rt::sdl::load_images(file, renderers, scene, films, arena)) {
 		rt::sdl::free_config_file(file);
 		return 0;
 	}
@@ -63,14 +63,18 @@ int run(int argc, char* argv[]) {
 
 	std::thread render_thread(rendering_thread, &renderers);
 
+	std::vector<rt::core::Surface2d*> surfaces;
+	for (auto film : films) {
+		surfaces.push_back(film->get_surface());
+	}
 	rt::sdl::present_rendering(surfaces);
 	
 	for (auto& renderer : renderers) {
-		renderer.stop_rendering();
+		renderer.do_not_render();
 	}
 	render_thread.join();
-	for (auto surf : surfaces) {
-		delete surf;
+	for (auto film : films) {
+		delete film;
 	}
 	manager.cleanup();
 }
@@ -79,5 +83,5 @@ int main(int argc, char* argv[]) {
 #ifdef _DEBUG
 	std::cout << "Warning: This is a debug build\n" << std::endl;
 #endif
-	return run(argc, argv);
+	return raytracer_entry_point(argc, argv);
 }
