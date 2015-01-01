@@ -1,0 +1,9 @@
+language: cpp
+compiler:
+  - gcc
+before_install: sudo apt-get update
+install:
+  - sudo apt-get install libsdl2-dev libassimp-dev
+  - wget -O ./3rdparty/glm.zip http://downloads.sourceforge.net/project/ogl-math/glm-0.9.6.1/glm-0.9.6.1.zip?r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fogl-math%2F&ts=1420140463
+  - cd ./3rdparty && unzip glm
+script: make
