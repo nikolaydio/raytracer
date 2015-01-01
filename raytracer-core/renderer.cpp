@@ -4,6 +4,7 @@
 #include "material.h"
 #include <omp.h>
 #include <memory>
+#include "config.h"
 
 namespace rt {
 	namespace core {

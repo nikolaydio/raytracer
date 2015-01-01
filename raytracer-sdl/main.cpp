@@ -83,6 +83,7 @@ int raytracer_entry_point(int argc, char* argv[]) {
 		delete film;
 	}
 	manager.cleanup();
+	return 0;
 }
 
 int main(int argc, char* argv[]) {

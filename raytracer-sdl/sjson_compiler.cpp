@@ -329,10 +329,14 @@ json_file* sjson_compile_source(const char* source_code) {
 	Lexer lexer((char*)source_code);
 	if(parse_table_content(file, &lexer) != SJSON_ROOT_TABLE_ID) {
 		SJSON_ACCESS_ERROR_HANDLE();
+		delete file;
+		return 0;
 	}
 
 	if(lexer.current_token != Lexer::LT_END) {
 		SJSON_ACCESS_ERROR_HANDLE();
+		delete file;
+		return 0;
 	}
 
 	return file;

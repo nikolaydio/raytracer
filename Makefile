@@ -40,8 +40,10 @@ dirs:
 	@mkdir -p obj
 	@mkdir -p obj/raytracer-core
 	@mkdir -p obj/raytracer-sdl
+	@mkdir -p lib
 	@mkdir -p bin
 
 clean:
 	rm ./bin -r
 	rm ./obj -r
+	rm ./lib

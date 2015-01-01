@@ -1,9 +1,20 @@
 language: cpp
 compiler:
   - gcc
-before_install: sudo apt-get update
+before_install: 
+  - if [ "$CXX" == "g++" ]; then sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test; fi
+  - sudo apt-get update
 install:
-  - sudo apt-get install libsdl2-dev libassimp-dev
-  - wget -O ./3rdparty/glm.zip http://downloads.sourceforge.net/project/ogl-math/glm-0.9.6.1/glm-0.9.6.1.zip?r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fogl-math%2F&ts=1420140463
-  - cd ./3rdparty && unzip glm
+  - if [ "$CXX" == "g++" ]; then sudo apt-get install -qq g++-4.8; fi
+  - if [ "$CXX" == "g++" ]; then sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 50; fi
+  - wget -O assimp.zip http://downloads.sourceforge.net/project/assimp/assimp-3.1/assimp-3.1.1.zip
+  - unzip assimp
+  - sudo apt-get install cmake build-essential xorg-dev libudev-dev libts-dev libgl1-mesa-dev libglu1-mesa-dev libasound2-dev libpulse-dev libopenal-dev libogg-dev libvorbis-dev libaudiofile-dev libpng12-dev libfreetype6-dev libusb-dev libdbus-1-dev zlib1g-dev libdirectfb-dev 
+  - cd ./assimp-3.1.1 && cmake .
+  - make && sudo make install && cd ..
+  - wget -O sdl2.zip http://www.libsdl.org/release/SDL2-2.0.3.zip && unzip sdl2
+  - cd ./SDL2-2.0.3 && ./configure && make && sudo make install && cd ..
+  - mkdir ./3rdparty
+  - cd ./3rdparty && wget -O glm.zip http://downloads.sourceforge.net/project/ogl-math/glm-0.9.5.4/glm-0.9.5.4.zip
+  - unzip glm && cd ../
 script: make

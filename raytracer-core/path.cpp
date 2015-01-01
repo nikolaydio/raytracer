@@ -21,7 +21,8 @@ namespace rt {
 				glm::vec3 outgoing = -ray.direction;
 				Spectrum direct;
 				for (int i = 0; i < 1; ++i) {
-					glm::vec3 light(dis(gen)*2.f - 1., 1, dis(gen)*2.0f - 1.);
+					const float size = 2.0f;
+					glm::vec3 light(dis(gen)*size - size / 2.f, 1, dis(gen)*size - size/2.f);
 					glm::vec3 light_incident = light - isect.position;
 					float light_distance = glm::length(light_incident);
 					light_incident = glm::normalize(light_incident);
