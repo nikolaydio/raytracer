@@ -1,14 +1,12 @@
 # RayTracer #
 
-### Tasks ###
- * Stratified Sampling support(+integrate it in the codebase)
- * Texture support. Linear filtering may be required if the result is looking too bad.
- * Fresnel reflectance and support for surface transmission(transparent objects) (optional)
- * Area light sampling(high priority)
+[![Build Status](https://travis-ci.org/nikolaydio/raytracer.svg?branch=master)](https://travis-ci.org/nikolaydio/raytracer)
 
-### Not exactly defined tasks ###
- * Research how to build a proper path integrator(ongoing)
- * Choose a good resource management model (Asset storage model).
+### Tasks ###
+ * Texture support based on bilinear filtering(high priority).
+ * Area light sampling(high priority).
+ * Clean up the scene loading code. Make it print error message & line if broken scene desc.
+ * Fresnel reflectance for scattering only(optional).
 
 ### Done Tasks ###
  * K-d tree accelerator (Naive implementation, good enough for now. Possible optimizations: Adaptive split and packing nodes in linear array)
@@ -36,6 +34,3 @@
  * apt-get install libassimp-dev
  * Download GLM into 3rdparty/
  * make
- * if you still get compile time errors, try to
-  * apt-get install linux-libc-dev
-  * apt-get install g++-4.8-multilib (your gcc version here)
