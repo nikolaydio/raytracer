@@ -6,7 +6,7 @@
 
 #define SJSON_LEX_ERROR_HANDLE(error_line)  { printf("Lex error at line %i...\n", error_line); }
 #define SJSON_PARSE_ERROR_HANDLE(error_line)  { printf("Parse error at line %i...\n", error_line); }
-#define SJSON_ACCESS_ERROR_HANDLE()  { printf("Error accessing sjson data...\n"); exit(0);  }
+#define SJSON_ACCESS_ERROR_HANDLE()  { printf("Error accessing sjson data...\n"); assert(0);  }
 
 #include <vector>
 
