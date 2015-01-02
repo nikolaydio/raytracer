@@ -4,20 +4,16 @@
 #include <assert.h>
 #include <cstring>
 
-#define SJSON_LEX_ERROR_HANDLE(error_line)  { printf("Lex error at line %i...\n", error_line); assert(0); }
-#define SJSON_PARSE_ERROR_HANDLE(error_line)  { printf("Parse error at line %i...\n", error_line); assert(0); }
-#define SJSON_ACCESS_ERROR_HANDLE()  { printf("Error accessing sjson data...\n"); assert(0); }
+#define SJSON_LEX_ERROR_HANDLE(error_line)  { printf("Lex error at line %i...\n", error_line); }
+#define SJSON_PARSE_ERROR_HANDLE(error_line)  { printf("Parse error at line %i...\n", error_line); }
+#define SJSON_ACCESS_ERROR_HANDLE()  { printf("Error accessing sjson data...\n"); exit(0);  }
 
 #include <vector>
 
 
 struct json_value {
 	ValueType value_type;
-	union {
-		int val_int;
-		float val_float;
-		char* val_string;
-	}value_data;
+	ValueUnion value_data;
 };
 
 struct table_entry {
@@ -26,9 +22,11 @@ struct table_entry {
 };
 struct json_list {
 	std::vector<json_value> _list_entries;
+	int line_number;
 };
 struct json_table {
 	std::vector<table_entry> _table_entries;
+	int line_number;
 };
 struct json_file {
 	std::vector<json_list> _lists;
@@ -279,6 +277,7 @@ json_value parse_value(json_file* file, Lexer* lexer) {
 int parse_list_content(json_file* file, Lexer* lexer) {
 	int id = file->_lists.size();
 	file->_lists.resize(file->_lists.size()+1);
+	file->_lists[id].line_number = lexer->GetLine();
 	while(true) {
 		lexer->NextToken();
 		switch(lexer->current_token) {
@@ -302,6 +301,7 @@ int parse_list_content(json_file* file, Lexer* lexer) {
 int parse_table_content(json_file* file, Lexer* lexer) {
 	int id = file->_tables.size();
 	file->_tables.resize(file->_tables.size()+1);
+	file->_tables[id].line_number = lexer->GetLine();
 	while(lexer->NextToken() == Lexer::LT_IDENT) {
 		int new_size = file->_tables[id]._table_entries.size() + 1;
 		file->_tables[id]._table_entries.resize(new_size);
@@ -328,13 +328,13 @@ json_file* sjson_compile_source(const char* source_code) {
 
 	Lexer lexer((char*)source_code);
 	if(parse_table_content(file, &lexer) != SJSON_ROOT_TABLE_ID) {
-		SJSON_ACCESS_ERROR_HANDLE();
+		SJSON_PARSE_ERROR_HANDLE(lexer.GetLine());
 		delete file;
 		return 0;
 	}
 
 	if(lexer.current_token != Lexer::LT_END) {
-		SJSON_ACCESS_ERROR_HANDLE();
+		SJSON_PARSE_ERROR_HANDLE(lexer.GetLine());
 		delete file;
 		return 0;
 	}
@@ -470,4 +470,100 @@ const char* sjson_list_string(json_file* file, int list, int id) {
 	}
 	SJSON_ACCESS_ERROR_HANDLE();
 	return 0;
+}
+
+
+
+
+
+
+//-------------------New unified interface-----------------//
+JS_Object sjson_object_root(json_file* file) {
+	JS_Object obj;
+	obj.file = file;
+	obj.type = AT_TABLE;
+	obj.value_data.val_int = SJSON_ROOT_TABLE_ID;
+	return obj;
+}
+int sjson_object_count(const JS_Object obj) {
+	if (obj.type == AT_LIST) {
+		return sjson_list_entry_count(obj.file, obj.value_data.val_int);
+	}
+	else if (obj.type == AT_TABLE) {
+		return sjson_table_entry_count(obj.file, obj.value_data.val_int);
+	}
+	else{
+		return 0;
+	}
+}
+JS_Object sjson_object_child(const JS_Object obj, int index) {
+	JS_Object ret;
+	ret.file = obj.file;
+	json_value* legacy_value = 0;
+	if (obj.type == AT_LIST) {
+		legacy_value = sjson_list_search(obj.file, obj.value_data.val_int, index);
+	} else if (obj.type == AT_TABLE) {
+		legacy_value = &obj.file->_tables[obj.value_data.val_int]._table_entries[index].value;
+	} else{
+		ret.type = AT_NONE;
+		return ret;
+	}
+	ret.type = legacy_value->value_type;
+	ret.value_data = legacy_value->value_data;
+	return ret;
+}
+JS_Object sjson_object_child(const JS_Object obj, const char* key) {
+	JS_Object ret;
+	ret.file = obj.file;
+	json_value* legacy_value = 0;
+	if (obj.type == AT_TABLE) {
+		legacy_value = sjson_table_search(obj.file, obj.value_data.val_int, key);
+		if (!legacy_value) {
+			ret.type = AT_NONE;
+			return ret;
+		}
+	}
+	else{
+		ret.type = AT_NONE;
+		return ret;
+	}
+	ret.type = legacy_value->value_type;
+	ret.value_data = legacy_value->value_data;
+	return ret;
+}
+const char* sjson_object_string(const JS_Object obj) {
+	assert(obj.type == AT_STRING);
+	return obj.value_data.val_string;
+}
+int sjson_object_int(const JS_Object obj) {
+	assert(obj.type == AT_INT || obj.type == AT_FLOAT);
+	if (obj.type == AT_INT) {
+		return obj.value_data.val_int;
+	} else if (obj.type == AT_FLOAT) {
+		return (int)obj.value_data.val_float;
+	} else {
+		assert(0);
+		return 0;
+	}
+}
+float sjson_object_float(const JS_Object obj) {
+	assert(obj.type == AT_INT || obj.type == AT_FLOAT);
+	if (obj.type == AT_INT) {
+		return (float)obj.value_data.val_int;
+	}
+	else if (obj.type == AT_FLOAT) {
+		return obj.value_data.val_float;
+	}
+	else {
+		assert(0);
+		return 0;
+	}
+}
+int sjson_object_line(const JS_Object obj) {
+	if (obj.type == AT_TABLE) {
+		return obj.file->_tables[obj.value_data.val_int].line_number;
+	} else if(obj.type == AT_LIST){
+		return obj.file->_lists[obj.value_data.val_int].line_number;
+	}
+	return -1;
 }

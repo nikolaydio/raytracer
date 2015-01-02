@@ -21,89 +21,226 @@ namespace rt {
 		std::unique_ptr<ConfigFile, ConfigFileDeleter> load_config_file(const char* fn, FileLoader& loader) {
 			std::string str;
 			bool success = loader.load_string_file(fn, &str);
-			if (!success) {
-				std::cout << "Failed to open file " << fn << std::endl;
-				return 0;
-			}
+if (!success) {
+	std::cout << "Failed to open file " << fn << std::endl;
+	return 0;
+}
 
-			json_file* file = sjson_compile_source(str.c_str());
-			if (!file) {
-				std::cout << "Failed to compile " << fn << std::endl;
-			}
-			return std::unique_ptr<ConfigFile, ConfigFileDeleter>((ConfigFile*)file);
+json_file* file = sjson_compile_source(str.c_str());
+if (!file) {
+	std::cout << "Failed to compile " << fn << std::endl;
+}
+return std::unique_ptr<ConfigFile, ConfigFileDeleter>((ConfigFile*)file);
 		}
 		void free_config_file(ConfigFile* f) {
 			sjson_free_file((json_file*)f);
 		}
 
-		bool load_scene_and_accelerate(const ConfigFile& f, rt::core::Scene& scene, ResourceManager& manager) {
-			std::vector<rt::core::Material> material_list;
 
-			json_file* file = (json_file*)&f;
-			std::cout << "Loading " << sjson_table_string(file, SJSON_ROOT_TABLE_ID, "name") << "\n";
-			int node_list = sjson_table_int(file, SJSON_ROOT_TABLE_ID, "nodelist");
-			int node_count = sjson_list_entry_count(file, node_list);
-			std::cout << "Objects count " << node_count << "\n";
 
+
+
+		//------------------Helper functions and macros------------------//
+
+		void dump_consumer_stack(std::vector<std::string>& consumer_stack) {
+			std::cout << "Scene desc parser stack:\n";
+			for (auto& str : consumer_stack) {
+				std::cout << "\t" << str << std::endl;
+			}
+		}
+
+
+#define STRINGIZE_DETAIL(x) #x
+#define STRINGIZE(x) STRINGIZE_DETAIL(x)
+
+		class StackFrame__ {
+			std::vector<std::string>& _stack;
+		public:
+			StackFrame__(std::vector<std::string>& stack, const char* str1, int line) : _stack(stack) {
+				_stack.push_back(str1);
+				_stack.back() += " : ";
+				_stack.back() += std::to_string(line);
+			}
+			~StackFrame__() {
+				_stack.pop_back();
+			}
+		};
+
+#define ABORT_LOADING(stack, msg) { dump_consumer_stack(stack); std::cout << msg << std::endl; return false; }
+
+#define ENSURE_TYPE(stack, obj, checked_type) { if(obj.type != checked_type) \
+	{ ABORT_LOADING(stack, "Expected type: " STRINGIZE_DETAIL(checked_type)) } }
+#define ENSURE_EITHER_TYPE(stack, obj, checked_type, checked_type2) \
+	if(obj.type != checked_type && obj.type != checked_type2) \
+	{ ABORT_LOADING(stack, "Expected type: " STRINGIZE_DETAIL(checked_type)) }
+
+#define ENSURE_EQUAL(stack, first, second) if(first != second) { dump_consumer_stack(stack); std::cout << "Expected val: " << STRINGIZE_DETAIL(second); return false; }
+#define STACK_FRAME(stack, name, obj) StackFrame__ ____stack__frame____(stack, name, sjson_object_line(obj));
+
+
+		//--------------------Scene NodeList Parser Recursive funcions----------------------//
+		bool consume_transform(std::vector<std::string>& stack, JS_Object obj, glm::mat4* transform) {
+			STACK_FRAME(stack, "Transform", obj);
+			int count = sjson_object_count(obj);
+			ENSURE_EQUAL(stack, count, 16);
+			for (int i = 0; i < 16; ++i) {
+				JS_Object val = sjson_object_child(obj, i);
+				ENSURE_EITHER_TYPE(stack, val, AT_FLOAT, AT_INT);
+				(*transform)[i / 4][i % 4] = sjson_object_float(val);
+			}
+			return true;
+		}
+		bool consume_shape(std::vector<std::string>& stack, JS_Object obj, ResourceManager& manager, rt::core::Shape** shape) {
+			STACK_FRAME(stack, "Shape", obj);
+
+			JS_Object mesh_type = sjson_object_child(obj, "type");
+			ENSURE_TYPE(stack, mesh_type, AT_STRING);
+			const char* mesh_type_str = sjson_object_string(mesh_type);
+			
+			if (strcmp(mesh_type_str, "mesh") == 0) {
+
+				//Mesh is loaded either directly(inline) or from file(source)
+				JS_Object source = sjson_object_child(obj, "source");
+				if (source.type == AT_STRING) {
+					const char* source_str = sjson_object_string(source);
+					int temp_size;
+					void* mesh = manager.get_resource(source_str, ResourceType::MESH, &temp_size);
+					if (!mesh) {
+						ABORT_LOADING(stack, "Failed to load mesh from source " << source_str);
+					}
+					*shape = (rt::core::Shape*)mesh;
+				} else {
+					//verify that we are loading from verts
+					JS_Object verts = sjson_object_child(obj, "verts");
+					ENSURE_TYPE(stack, verts, AT_LIST);
+					int vert_component_count = sjson_object_count(verts);
+					if (vert_component_count % 3 != 0) {
+						ABORT_LOADING(stack, "Vertex component count must be multiple of 3.");
+					}
+					int vert_count = vert_component_count / 3;
+					rt::core::Mesh* mesh = new rt::core::Mesh;
+					for (int i = 0; i < vert_count; ++i) {
+						glm::vec3 vert;
+
+						for (int u = 0; u < 3; ++u) {
+							JS_Object vert_cmp = sjson_object_child(verts, i * 3 + u);
+							ENSURE_EITHER_TYPE(stack, vert_cmp, AT_FLOAT, AT_INT);
+							vert[u] = sjson_object_float(vert_cmp);
+						}
+
+						mesh->push_vert(vert);
+					}
+					//the default accelerator for inline meshes is default accelerator
+					//as it has minimal overhead, and inline meshes are usually a few faces
+					mesh->set_accelerator(new rt::core::DefaultAccelerator(mesh->get_adapter()));
+					*shape = mesh;
+					//this will transfer the ownership to the mesh manager so it can be freed when the time comes
+					manager.add_unnamed_shape(mesh);
+				}
+			}else if (strcmp(mesh_type_str, "sphere") == 0) {
+				JS_Object sphere_radius = sjson_object_child(obj, "radius");
+				ENSURE_EITHER_TYPE(stack, sphere_radius, AT_FLOAT, AT_INT);
+				float radius = sjson_object_float(sphere_radius);
+				*shape = new rt::core::Sphere(glm::vec3(0, 0, 0), radius);
+				manager.add_unnamed_shape(*shape);
+			}else{
+				ABORT_LOADING(stack, "Unknown mesh type");
+			}
+
+			return true;
+		}
+		bool consume_vector(std::vector<std::string>& stack, JS_Object obj, glm::vec3* res) {
+			STACK_FRAME(stack, "Vector", obj);
+			int components = sjson_object_count(obj);
+			if (components != 3) {
+				ABORT_LOADING(stack, "Vector list must contain exactly 3 numbers.");
+			}
+			for (int i = 0; i < 3; ++i) {
+				JS_Object component = sjson_object_child(obj, i);
+				ENSURE_EITHER_TYPE(stack, component, AT_FLOAT, AT_INT);
+				(*res)[i] = sjson_object_float(component);
+			}
+			return true;
+		}
+		bool consume_material(std::vector<std::string>& stack, JS_Object obj, rt::core::Scene& scene, ResourceManager& manager, rt::core::MaterialId* id) {
+			STACK_FRAME(stack, "Material", obj);
+			rt::core::Material mat;
+			JS_Object emit_vector = sjson_object_child(obj, "emit");
+			JS_Object reflect_vector = sjson_object_child(obj, "reflect");
+			JS_Object specular_flag = sjson_object_child(obj, "specular");
+
+			if (!consume_vector(stack, emit_vector, &mat.emitted)) {
+				return false;
+			}
+			if (!consume_vector(stack, reflect_vector, &mat.reflected)) {
+				return false;
+			}
+			
+			if (specular_flag.type == AT_INT && sjson_object_int(specular_flag) != 0) {
+				mat.specular = true;
+			}
+			*id = scene.push_material(mat);
+			return true;
+		}
+		bool consume_single_node(std::vector<std::string>& stack, JS_Object obj, rt::core::Scene& scene, ResourceManager& manager) {
+			STACK_FRAME(stack, "Single Node", obj);
+			JS_Object node_obj(obj);
+			rt::core::Node node;
+
+			JS_Object transform = sjson_object_child(node_obj, "transform");
+			ENSURE_TYPE(stack, transform, AT_LIST);
+			if (!consume_transform(stack, transform, &node.transform)) {
+				return false;
+			}
+
+			JS_Object shape = sjson_object_child(node_obj, "shape");
+			ENSURE_TYPE(stack, shape, AT_TABLE);
+			if (!consume_shape(stack, shape, manager, &node.shape)) {
+				return false;
+			}
+
+			JS_Object material = sjson_object_child(node_obj, "material");
+			ENSURE_TYPE(stack, material, AT_TABLE);
+			rt::core::MaterialId material_id;
+			if (!consume_material(stack, material, scene, manager, &material_id)) {
+				return false;
+			}
+			scene.push_node(node, material_id);
+			return true;
+		}
+		bool consume_nodelist(std::vector<std::string>& stack, JS_Object obj, rt::core::Scene& scene, ResourceManager& manager) {
+			STACK_FRAME(stack, "Node List", obj);
+			int node_count = sjson_object_count(obj);
 			for (int i = 0; i < node_count; ++i) {
-				int node_id = sjson_list_int(file, node_list, i);
-				rt::core::Node node;
-				int transform_id = sjson_table_int(file, node_id, "transform");
-				for (int i = 0; i < 16; ++i) {
-					node.transform[i / 4][i % 4] = sjson_list_float(file, transform_id, i);
-				}
-
-				int shape_id = sjson_table_int(file, node_id, "shape");
-				if (strcmp(sjson_table_string(file, shape_id, "type"), "mesh") == 0) {
-					if (sjson_table_lookup(file, shape_id, "verts") == AT_LIST) {
-						rt::core::Mesh* mesh = new rt::core::Mesh;
-						int vert_list = sjson_table_int(file, shape_id, "verts");
-						int vert_count = sjson_list_entry_count(file, vert_list) / 3;
-						for (int i = 0; i < vert_count; ++i) {
-							glm::vec3 vert(sjson_list_float(file, vert_list, i * 3),
-								sjson_list_float(file, vert_list, i * 3 + 1),
-								sjson_list_float(file, vert_list, i * 3 + 2));
-							mesh->push_vert(vert);
-						}
-						mesh->set_accelerator(new rt::core::DefaultAccelerator(mesh->get_adapter()));
-						node.shape = mesh;
-						manager.add_unnamed_shape(mesh);
-					}
-					else{
-						const char* filename = sjson_table_string(file, shape_id, "source");
-						int temp_size;
-						void* mesh = manager.get_resource(filename, ResourceType::MESH, &temp_size);
-						if (!mesh) {
-							sjson_free_file(file);
-							return false;
-						}
-						node.shape = (rt::core::Shape*)mesh;
-					}
-				}
-				else if (strcmp(sjson_table_string(file, shape_id, "type"), "sphere") == 0){
-					float radius = sjson_table_float(file, shape_id, "radius");
-					node.shape = new rt::core::Sphere(glm::vec3(0, 0, 0), radius);
-					manager.add_unnamed_shape(node.shape);
-				}
-				else{
-					sjson_free_file(file);
+				JS_Object node = sjson_object_child(obj, i);
+				ENSURE_TYPE(stack, node, AT_TABLE);
+				if (!consume_single_node(stack, node, scene, manager)) {
 					return false;
 				}
-
-				rt::core::Material mat;
-				int mat_id = sjson_table_int(file, node_id, "material");
-				int emit_id = sjson_table_int(file, mat_id, "emit");
-				int reflect_id = sjson_table_int(file, mat_id, "reflect");
-				for (int i = 0; i < 3; ++i) {
-					mat.emitted[i] = sjson_list_float(file, emit_id, i);
-					mat.reflected[i] = sjson_list_float(file, reflect_id, i);
-				}
-				if (sjson_table_lookup(file, mat_id, "specular") == AT_INT) {
-					mat.specular = true;
-				}
-				material_list.push_back(mat);
-				scene.push_node(node, material_list.size()-1);
 			}
+			return true;
+		}
+		
+		bool load_scene_and_accelerate(const ConfigFile& f, rt::core::Scene& scene, ResourceManager& manager) {
+			std::vector<std::string> consumer_stack;
+
+			json_file* file = (json_file*)&f;
+			JS_Object root = sjson_object_root(file);
+			STACK_FRAME(consumer_stack, "Scene root", root);
+
+
+			JS_Object scene_name = sjson_object_child(root, "name");
+			ENSURE_TYPE(consumer_stack, scene_name, AT_STRING);
+			std::cout << "Loading " << sjson_object_string(scene_name) << "\n";
+
+
+			JS_Object nodelist = sjson_object_child(root, "nodelist");
+			ENSURE_TYPE(consumer_stack, nodelist, AT_LIST);
+			std::cout << "Object count: " << sjson_object_count(nodelist) << std::endl;
+			if (!consume_nodelist(consumer_stack, nodelist, scene, manager)) {
+				return false;
+			}
+
 
 			const char* accelerator_name = sjson_table_string(file, SJSON_ROOT_TABLE_ID, "accelerator");
 			rt::core::Accelerator* accelerator = 0;
@@ -117,8 +254,6 @@ namespace rt {
 				accelerator = rt::core::create_kdtree(scene.get_adapter());
 			}
 			scene.accelerate_and_rebuild(accelerator);
-
-			scene.set_material_bucket(material_list);
 			return true;
 		}
 		bool load_images(const ConfigFile& f, std::vector<rt::core::Renderer>& renderers, rt::core::Scene& scene, std::vector<rt::core::Film*>& films, core::MemoryArena& arena) {
