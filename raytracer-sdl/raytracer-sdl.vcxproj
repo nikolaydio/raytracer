@@ -103,6 +103,7 @@
     <ClInclude Include="resource_manager.h" />
     <ClInclude Include="scene_loader.h" />
     <ClInclude Include="sjson_compiler.h" />
+    <ClInclude Include="stb_image.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -36,6 +36,9 @@
     <ClInclude Include="resource_manager.h">
       <Filter>Scene &amp; Config Loading</Filter>
     </ClInclude>
+    <ClInclude Include="stb_image.h">
+      <Filter>Scene &amp; Config Loading</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Main">

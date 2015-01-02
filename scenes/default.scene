@@ -50,9 +50,9 @@ nodelist = [
 			source = "/box.dae"
 		}
 		material = {
+			type = "matte"
+			reflect = [0.6 0.94 1.]
 			emit = [0. 0. 0.]
-			reflect = [0.6 0.4 1.]
-			specular = 1
 		}
 	}
 	{
