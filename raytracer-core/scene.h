@@ -48,6 +48,7 @@ namespace rt {
 
 			Material material_by_id(int id) const;
 			void set_material_bucket(std::vector<Material>& mat_bucket);
+			MaterialId push_material(rt::core::Material& mat);
 
 			void accelerate_and_rebuild(Accelerator* pacc);
 			ElementAdapter& get_adapter();

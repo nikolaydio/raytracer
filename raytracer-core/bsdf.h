@@ -14,10 +14,15 @@ namespace rt {
 			virtual Spectrum evaluate_sample_f(glm::vec3 outgoing_w, glm::vec3* incident_w, float u1, float u2, float* pdf) const;
 
 			virtual float calc_pdf(const glm::vec3 &outgoing_w, const glm::vec3 &incident_w) const;
+
+			//BxDF classes are instantiated in arena memory pool
+			//constructor is never called.
+			BxDF() {}
+		protected:
+			~BxDF() {}
 		};
 		class BRDF : public BxDF {
 		public:
-
 		};
 		class LambertianBRDF : public BRDF {
 			Spectrum _R; //reflectance spectrum
@@ -57,6 +62,7 @@ namespace rt {
 			glm::vec3 local_to_world(glm::vec3 local) const;
 		public:
 			BSDF(glm::vec3 normal);
+
 			void add_brdf(BRDF* brdf, float scale);
 
 			virtual Spectrum evaluate_f(glm::vec3 outgoing_w, glm::vec3 incident_w) const;

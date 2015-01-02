@@ -71,6 +71,10 @@ namespace rt {
 		void Scene::set_material_bucket(std::vector<Material>& mat_bucket) {
 			_material_bucket = mat_bucket;
 		}
+		MaterialId Scene::push_material(rt::core::Material& mat) {
+			_material_bucket.push_back(mat);
+			return _material_bucket.size() - 1;
+		}
 
 		void Scene::accelerate_and_rebuild(Accelerator* pacc) {
 
