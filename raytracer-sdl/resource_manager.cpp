@@ -129,7 +129,7 @@ namespace rt {
 			for (int u = 0; u < width; ++u) {
 				for (int v = 0; v < height; ++v) {
 					int32_t color = image[u + v * width];
-					core::Color new_color((color & 0xFF00) >> 8, (color & 0x00FF0000) >> 16, color & 0xFF, (color & 0xFF000000) >> 24);
+					core::Color new_color(color & 0xFF, (color >> 8) & 0xFF, (color >> 16) & 0xFF, (color & 0xFF000000) >> 24);
 					surf->pixel(u, v) = new_color;
 				}
 			}
