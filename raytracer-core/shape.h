@@ -36,8 +36,17 @@ namespace rt {
 
 		class Triangle : public Shape {
 			glm::vec3 p0, p1, p2;
+			glm::vec2 uv0, uv1, uv2;
 		public:
-			Triangle(glm::vec3 a, glm::vec3 b, glm::vec3 c) : p0(a), p1(b), p2(c) {}
+			Triangle(const glm::vec3 a, const glm::vec3 b, const glm::vec3 c,
+				const glm::vec2 _uv0, const glm::vec2 _uv1, const glm::vec2 _uv2) {
+				p0 = a;
+				p1 = b;
+				p2 = c;
+				uv0 = _uv0;
+				uv1 = _uv1;
+				uv2 = _uv2;
+			}
 
 			bool intersect(rt::core::Ray ray, rt::core::Intersection* result) const;
 			rt::core::AABB get_bounding_box() const;
@@ -46,11 +55,13 @@ namespace rt {
 
 		class Mesh : public Shape {
 			std::vector<glm::vec3> points;
+			std::vector<glm::vec2> _uvs;
 			class MeshAdapter : public ElementAdapter {
-				std::vector<glm::vec3>& _mesh;
-
+				std::vector<glm::vec3>& _points;
+				std::vector<glm::vec2>& _uvs;
 			public:
-				MeshAdapter(std::vector<glm::vec3>& mesh) : _mesh(mesh) {}
+				MeshAdapter(std::vector<glm::vec3>& points, std::vector<glm::vec2>& uvs) : _points(points),
+				_uvs(uvs) {}
 				virtual int count();
 				virtual rt::core::AABB get_bounding_box(int index) const;
 				virtual bool intersect(int index, rt::core::Ray ray, rt::core::Intersection* result) const;
@@ -59,11 +70,12 @@ namespace rt {
 			Accelerator* _accelerator;
 			AABB bbox;
 		public:
-			Mesh() : _accelerator(0), _adapter(points) { }
+			Mesh() : _accelerator(0), _adapter(points, _uvs) { }
 			~Mesh() { delete _accelerator; }
 			ElementAdapter& get_adapter();
 			void push_face(glm::vec3 a, glm::vec3 b, glm::vec3 c);
 			void push_vert(glm::vec3 a);
+			void push_vert(glm::vec3 a, glm::vec2 uv);
 			void set_accelerator(rt::core::Accelerator* acc);
 			bool intersect(rt::core::Ray ray, rt::core::Intersection* result) const;
 			AABB get_bounding_box() const;

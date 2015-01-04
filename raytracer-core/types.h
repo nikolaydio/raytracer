@@ -16,6 +16,7 @@ namespace rt {
 			float d;
 			glm::vec3 position;
 			glm::vec3 normal;
+			glm::vec2 uv;
 			MaterialId material;
 		};
 

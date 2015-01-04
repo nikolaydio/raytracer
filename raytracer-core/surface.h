@@ -20,10 +20,17 @@ namespace rt {
 			explicit Color(glm::vec3 color) {
 				color = glm::clamp(color, glm::vec3(0, 0, 0), glm::vec3(1, 1, 1));
 
-				r = (unsigned char)(color.z * 255);
-				g = (unsigned char)(color.y * 255);
-				b = (unsigned char)(color.x * 255);
+				r = (unsigned char)(color.x * 255.f);
+				g = (unsigned char)(color.y * 255.f);
+				b = (unsigned char)(color.z * 255.f);
 				x = 255;
+			}
+			glm::vec3 as_vec3() {
+				glm::vec3 res;
+				res.x = (float)r / 255.0f;
+				res.y = (float)g / 255.0f;
+				res.z = (float)b / 255.0f;
+				return res;
 			}
 			unsigned char r;
 			unsigned char g;

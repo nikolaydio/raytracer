@@ -9,6 +9,7 @@ namespace rt {
 		enum class ResourceType {
 			MATERIAL,
 			MESH,
+			TEXTURE,
 			UNDEFINED
 		};
 		class Resource {
@@ -42,6 +43,7 @@ namespace rt {
 			FileLoader& _file_loader;
 
 			void* parse_mesh(const char* data, int* size);
+			void* parse_image(const char* data, int* size);
 		public:
 			ResourceManager(FileLoader& fl) : _file_loader(fl) {}
 			~ResourceManager() { cleanup(); }

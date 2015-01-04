@@ -46,7 +46,7 @@ namespace rt {
 			MaterialId material(uint32_t index) const;
 			Node node(uint32_t index) const;
 
-			Material material_by_id(int id) const;
+			const Material& material_by_id(int id) const;
 			void set_material_bucket(std::vector<Material>& mat_bucket);
 			MaterialId push_material(rt::core::Material& mat);
 

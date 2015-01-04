@@ -9,36 +9,24 @@ namespace rt {
 	namespace sdl {
 
 
-		static void putpixel(SDL_Surface *surface, int x, int y, Uint32 pixel)
+		static void putpixel(SDL_Surface *surface, int x, int y, core::Color pixel)
 		{
 			int bpp = surface->format->BytesPerPixel;
 			/* Here p is the address to the pixel we want to set */
 			Uint8 *p = (Uint8 *)surface->pixels + y * surface->pitch + x * bpp;
 
 			switch (bpp) {
-			case 1:
-				*p = pixel;
-				break;
-
-			case 2:
-				*(Uint16 *)p = pixel;
-				break;
-
-			case 3:
+			case 4:
 				if (SDL_BYTEORDER == SDL_BIG_ENDIAN) {
-					p[0] = (pixel >> 16) & 0xff;
-					p[1] = (pixel >> 8) & 0xff;
-					p[2] = pixel & 0xff;
+					p[0] = pixel.r;
+					p[1] = pixel.g;
+					p[2] = pixel.b;
 				}
 				else {
-					p[0] = pixel & 0xff;
-					p[1] = (pixel >> 8) & 0xff;
-					p[2] = (pixel >> 16) & 0xff;
+					p[0] = pixel.b;
+					p[1] = pixel.g;
+					p[2] = pixel.r;
 				}
-				break;
-
-			case 4:
-				*(Uint32 *)p = pixel;
 				break;
 			}
 		}
@@ -88,7 +76,7 @@ namespace rt {
 				SDL_LockSurface(surface);
 				for (int y = 0; y < h; ++y) {
 					for (int x = 0; x < w; ++x) {
-						putpixel(surface, x, y, *(Uint32*)&to_copy->pixel(x, y));
+						putpixel(surface, x, y, to_copy->pixel(x, y));
 					}
 				}
 				SDL_UnlockSurface(surface);

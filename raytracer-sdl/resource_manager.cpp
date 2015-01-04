@@ -3,8 +3,13 @@
 #include <assimp/scene.h> // Output data structure
 #include <assimp/postprocess.h> // Post processing flags
 #include <assimp/mesh.h>
-#include <shape.h>
+#include <assimp/texture.h>
 
+#include <shape.h>
+#include <surface.h>
+
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
 namespace rt {
 	namespace sdl {
@@ -14,7 +19,8 @@ namespace rt {
 		void ResourceCache::add_resource(const char* path, Resource resource) {
 			if (!path) {
 				_unnamed_resouces.push_back(resource);
-			}else{
+			}
+			else{
 				_resource_map[path] = resource;
 			}
 		}
@@ -46,6 +52,11 @@ namespace rt {
 			delete shape;
 		}
 
+		void release_texture_callback(Resource* res) {
+			rt::core::Surface2d* surf = (rt::core::Surface2d*)res->data;
+			delete surf;
+		}
+
 		void* ResourceManager::get_resource(const char* path, ResourceType type, int* size) {
 			//If the resource is in memory, return it
 			rt::sdl::Resource* res = _cache.get_resource(path);
@@ -68,6 +79,13 @@ namespace rt {
 				resource.size = *size;
 				resource.release_func = release_shape_callback;
 				resource.type = ResourceType::MESH;
+			}
+			else if (type == ResourceType::TEXTURE) {
+				void* image_object = parse_image((const char*)buffer, size);
+				resource.data = image_object;
+				resource.size = *size;
+				resource.release_func = release_texture_callback;
+				resource.type = ResourceType::TEXTURE;
 			}
 			delete[] buffer;
 
@@ -100,6 +118,24 @@ namespace rt {
 
 
 		//-----------Functions for handling different type of data-----------//
+		void* ResourceManager::parse_image(const char* data, int* size) {
+			int width, height, comp;
+			stbi_uc* stbi = stbi_load_from_memory((const stbi_uc*)data, *size, &width, &height, &comp, STBI_rgb_alpha);
+			if (!stbi) {
+				return 0;
+			}
+			int32_t* image = (int32_t*)stbi;
+			rt::core::Surface2d* surf = new rt::core::Surface2d(width, height);
+			for (int u = 0; u < width; ++u) {
+				for (int v = 0; v < height; ++v) {
+					int32_t color = image[u + v * width];
+					core::Color new_color((color & 0xFF00) >> 8, (color & 0x00FF0000) >> 16, color & 0xFF, (color & 0xFF000000) >> 24);
+					surf->pixel(u, v) = new_color;
+				}
+			}
+			stbi_image_free(stbi);
+			return surf;
+		}
 		void* ResourceManager::parse_mesh(const char* data, int* size) {
 			Assimp::Importer importer;
 
@@ -115,21 +151,27 @@ namespace rt {
 				return 0;
 			}
 			rt::core::Mesh* rtmesh = new rt::core::Mesh;
-			for (int i = 0; i < scene->mNumMeshes; ++i) {
-				const struct aiMesh* mesh = scene->mMeshes[i];;
+			for (int mesh_id = 0; mesh_id < scene->mNumMeshes; ++mesh_id) {
+				const struct aiMesh* mesh = scene->mMeshes[mesh_id];;
 				for (unsigned int t = 0; t < mesh->mNumFaces; ++t)
 				{
 					const struct aiFace * face = &mesh->mFaces[t];
 
 					for (int i = 2; i >= 0; --i) {
-						glm::vec3 v(mesh->mVertices[face->mIndices[i]].x,
+						glm::vec3 vert(mesh->mVertices[face->mIndices[i]].x,
 							mesh->mVertices[face->mIndices[i]].z,
 							mesh->mVertices[face->mIndices[i]].y);
 
 
-						rtmesh->push_vert(v);
+						if (mesh->HasTextureCoords(0)) {
+							glm::vec2 uv(mesh->mTextureCoords[0][face->mIndices[i]].x,
+								mesh->mTextureCoords[0][face->mIndices[i]].y);
+							rtmesh->push_vert(vert, uv);
+						} else{
+							rtmesh->push_vert(vert);
+						}
 					}
-
+					
 
 				}
 			}

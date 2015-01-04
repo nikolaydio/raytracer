@@ -172,8 +172,20 @@ return std::unique_ptr<ConfigFile, ConfigFileDeleter>((ConfigFile*)file);
 			if (!consume_vector(stack, emit_vector, &mat.emitted)) {
 				return false;
 			}
-			if (!consume_vector(stack, reflect_vector, &mat.reflected)) {
-				return false;
+			if (reflect_vector.type == AT_STRING) {
+				const char* source = sjson_object_string(reflect_vector);
+				int temp;
+				rt::core::Surface2d* texture_surface = (rt::core::Surface2d*)manager.get_resource(source, ResourceType::TEXTURE, &temp);
+				if (!texture_surface) {
+					ABORT_LOADING(stack, "Failed to load texture from source " << source);
+				}
+				mat.reflected.reset(new core::BilinearFilter(*texture_surface));
+			} else{
+				glm::vec3 reflect;
+				if (!consume_vector(stack, reflect_vector, &reflect)) {
+					return false;
+				}
+				mat.reflected.reset(new core::SpectrumFilter(reflect));
 			}
 			
 			if (specular_flag.type == AT_INT && sjson_object_int(specular_flag) != 0) {

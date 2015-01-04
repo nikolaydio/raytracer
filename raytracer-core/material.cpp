@@ -30,7 +30,7 @@ namespace rt {
 
 		BSDF* Material::get_brdf(Intersection& isect, MemoryArena& arena) const {
 			BSDF* bsdf = ARENA_NEWV(arena, BSDF, isect.normal);
-			bsdf->add_brdf(ARENA_NEWV(arena, LambertianBRDF, Spectrum(reflected)), 1);
+			bsdf->add_brdf(ARENA_NEWV(arena, LambertianBRDF, reflected->get_color(isect.uv.x, isect.uv.y)), 1);
 			if (specular)
 				bsdf->add_brdf(ARENA_NEWV(arena, SpecularReflectionBRDF, Spectrum(1,1,1)), 1);
 			return bsdf;

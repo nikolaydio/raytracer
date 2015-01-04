@@ -94,6 +94,8 @@ namespace rt {
 			result->d = t;
 			result->position = ray.origin + ray.direction * t;
 			result->normal = glm::normalize(glm::cross(e1, e2));
+			float b0 = 1.f - b1 - b2;
+			result->uv = b0 * uv0 + b1 * uv1 + b2 * uv2;
 			return true;
 		}
 		rt::core::AABB Triangle::get_bounding_box() const {
@@ -104,16 +106,23 @@ namespace rt {
 
 
 		int Mesh::MeshAdapter::count() {
-					return _mesh.size() / 3;
+					return _points.size() / 3;
 				}
 		AABB Mesh::MeshAdapter::get_bounding_box(int index) const {
 			rt::core::AABB aabb(
-				_mesh[index * 3], _mesh[index * 3 + 1], _mesh[index * 3 + 2]);
+				_points[index * 3], _points[index * 3 + 1], _points[index * 3 + 2]);
 
 			return aabb;
 		}
 		bool Mesh::MeshAdapter::intersect(int index, rt::core::Ray ray, rt::core::Intersection* result) const {
-			Triangle tri(_mesh[index * 3], _mesh[index * 3 + 1], _mesh[index * 3 + 2]);
+			glm::vec2 uvs[3];
+			if (_uvs.size() != 0) {
+				uvs[0] = _uvs[index * 3];
+				uvs[1] = _uvs[index * 3 + 1];
+				uvs[2] = _uvs[index * 3 + 2];
+			}
+			Triangle tri(_points[index * 3], _points[index * 3 + 1], _points[index * 3 + 2],
+				uvs[0], uvs[1], uvs[2]);
 			return tri.intersect(ray, result);
 		}
 
@@ -128,6 +137,10 @@ namespace rt {
 		}
 		void Mesh::push_vert(glm::vec3 a) {
 			points.push_back(a);
+		}
+		void Mesh::push_vert(glm::vec3 a, glm::vec2 uv) {
+			points.push_back(a);
+			_uvs.push_back(uv);
 		}
 		void Mesh::set_accelerator(rt::core::Accelerator* acc) {
 			_accelerator = acc;

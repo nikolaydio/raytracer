@@ -70,7 +70,7 @@ namespace rt {
 			return f;
 		}
 		Spectrum BSDF::evaluate_sample_f(glm::vec3 outgoing_w, glm::vec3* incident_w, float u1, float u2, float* pdf) const {
-			assert(u1 < 1.0);
+			assert(u1 <= 1.0);
 			int brdf_num = glm::round(u1 * (_brdf_count-1));
 			BRDF* brdf = _brdfs[brdf_num];
 

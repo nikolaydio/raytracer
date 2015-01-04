@@ -1,18 +1,7 @@
 images = [
 	{
 		method = "path"
-		samples = 4
-		camera = {
-			type = "pinhole"
-			eye = [-0.7 0.8 -3]
-			lookat = [0 0 0]
-			fov = 60
-		}
-		take_normals = 0
-	}
-	{
-		method = "path"
-		samples = 16
+		samples = 64
 		camera = {
 			type = "pinhole"
 			eye = [0 0 -3]
@@ -37,7 +26,7 @@ nodelist = [
 		}
 		material = {
 			emit = [0. 0. 0.]
-			reflect = [0.6 0.94 1.]
+			reflect = "/crate.bmp"
 		}
 	}
 	{
@@ -53,6 +42,7 @@ nodelist = [
 			type = "matte"
 			reflect = [0.6 0.94 1.]
 			emit = [0. 0. 0.]
+			specular = 1
 		}
 	}
 	{
@@ -130,9 +120,9 @@ nodelist = [
 	}
 
 	{
-		transform = [1. 0. 0. 0.
+		transform = [0.1 0. 0. 0.
 					 0. 1. 0. 0.
-					 0. 0. 1. 0.
+					 0. 0. 0.1 0.
 					 0. 0. 0. 1.]
 		shape = {
 			type = "mesh"
