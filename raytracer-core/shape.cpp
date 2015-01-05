@@ -96,6 +96,8 @@ namespace rt {
 			result->normal = glm::normalize(glm::cross(e1, e2));
 			float b0 = 1.f - b1 - b2;
 			result->uv = b0 * uv0 + b1 * uv1 + b2 * uv2;
+			assert(result->uv.x >= 0 && result->uv.x <= 1);
+			assert(result->uv.y >= 0 && result->uv.y <= 1);
 			return true;
 		}
 		rt::core::AABB Triangle::get_bounding_box() const {
@@ -116,10 +118,15 @@ namespace rt {
 		}
 		bool Mesh::MeshAdapter::intersect(int index, rt::core::Ray ray, rt::core::Intersection* result) const {
 			glm::vec2 uvs[3];
-			if (_uvs.size() != 0) {
+			if (_uvs.size() == _points.size()) {
 				uvs[0] = _uvs[index * 3];
 				uvs[1] = _uvs[index * 3 + 1];
 				uvs[2] = _uvs[index * 3 + 2];
+			}
+			else{
+				uvs[0] = glm::vec2(0, 0);
+				uvs[1] = glm::vec2(1, 0);
+				uvs[2] = glm::vec2(0, 1);
 			}
 			Triangle tri(_points[index * 3], _points[index * 3 + 1], _points[index * 3 + 2],
 				uvs[0], uvs[1], uvs[2]);

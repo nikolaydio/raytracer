@@ -24,7 +24,7 @@ namespace rt {
 		class ColorFilter {
 		public:
 			virtual glm::vec3 get_color(float u, float v) = 0;
-
+			virtual ~ColorFilter() {}
 		};
 		class SpectrumFilter : public ColorFilter {
 		public:
@@ -43,8 +43,11 @@ namespace rt {
 			}
 			glm::vec3 get_color(float u, float v) {
 				glm::vec2 size = _surface.get_size();
-				int xpos = (int)(size.x * u);
-				int ypos = (int)(size.y * v);
+				//the next 2 lines are here to handle cases where uvs and <0 or abs(uv) > 1
+				glm::vec2 uvs(u, v);
+				uvs = glm::min(glm::abs(uvs), glm::vec2(1.0f, 1.0f));
+				int xpos = (int)(size.x * uvs.x);
+				int ypos = (int)(size.y * uvs.y);
 				Color color = _surface.pixel(xpos, ypos);
 				return color.as_vec3();
 			}

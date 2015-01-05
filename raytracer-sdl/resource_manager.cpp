@@ -158,14 +158,16 @@ namespace rt {
 					const struct aiFace * face = &mesh->mFaces[t];
 
 					for (int i = 2; i >= 0; --i) {
-						glm::vec3 vert(mesh->mVertices[face->mIndices[i]].x,
-							mesh->mVertices[face->mIndices[i]].z,
-							mesh->mVertices[face->mIndices[i]].y);
+						int index = face->mIndices[i];
+						glm::vec3 vert(mesh->mVertices[index].x,
+							mesh->mVertices[index].z,
+							mesh->mVertices[index].y);
 
 
 						if (mesh->HasTextureCoords(0)) {
-							glm::vec2 uv(mesh->mTextureCoords[0][face->mIndices[i]].x,
-								mesh->mTextureCoords[0][face->mIndices[i]].y);
+							glm::vec2 uv(mesh->mTextureCoords[0][index].x,
+								mesh->mTextureCoords[0][index].y);
+
 							rtmesh->push_vert(vert, uv);
 						} else{
 							rtmesh->push_vert(vert);

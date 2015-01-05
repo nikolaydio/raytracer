@@ -13,6 +13,13 @@ namespace rt {
 		struct Intersection{
 			//D is the distance from the ray origin to the intersection point.
 			//most algorithms calculate this first and it is easier to do some other checks with it
+			Intersection() {
+				d = 0;
+				position = glm::vec3(0, 0, 0);
+				normal = glm::vec3(0,0, 0);
+				uv = glm::vec2(0, 0);
+				material = -1;
+			}
 			float d;
 			glm::vec3 position;
 			glm::vec3 normal;
