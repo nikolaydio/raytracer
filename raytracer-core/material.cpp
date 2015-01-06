@@ -1,4 +1,6 @@
 #include "material.h"
+#include "microfacet.h"
+
 #include <iostream>
 #include <new>
 namespace rt {
@@ -30,9 +32,18 @@ namespace rt {
 
 		BSDF* Material::get_brdf(Intersection& isect, MemoryArena& arena) const {
 			BSDF* bsdf = ARENA_NEWV(arena, BSDF, isect.normal);
-			bsdf->add_brdf(ARENA_NEWV(arena, LambertianBRDF, reflected->get_color(isect.uv.x, isect.uv.y)), 1);
-			if (specular)
-				bsdf->add_brdf(ARENA_NEWV(arena, SpecularReflectionBRDF, Spectrum(1,1,1)), 1);
+			if (diffuse) {
+				bsdf->add_brdf(ARENA_NEWV(arena, LambertianBRDF, diffuse->get_color(isect.uv.x, isect.uv.y)), 1);
+			}
+			if (specular)  {
+				bsdf->add_brdf(ARENA_NEWV(arena, SpecularReflectionBRDF, specular->get_color(isect.uv.x, isect.uv.y)), 1);
+			}
+			if (glossy) {
+				MicrofacetDistribution* distr = ARENA_NEWV(arena, Blinn, 20.f);
+				BRDF* spec = ARENA_NEWV(arena, Microfacet, glossy->get_color(isect.uv.x, isect.uv.y), distr);
+				bsdf->add_brdf(spec, 1.0f);
+			}
+			
 			return bsdf;
 		}
 	}

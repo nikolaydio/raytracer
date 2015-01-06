@@ -162,35 +162,53 @@ return std::unique_ptr<ConfigFile, ConfigFileDeleter>((ConfigFile*)file);
 			}
 			return true;
 		}
-		bool consume_material(std::vector<std::string>& stack, JS_Object obj, rt::core::Scene& scene, ResourceManager& manager, rt::core::MaterialId* id) {
-			STACK_FRAME(stack, "Material", obj);
-			rt::core::Material mat;
-			JS_Object emit_vector = sjson_object_child(obj, "emit");
-			JS_Object reflect_vector = sjson_object_child(obj, "reflect");
-			JS_Object specular_flag = sjson_object_child(obj, "specular");
-
-			if (!consume_vector(stack, emit_vector, &mat.emitted)) {
-				return false;
-			}
-			if (reflect_vector.type == AT_STRING) {
-				const char* source = sjson_object_string(reflect_vector);
+		bool consume_filter(std::vector<std::string>& stack, JS_Object obj, ResourceManager& manager, std::shared_ptr<rt::core::ColorFilter>* filter) {
+			STACK_FRAME(stack, "ColorSource", obj);
+			if (obj.type == AT_STRING) {
+				const char* source = sjson_object_string(obj);
 				int temp;
 				rt::core::Surface2d* texture_surface = (rt::core::Surface2d*)manager.get_resource(source, ResourceType::TEXTURE, &temp);
 				if (!texture_surface) {
 					ABORT_LOADING(stack, "Failed to load texture from source " << source);
 				}
-				mat.reflected.reset(new core::BilinearFilter(*texture_surface));
-			} else{
-				glm::vec3 reflect;
-				if (!consume_vector(stack, reflect_vector, &reflect)) {
+				(*filter).reset(new core::BilinearFilter(*texture_surface));
+			}else{
+				glm::vec3 out;
+				if (!consume_vector(stack, obj, &out)) {
 					return false;
 				}
-				mat.reflected.reset(new core::SpectrumFilter(reflect));
+				(*filter).reset(new core::SpectrumFilter(out));
+			}
+			return true;
+		}
+		bool consume_material(std::vector<std::string>& stack, JS_Object obj, rt::core::Scene& scene, ResourceManager& manager, rt::core::MaterialId* id) {
+			STACK_FRAME(stack, "Material", obj);
+			rt::core::Material mat;
+			JS_Object emit_vector = sjson_object_child(obj, "emit");
+			JS_Object diffuse_obj = sjson_object_child(obj, "diffuse");
+			JS_Object specular_obj = sjson_object_child(obj, "specular");
+			JS_Object glossy_obj = sjson_object_child(obj, "glossy");
+
+			if (!consume_vector(stack, emit_vector, &mat.emitted)) {
+				return false;
 			}
 			
-			if (specular_flag.type == AT_INT && sjson_object_int(specular_flag) != 0) {
-				mat.specular = true;
+			if (diffuse_obj.type != AT_NONE) {
+				if (!consume_filter(stack, diffuse_obj, manager, &mat.diffuse)) {
+					return false;
+				}
 			}
+			if (specular_obj.type != AT_NONE) {
+				if (!consume_filter(stack, specular_obj, manager, &mat.specular)) {
+					return false;
+				}
+			}
+			if (glossy_obj.type != AT_NONE) {
+				if (!consume_filter(stack, glossy_obj, manager, &mat.glossy)) {
+					return false;
+				}
+			}
+
 			*id = scene.push_material(mat);
 			return true;
 		}

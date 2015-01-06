@@ -37,6 +37,9 @@
     <ClInclude Include="path.h">
       <Filter>Raytracer\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="microfacet.h">
+      <Filter>Raytracer\Material</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="renderer.cpp">
@@ -70,6 +73,9 @@
       <Filter>Raytracer\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="material.cpp">
+      <Filter>Raytracer\Material</Filter>
+    </ClCompile>
+    <ClCompile Include="microfacet.cpp">
       <Filter>Raytracer\Material</Filter>
     </ClCompile>
   </ItemGroup>

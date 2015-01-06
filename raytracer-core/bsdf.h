@@ -24,6 +24,7 @@ namespace rt {
 		class BRDF : public BxDF {
 		public:
 		};
+
 		class LambertianBRDF : public BRDF {
 			Spectrum _R; //reflectance spectrum
 

@@ -5,17 +5,6 @@
 
 namespace rt {
 	namespace core {
-
-		//2 utility functions
-		glm::vec3 spherical_direction(float sintheta, float costheta, float phi,
-			const glm::vec3 x, const glm::vec3 y, const glm::vec3 z);
-		glm::vec3 spherical_direction(float sintheta, float costheta, float phi);
-
-		//to thetha(x) and phi(y)
-		glm::vec2 spherical_angles(const glm::vec3 dir);
-		//to sintheta(x), costheta(y) and phi(z)
-		glm::vec3 spherical_angles_tri(const glm::vec3 dir);
-
 		class Shape {
 		public:
 			virtual bool intersect(Ray ray, Intersection* result) const = 0;

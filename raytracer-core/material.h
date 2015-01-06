@@ -58,10 +58,12 @@ namespace rt {
 			~Material() {}
 			BSDF* get_brdf(Intersection& isect, MemoryArena& arena) const;
 
-			std::shared_ptr<ColorFilter> reflected;
+			std::shared_ptr<ColorFilter> diffuse;
+			std::shared_ptr<ColorFilter> glossy;
+			std::shared_ptr<ColorFilter> specular;
+
 
 			glm::vec3 emitted;
-			bool specular;
 		};
 	}
 }
