@@ -16,6 +16,8 @@ namespace rt {
 		public:
 			glm::mat4 transform;
 			Shape* shape;
+
+			glm::vec3 sample_position(float u1, float u2, float u3);
 		};
 
 		class Scene {
@@ -41,7 +43,7 @@ namespace rt {
 			uint32_t ensure_capacity(uint32_t at_least);
 
 			uint32_t push_node(Node node, MaterialId material);
-			void erase_node(uint32_t index);
+			//void erase_node(uint32_t index);
 
 			MaterialId material(uint32_t index) const;
 			Node node(uint32_t index) const;
@@ -52,6 +54,9 @@ namespace rt {
 
 			void accelerate_and_rebuild(Accelerator* pacc);
 			ElementAdapter& get_adapter();
+
+			//light sampling
+			Node& sample_light(float u) const;
 		private:
 			Node* _nodes;
 			MaterialId* _materials;
@@ -61,6 +66,9 @@ namespace rt {
 
 			Accelerator* _accelerator;
 			std::vector<Material> _material_bucket;
+
+			std::vector<int> _light_sources;
+
 			class SceneAccAdapter : public ElementAdapter {
 			public:
 				SceneAccAdapter(Scene& scene) : _scene(scene) {}

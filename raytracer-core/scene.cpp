@@ -3,7 +3,13 @@
 namespace rt {
 	namespace core {
 
-
+		glm::vec3 Node::sample_position(float u1, float u2, float u3) {
+			glm::vec3 local_pos = shape->sample(u1, u2, u3);
+			//transform to world
+			glm::mat4 inv = glm::inverse(transform);
+			glm::vec4 world = inv * glm::vec4(local_pos, 1);
+			return glm::vec3(world);
+		}
 
 		bool Scene::intersect(Ray ray, Intersection* result) const {
 			assert(_accelerator);
@@ -51,13 +57,19 @@ namespace rt {
 			_nodes[_node_count] = node;
 			_materials[_node_count] = material;
 			_node_count += 1;
+
+			//if the object is emitting add it in the lights
+			Material& color = _material_bucket[material];
+			if (color.emitted.x > 0.f || color.emitted.y > 0.f || color.emitted.z > 0.f) {
+				_light_sources.push_back(_node_count - 1);
+			}
 			return _node_count;
 		}
-		void Scene::erase_node(uint32_t index) {
-			_node_count -= 1;
-			_nodes[index] = _nodes[_node_count];
-			_materials[index] = _materials[index];
-		}
+		//void Scene::erase_node(uint32_t index) {
+		//	_node_count -= 1;
+		//	_nodes[index] = _nodes[_node_count];
+		//	_materials[index] = _materials[index];
+		//}
 
 		MaterialId Scene::material(uint32_t index) const {
 			return _materials[index];
@@ -95,6 +107,10 @@ namespace rt {
 			return _adapter;
 		}
 
+		Node& Scene::sample_light(float u) const {
+			int idx = round((_light_sources.size() - 1) * u);
+			return _nodes[_light_sources[idx]];
+		}
 
 		int Scene::SceneAccAdapter::count() {
 			return _scene.node_count();

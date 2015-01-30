@@ -9,6 +9,9 @@ namespace rt {
 		public:
 			virtual bool intersect(Ray ray, Intersection* result) const = 0;
 			virtual AABB get_bounding_box() const = 0;
+			//return origin by default
+			//sphere emitter will behave like point lights if not override
+			virtual glm::vec3 sample(float u1, float u2, float u3) const { return glm::vec3(0, 0, 0); };
 			virtual ~Shape() {}
 		};
 
@@ -39,6 +42,8 @@ namespace rt {
 
 			bool intersect(rt::core::Ray ray, rt::core::Intersection* result) const;
 			rt::core::AABB get_bounding_box() const;
+
+			glm::vec3 sample(float u1, float u2, float u3) const;
 		};
 
 
@@ -68,6 +73,8 @@ namespace rt {
 			void set_accelerator(rt::core::Accelerator* acc);
 			bool intersect(rt::core::Ray ray, rt::core::Intersection* result) const;
 			AABB get_bounding_box() const;
+
+			glm::vec3 sample(float u1, float u2, float u3) const;
 		};
 	}
 }

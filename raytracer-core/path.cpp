@@ -3,7 +3,8 @@
 
 namespace rt {
 	namespace core {
-
+		//It will be runned for each sample so generally this is good enough even if its set to 1
+#define SAMPLE_LIGHT_COUNT 1
 		Spectrum Path::calculate_color(const Scene& scene, Ray ray, Intersection isect, int depth, MemoryArena& arena) const {
 			std::random_device rd;
 			//std::mt19937 gen(rd());
@@ -20,11 +21,15 @@ namespace rt {
 				BSDF* bsdf = mat.get_brdf(isect, arena);
 
 				glm::vec3 outgoing = -ray.direction;
-				Spectrum direct;
-				for (int i = 0; i < 1; ++i) {
-					const float size = 2.0f;
-					glm::vec3 light(dis(gen)*size - size / 2.f, 1, dis(gen)*size - size/2.f);
-					glm::vec3 light_incident = light - isect.position;
+
+				//Sample lights
+				Spectrum sampled_light_contribution;
+				for (int i = 0; i < SAMPLE_LIGHT_COUNT; ++i) {
+					//choose random emitting object in the scene
+					Node& node = scene.sample_light(dis(gen));
+					//choose random position on the surface of this object
+					glm::vec3 light_pos = node.sample_position(dis(gen), dis(gen), dis(gen));
+					glm::vec3 light_incident = light_pos - isect.position;
 					float light_distance = glm::length(light_incident);
 					light_incident = glm::normalize(light_incident);
 
@@ -36,10 +41,10 @@ namespace rt {
 					if (temp.d + 0.0000001 < light_distance) {
 						continue;
 					}
-					direct += path_throughput * bsdf->evaluate_f(outgoing, light_incident) * glm::abs(glm::dot(light_incident, isect.normal));
+					sampled_light_contribution += path_throughput * bsdf->evaluate_f(outgoing, light_incident) * glm::abs(glm::dot(light_incident, isect.normal));
 
 				}
-				L += direct / 1.f;
+				L += sampled_light_contribution / (float)SAMPLE_LIGHT_COUNT;
 
 				glm::vec3 incident;
 				float pdf;
