@@ -99,7 +99,7 @@ namespace rt{
 			KdTreeNode* build_tree(AABB nodeBounds, int* elements, int nPrims, int depth) {
 				KdTreeNode* node = new KdTreeNode;
 				node->self_aabb = nodeBounds;
-				if (depth >= 15 || nPrims <= 100) {
+				if (depth >= 20 || nPrims <= 20) {
 					node->node_type = KdTreeNode::NT_LEAF;
 					node->elements.resize(nPrims);
 					for (int i = 0; i < nPrims; ++i) {

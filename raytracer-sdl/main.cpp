@@ -46,7 +46,14 @@ int raytracer_entry_point(int argc, char* argv[]) {
 	}
 	
 	rt::sdl::FileLoader loader;
-	loader.add_directory("./scenes");
+	if (argc <= 1) {
+		loader.add_directory("./scenes");
+	}
+	else{
+		for (int i = 2; i < argc; ++i) {
+			loader.add_directory(argv[i]);
+		}
+	}
 	auto&& file = rt::sdl::load_config_file(scene_fn, loader);
 	if (!file) {
 		return 0;

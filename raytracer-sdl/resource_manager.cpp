@@ -160,8 +160,8 @@ namespace rt {
 					for (int i = 2; i >= 0; --i) {
 						int index = face->mIndices[i];
 						glm::vec3 vert(mesh->mVertices[index].x,
-							mesh->mVertices[index].z,
-							mesh->mVertices[index].y);
+							mesh->mVertices[index].y,
+							mesh->mVertices[index].z);
 
 
 						if (mesh->HasTextureCoords(0)) {
