@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/nikolaydio/raytracer.svg?branch=master)](https://travis-ci.org/nikolaydio/raytracer)
 
+Screenshots available at https://drive.google.com/folderview?id=0B-aY1M-oaiRtaVE3TWJLM09wRFE
 ### Tasks ###
  * Texture support based on bilinear filtering(high priority).
  * Area light sampling(high priority).
