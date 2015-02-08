@@ -21,16 +21,16 @@ namespace rt {
 		std::unique_ptr<ConfigFile, ConfigFileDeleter> load_config_file(const char* fn, FileLoader& loader) {
 			std::string str;
 			bool success = loader.load_string_file(fn, &str);
-if (!success) {
-	std::cout << "Failed to open file " << fn << std::endl;
-	return 0;
-}
+			if (!success) {
+				std::cout << "Failed to open file " << fn << std::endl;
+				return 0;
+			}
 
-json_file* file = sjson_compile_source(str.c_str());
-if (!file) {
-	std::cout << "Failed to compile " << fn << std::endl;
-}
-return std::unique_ptr<ConfigFile, ConfigFileDeleter>((ConfigFile*)file);
+			json_file* file = sjson_compile_source(str.c_str());
+			if (!file) {
+				std::cout << "Failed to compile " << fn << std::endl;
+			}
+			return std::unique_ptr<ConfigFile, ConfigFileDeleter>((ConfigFile*)file);
 		}
 		void free_config_file(ConfigFile* f) {
 			sjson_free_file((json_file*)f);

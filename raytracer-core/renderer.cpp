@@ -63,11 +63,10 @@ namespace rt {
 			Sampler::SubSampler sub_sampler =
 				_sampler.create_subsampler(glm::vec2(0, 0),
 										_film->get_surface()->get_size());
-			MemoryArena arena(64*8*1024);
+			MemoryArena arena(MATERIAL_MEMORY_ARENA_SIZE);
 			process_subsampler(sub_sampler, arena);
 		}
 		void Renderer::process_subsampler(Sampler::SubSampler& sampler, MemoryArena& arena) {
-
 			Sampler::SubSampler& sub_sampler = sampler;
 
 			Sample* samples = new Sample[sub_sampler.max_samples()];
@@ -81,13 +80,13 @@ namespace rt {
 
 					Intersection intersection;
 					if (_scene.intersect(ray, &intersection)) {
-						glm::vec3 color = _integrator.calculate_radiance(_scene, ray, intersection, arena);
+						Spectrum spectrum = _integrator.calculate_radiance(_scene, ray, intersection, arena);
 						arena.free_all();
 
-						_film->apply_radiance((int)original_position.x, (int)original_position.y, Color(color));
+						_film->apply_radiance((int)original_position.x, (int)original_position.y, spectrum);
 						
 						if (_normals) {
-							_normals->apply_radiance((int)original_position.x, (int)original_position.y, Color(glm::abs(intersection.normal)));
+							_normals->apply_radiance((int)original_position.x, (int)original_position.y, glm::abs(intersection.normal));
 						}
 					}
 				}

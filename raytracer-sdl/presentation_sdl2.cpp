@@ -4,7 +4,7 @@
 
 
 #define REQUIRE(cond) do { if(!(cond)) { printf("Cond failed %s: %s\n", __FILE__, __LINE__); exit(0); }  }while(0)
-
+#define WAIT_TIME 120
 namespace rt {
 	namespace sdl {
 
@@ -82,7 +82,7 @@ namespace rt {
 				SDL_UnlockSurface(surface);
 
 				SDL_UpdateWindowSurface(window);
-				SDL_Delay(120);
+				SDL_Delay(WAIT_TIME);
 			}
 
 			SDL_DestroyWindow(window);

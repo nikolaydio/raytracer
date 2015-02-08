@@ -1,5 +1,6 @@
 #pragma once
 #include <glm/glm.hpp>
+#include "types.h"
 
 namespace rt {
 	namespace core {
@@ -17,7 +18,7 @@ namespace rt {
 				r = 0; g = 0;
 				b = 0; x = 255;
 			}
-			explicit Color(glm::vec3 color) {
+			explicit Color(Spectrum color) {
 				color = glm::clamp(color, glm::vec3(0, 0, 0), glm::vec3(1, 1, 1));
 
 				r = (unsigned char)(color.x * 255.f);

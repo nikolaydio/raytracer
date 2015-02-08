@@ -8,7 +8,6 @@
 namespace rt {
 	namespace core {
 		class Sampler {
-			//this value indicated the generated samples per pixel. (actually sqrt(saples per pixel))
 			float sampling;
 		public:
 			Sampler(float samples_per_pixel) : sampling(glm::sqrt(samples_per_pixel)) {}

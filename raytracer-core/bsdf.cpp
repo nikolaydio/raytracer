@@ -5,7 +5,16 @@ namespace rt {
 	namespace core {
 		//Utility
 		glm::vec3 cosine_sample_hemisphere(float u1, float u2) {
-			return glm::vec3(0, 0, 0);
+			const float r = glm::sqrt(u1);
+			const float theta = 2 * glm::pi<float>() * u2;
+
+			const float x = r * glm::cos(theta);
+			const float y = r * glm::sin(theta);
+
+			return glm::vec3(x, y, glm::sqrt(glm::max(0.0f, 1 - u1)));
+		}
+		float cosine_sample_pdf(float costheta) {
+			return costheta * glm::one_over_pi<float>();
 		}
 
 		glm::vec3 uniform_sample_hemisphere(float u1, float u2) {
@@ -71,6 +80,9 @@ namespace rt {
 		}
 		Spectrum BSDF::evaluate_sample_f(glm::vec3 outgoing_w, glm::vec3* incident_w, float u1, float u2, float* pdf) const {
 			assert(u1 <= 1.0);
+			if (_brdf_count < 1) {
+				return Spectrum(0, 0, 0);
+			}
 			int brdf_num = glm::round(u1 * (_brdf_count-1));
 			BRDF* brdf = _brdfs[brdf_num];
 
@@ -88,6 +100,9 @@ namespace rt {
 			float pdf = 0;
 			for (int i = 0; i < _brdf_count; ++i) {
 				pdf += _brdfs[i]->calc_pdf(local_outgoing, local_incident) * _brdf_scales[i];
+			}
+			if (_brdf_count == 0) {
+				return 1;
 			}
 			return pdf / _brdf_count;
 		}

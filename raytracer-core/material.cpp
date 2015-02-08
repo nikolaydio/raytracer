@@ -39,7 +39,8 @@ namespace rt {
 				bsdf->add_brdf(ARENA_NEWV(arena, SpecularReflectionBRDF, specular->get_color(isect.uv.x, isect.uv.y)), 1);
 			}
 			if (glossy) {
-				MicrofacetDistribution* distr = ARENA_NEWV(arena, Blinn, 20.f);
+				//The blinn exponent should be editable from config file in the future
+				MicrofacetDistribution* distr = ARENA_NEWV(arena, Blinn, 360.f);
 				BRDF* spec = ARENA_NEWV(arena, Microfacet, glossy->get_color(isect.uv.x, isect.uv.y), distr);
 				bsdf->add_brdf(spec, 1.0f);
 			}
