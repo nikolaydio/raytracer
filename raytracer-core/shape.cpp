@@ -96,8 +96,7 @@ namespace rt {
 			result->normal = glm::normalize(glm::cross(e1, e2));
 			float b0 = 1.f - b1 - b2;
 			result->uv = b0 * uv0 + b1 * uv1 + b2 * uv2;
-			assert(result->uv.x >= 0 && result->uv.x <= 1);
-			assert(result->uv.y >= 0 && result->uv.y <= 1);
+
 			return true;
 		}
 		rt::core::AABB Triangle::get_bounding_box() const {
