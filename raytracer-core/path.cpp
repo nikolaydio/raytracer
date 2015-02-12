@@ -5,11 +5,11 @@ namespace rt {
 	namespace core {
 		//It will be runned for each sample so generally this is good enough even if its set to 1
 #define SAMPLE_LIGHT_COUNT 1
-		Spectrum Path::calculate_color(const Scene& scene, Ray ray, Intersection isect, int depth, MemoryArena& arena) const {
-			std::random_device rd;
+		Spectrum Path::calculate_color(const Scene& scene, Ray ray, Intersection isect, int depth, RNG& rng, MemoryArena& arena) const {
+			//std::random_device rd;
 			//std::mt19937 gen(rd());
-			std::minstd_rand gen(rd());
-			std::uniform_real_distribution<float> dis(0, 1); 
+			//std::minstd_rand gen(0);
+			//std::uniform_real_distribution<float> dis(0, 1); 
 			
 
 			Spectrum path_throughput(1, 1, 1), L(0,0,0);
@@ -26,9 +26,9 @@ namespace rt {
 				Spectrum sampled_light_contribution;
 				for (int i = 0; i < SAMPLE_LIGHT_COUNT; ++i) {
 					//choose random emitting object in the scene
-					Node& node = scene.sample_light(dis(gen));
+					Node& node = scene.sample_light(rng.gen());
 					//choose random position on the surface of this object
-					glm::vec3 light_pos = node.sample_position(dis(gen), dis(gen), dis(gen));
+					glm::vec3 light_pos = node.sample_position(rng.gen(), rng.gen(), rng.gen());
 					glm::vec3 light_incident = light_pos - isect.position;
 					float light_distance = glm::length(light_incident);
 					light_incident = glm::normalize(light_incident);
@@ -48,7 +48,7 @@ namespace rt {
 
 				glm::vec3 incident;
 				float pdf;
-				Spectrum f = bsdf->evaluate_sample_f(outgoing, &incident, dis(gen), dis(gen), &pdf);
+				Spectrum f = bsdf->evaluate_sample_f(outgoing, &incident, rng.gen(), rng.gen(), &pdf);
 				if (glm::length(f) < 0.000001 || pdf == 0.) {
 					break;
 				}
@@ -70,8 +70,8 @@ namespace rt {
 			}
 			return L;
 		}
-		Spectrum Path::calculate_radiance(const Scene& scene, Ray ray, Intersection isect, MemoryArena& arena) const {
-			return calculate_color(scene, ray, isect, 0, arena);
+		Spectrum Path::calculate_radiance(const Scene& scene, Ray ray, Intersection isect, RNG& rng, MemoryArena& arena) const {
+			return calculate_color(scene, ray, isect, 0, rng, arena);
 		}
 	}
 }

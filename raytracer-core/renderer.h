@@ -4,6 +4,7 @@
 #include "film.h"
 #include <random>
 #include "material.h"
+#include "rng.h"
 
 namespace rt {
 	namespace core {
@@ -30,7 +31,7 @@ namespace rt {
 	
 		class Integrator {
 		public:
-			virtual Spectrum calculate_radiance(const Scene& scene, Ray ray, Intersection isect, MemoryArena& arena) const = 0;
+			virtual Spectrum calculate_radiance(const Scene& scene, Ray ray, Intersection isect, RNG& rng, MemoryArena& arena) const = 0;
 		};
 
 		class Renderer {

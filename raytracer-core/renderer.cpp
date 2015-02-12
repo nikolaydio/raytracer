@@ -5,6 +5,7 @@
 #include <omp.h>
 #include <memory>
 #include "config.h"
+#include "rng.h"
 
 namespace rt {
 	namespace core {
@@ -67,6 +68,8 @@ namespace rt {
 			process_subsampler(sub_sampler, arena);
 		}
 		void Renderer::process_subsampler(Sampler::SubSampler& sampler, MemoryArena& arena) {
+			std::random_device rd;
+			RNG rng(rd());
 			Sampler::SubSampler& sub_sampler = sampler;
 
 			Sample* samples = new Sample[sub_sampler.max_samples()];
@@ -80,7 +83,7 @@ namespace rt {
 
 					Intersection intersection;
 					if (_scene.intersect(ray, &intersection)) {
-						Spectrum spectrum = _integrator.calculate_radiance(_scene, ray, intersection, arena);
+						Spectrum spectrum = _integrator.calculate_radiance(_scene, ray, intersection, rng, arena);
 						arena.free_all();
 
 						_film->apply_radiance((int)original_position.x, (int)original_position.y, spectrum);
