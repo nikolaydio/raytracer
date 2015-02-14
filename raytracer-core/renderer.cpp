@@ -9,6 +9,34 @@
 
 namespace rt {
 	namespace core {
+		Spectrum estimate_direct(const Scene& scene, Intersection isect, Node& light, BSDF* bsdf, glm::vec3 outgoing_w, RNG& rng, MemoryArena& arena) {
+
+			glm::vec3 light_pos = light.sample_as_light(rng.gen(), rng.gen(), rng.gen());
+			glm::vec3 light_incident = light_pos - isect.position;
+			float light_distance = glm::length(light_incident);
+			light_incident = glm::normalize(light_incident);
+
+			Intersection temp;
+			Ray tray; tray.origin = isect.position; tray.direction = light_incident;
+			if (!scene.intersect(tray, &temp)) {
+				return Spectrum(0, 0, 0);
+			}
+			if (temp.d + 0.0000001 < light_distance) {
+				return Spectrum(0, 0, 0);
+			}
+			return bsdf->evaluate_f(outgoing_w, light_incident) * glm::abs(glm::dot(light_incident, isect.normal));
+		}
+		Spectrum uniform_sample_one_light(const Scene& scene, Intersection isect, BSDF* bsdf, glm::vec3 outgoing_w, RNG& rng, MemoryArena& arena) {
+			auto& lights = scene.get_lights();
+			if (lights.size() == 0){
+				return Spectrum(0, 0, 0);
+			}
+			int light_index = glm::round(rng.gen() * (lights.size() - 1));
+			int light_node_id = lights[light_index];
+			Node& node = scene.node(light_node_id);
+			return (float)lights.size() * estimate_direct(scene, isect, node, bsdf, outgoing_w, rng, arena);
+		}
+
 
 		Sampler::SubSampler::SubSampler(glm::vec2 pos, glm::vec2 size, float sampling) {
 			_pos = pos;

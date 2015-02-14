@@ -3,7 +3,7 @@
 namespace rt {
 	namespace core {
 
-		glm::vec3 Node::sample_position(float u1, float u2, float u3) {
+		glm::vec3 Node::sample_as_light(float u1, float u2, float u3) {
 			glm::vec3 local_pos = shape->sample(u1, u2, u3);
 			//transform to world
 			glm::mat4 inv = glm::inverse(transform);
@@ -110,6 +110,9 @@ namespace rt {
 		Node& Scene::sample_light(float u) const {
 			int idx = round((_light_sources.size() - 1) * u);
 			return _nodes[_light_sources[idx]];
+		}
+		const std::vector<int>& Scene::get_lights() const {
+			return _light_sources;
 		}
 
 		int Scene::SceneAccAdapter::count() {

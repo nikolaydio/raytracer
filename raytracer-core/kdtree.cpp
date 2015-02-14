@@ -1,5 +1,5 @@
 #include "scene.h"
-
+#include "config.h"
 
 namespace rt{
 	namespace core {
@@ -99,7 +99,7 @@ namespace rt{
 			KdTreeNode* build_tree(AABB nodeBounds, int* elements, int nPrims, int depth) {
 				KdTreeNode* node = new KdTreeNode;
 				node->self_aabb = nodeBounds;
-				if (depth >= 20 || nPrims <= 20) {
+				if (depth >= KDTREE_MAX_DEPTH || nPrims <= KDTREE_MIN_ELEMENTS) {
 					node->node_type = KdTreeNode::NT_LEAF;
 					node->elements.resize(nPrims);
 					for (int i = 0; i < nPrims; ++i) {

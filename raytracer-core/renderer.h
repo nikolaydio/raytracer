@@ -29,10 +29,12 @@ namespace rt {
 			SubSampler create_subsampler(glm::vec2 pos, glm::vec2 size) const;
 		};
 	
+		
 		class Integrator {
 		public:
 			virtual Spectrum calculate_radiance(const Scene& scene, Ray ray, Intersection isect, RNG& rng, MemoryArena& arena) const = 0;
 		};
+		Spectrum uniform_sample_one_light(const Scene& scene, Intersection isect, BSDF* bsdf, glm::vec3 outgoing_w, RNG& rng, MemoryArena& arena);
 
 		class Renderer {
 			const Sampler& _sampler;

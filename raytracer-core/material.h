@@ -23,25 +23,25 @@ namespace rt {
 		};
 		class ColorFilter {
 		public:
-			virtual glm::vec3 get_color(float u, float v) = 0;
+			virtual Spectrum get_color(float u, float v) = 0;
 			virtual ~ColorFilter() {}
 		};
 		class SpectrumFilter : public ColorFilter {
 		public:
-			SpectrumFilter(Spectrum r) : R(r) {}
-			Spectrum R;
-			glm::vec3 get_color(float u, float v) {
+			SpectrumFilter(Spectrum r) : _R(r) {}
+			Spectrum _R;
+			Spectrum get_color(float u, float v) {
 				u; v;
-				return R;
+				return _R;
 			}
 		};
-		class BilinearFilter : public ColorFilter {
+		class DirectTexFilter : public ColorFilter {
 			rt::core::Surface2d& _surface;
 		public:
-			BilinearFilter(rt::core::Surface2d& surface) : _surface(surface) {
+			DirectTexFilter(rt::core::Surface2d& surface) : _surface(surface) {
 
 			}
-			glm::vec3 get_color(float u, float v) {
+			Spectrum get_color(float u, float v) {
 				glm::vec2 size = _surface.get_size();
 				//the next 2 lines are here to handle cases where uvs and <0 or abs(uv) > 1
 				glm::vec2 uvs(u, v);
