@@ -171,7 +171,7 @@ namespace rt {
 				if (!texture_surface) {
 					ABORT_LOADING(stack, "Failed to load texture from source " << source);
 				}
-				(*filter).reset(new core::BilinearFilter(*texture_surface));
+				(*filter).reset(new core::DirectTexFilter(*texture_surface));
 			}else{
 				glm::vec3 out;
 				if (!consume_vector(stack, obj, &out)) {
