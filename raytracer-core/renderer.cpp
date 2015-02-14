@@ -9,7 +9,7 @@
 
 namespace rt {
 	namespace core {
-		Spectrum estimate_direct(const Scene& scene, Intersection isect, Node& light, BSDF* bsdf, glm::vec3 outgoing_w, RNG& rng, MemoryArena& arena) {
+		Spectrum estimate_direct(const Scene& scene, Intersection isect, const Node& light, BSDF* bsdf, glm::vec3 outgoing_w, RNG& rng, MemoryArena& arena) {
 
 			glm::vec3 light_pos = light.sample_as_light(rng.gen(), rng.gen(), rng.gen());
 			glm::vec3 light_incident = light_pos - isect.position;
@@ -33,7 +33,7 @@ namespace rt {
 			}
 			int light_index = glm::round(rng.gen() * (lights.size() - 1));
 			int light_node_id = lights[light_index];
-			Node& node = scene.node(light_node_id);
+			const Node& node = scene.node(light_node_id);
 			return (float)lights.size() * estimate_direct(scene, isect, node, bsdf, outgoing_w, rng, arena);
 		}
 

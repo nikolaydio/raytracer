@@ -3,7 +3,7 @@
 namespace rt {
 	namespace core {
 
-		glm::vec3 Node::sample_as_light(float u1, float u2, float u3) {
+		glm::vec3 Node::sample_as_light(float u1, float u2, float u3) const {
 			glm::vec3 local_pos = shape->sample(u1, u2, u3);
 			//transform to world
 			glm::mat4 inv = glm::inverse(transform);
