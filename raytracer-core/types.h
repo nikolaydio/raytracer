@@ -82,6 +82,27 @@ namespace rt {
 				//t = tmin;
 				return true;
 			}
+			float intersect_t(Ray ray) const {
+				glm::vec3 dirfrac = 1.0f / ray.direction;
+
+				float t1 = (_min.x - ray.origin.x)*dirfrac.x;
+				float t2 = (_max.x - ray.origin.x)*dirfrac.x;
+				float t3 = (_min.y - ray.origin.y)*dirfrac.y;
+				float t4 = (_max.y - ray.origin.y)*dirfrac.y;
+				float t5 = (_min.z - ray.origin.z)*dirfrac.z;
+				float t6 = (_max.z - ray.origin.z)*dirfrac.z;
+
+				float tmin = glm::max(glm::max(glm::min(t1, t2), glm::min(t3, t4)), glm::min(t5, t6));
+				float tmax = glm::min(glm::min(glm::max(t1, t2), glm::max(t3, t4)), glm::max(t5, t6));
+
+				if (tmax < 0) {
+					return 0.f;
+				}
+				if (tmin > tmax){
+					return 0.f;
+				}
+				return tmin;
+			}
 			bool intersect(const AABB b) const {
 				if (_max.x < b._min.x) {
 					return false;

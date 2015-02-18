@@ -44,23 +44,20 @@ namespace rt{
 				}
 				if (node->node_type == KdTreeNode::NT_INTERIOR) {
 					Intersection left, right;
-					bool left_h = hit(node->left, ray, &left);
-					bool right_h = hit(node->right, ray, &right);
-					if (left_h && right_h) {
-						if (left.d < right.d) {
-							*result = left;
-						} else{
-							*result = right;
+					float range_left = glm::abs(node->left->self_aabb.intersect_t(ray));
+					float range_right = glm::abs(node->right->self_aabb.intersect_t(ray));
+					if (range_left < range_right) {
+						bool left_h = hit(node->left, ray, result);
+						if (left_h) {
+							return true;
 						}
-						return true;
-					}
-					if (left_h) {
-						*result = left;
-						return true;
-					}
-					if (right_h) {
-						*result = right;
-						return true;
+						return hit(node->right, ray, result);
+					} else {
+						bool right_h = hit(node->right, ray, result);
+						if (right_h) {
+							return true;
+						}
+						return hit(node->left, ray, result);
 					}
 					return false;
 				} else {
