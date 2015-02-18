@@ -102,7 +102,9 @@ namespace rt {
 		rt::core::AABB Triangle::get_bounding_box() const {
 			return rt::core::AABB(p0, p1, p2);
 		}
-		glm::vec3 Triangle::sample(float u1, float u2, float u3) const {
+		glm::vec3 Triangle::sample(float u1, float u2, float u3, float* pdf) const {
+			float area = 0.5f * glm::length(glm::cross(p1 - p0, p2 - p0));
+			*pdf = 1.0f / area;
 			return (1.f - glm::sqrt(u1)) * p0 + (glm::sqrt(u1) * (1 - u2)) * p1 + (glm::sqrt(u1) * u2) * p2;
 		}
 
@@ -171,14 +173,16 @@ namespace rt {
 			return aabb;
 		}
 
-		glm::vec3 Mesh::sample(float u1, float u2, float u3) const {
+		glm::vec3 Mesh::sample(float u1, float u2, float u3, float* pdf) const {
 			//choose face randomly.
 			//better approach would be to use comulative distr func
 			int index = glm::round(u1 * ((points.size() / 3) - 1));
 			glm::vec2 uvs[3];
 			Triangle tri(points[index * 3], points[index * 3 + 1], points[index * 3 + 2],
 				uvs[0], uvs[1], uvs[2]);
-			return tri.sample(u2, u3, 0);
+			glm::vec3 result = tri.sample(u2, u3, 0, pdf);
+			*pdf *= 1.0f / (points.size() / 3.0f);
+			return result;
 		}
 	}
 }

@@ -26,7 +26,7 @@ namespace rt {
 				L += (sampled_light_contribution / (float)SAMPLE_LIGHT_COUNT) * path_throughput ;
 
 				glm::vec3 incident;
-				float pdf;
+				float pdf = 0;
 				Spectrum f = bsdf->evaluate_sample_f(outgoing, &incident, rng.gen(), rng.gen(), &pdf);
 				if (glm::length(f) < 0.000001 || pdf == 0.) {
 					break;

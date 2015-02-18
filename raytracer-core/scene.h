@@ -17,7 +17,7 @@ namespace rt {
 			glm::mat4 transform;
 			Shape* shape;
 
-			glm::vec3 sample_as_light(float u1, float u2, float u3) const;
+			glm::vec3 sample_as_light(float u1, float u2, float u3, float* pdf) const;
 		};
 
 		class Scene {

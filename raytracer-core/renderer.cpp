@@ -10,8 +10,8 @@
 namespace rt {
 	namespace core {
 		Spectrum estimate_direct(const Scene& scene, Intersection isect, const Node& light, BSDF* bsdf, glm::vec3 outgoing_w, RNG& rng, MemoryArena& arena) {
-
-			glm::vec3 light_pos = light.sample_as_light(rng.gen(), rng.gen(), rng.gen());
+			float pdf;
+			glm::vec3 light_pos = light.sample_as_light(rng.gen(), rng.gen(), rng.gen(), &pdf);
 			glm::vec3 light_incident = light_pos - isect.position;
 			float light_distance = glm::length(light_incident);
 			light_incident = glm::normalize(light_incident);
@@ -24,7 +24,7 @@ namespace rt {
 			if (temp.d + 0.0000001 < light_distance) {
 				return Spectrum(0, 0, 0);
 			}
-			return bsdf->evaluate_f(outgoing_w, light_incident) * glm::abs(glm::dot(light_incident, isect.normal));
+			return bsdf->evaluate_f(outgoing_w, light_incident) * glm::abs(glm::dot(light_incident, isect.normal)) / pdf;
 		}
 		Spectrum uniform_sample_one_light(const Scene& scene, Intersection isect, BSDF* bsdf, glm::vec3 outgoing_w, RNG& rng, MemoryArena& arena) {
 			auto& lights = scene.get_lights();
