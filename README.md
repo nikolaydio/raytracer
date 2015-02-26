@@ -4,6 +4,8 @@
 
 Screenshots available at https://drive.google.com/folderview?id=0B-aY1M-oaiRtaVE3TWJLM09wRFE
 
+If you got this document from other source than github - you can view the most up to date version at https://github.com/nikolaydio/raytracer
+
 ### Features ###
  * Material system with emit, diffuse, glossy and specular options
  * Support for most common image formats by stb_image
@@ -20,6 +22,10 @@ Screenshots available at https://drive.google.com/folderview?id=0B-aY1M-oaiRtaVE
 
 ### Building ###
 
+The notes below assume you don't have "3rdparty" folder. If your distribution contains such folder then it contains 32bit windows prebuilt libraries with the following differences:
+ * The assimp directory that is provided contains precompiled binaries by me. The original ones are broken(see additional tips).
+ * Removed 64bit SDL2.
+
 #### Windows - Visual Studio ####
  * Download SDL 2.0.3 into 3rdparty/
  * Download GLM 0.9.4 into 3rdparty/
@@ -28,7 +34,7 @@ Screenshots available at https://drive.google.com/folderview?id=0B-aY1M-oaiRtaVE
  * Visual studio 2013 open .sln
 
 Additional tips:
- * OpenAssetImporter can be easily built by CMake. This is preferred over precompiled version(there seems to be some kind of compatibilty problems otherwise).
+ * OpenAssetImporter can easily be built by CMake. You should certainly build it yourself - https://github.com/assimp/assimp/issues/302
  * Newer GLM version dropped backward compatibilty with 0.9.4.
  * If you don't have visual studio 2013, you may be able to build the project using mingw or cygwin.(Not tested yet)
 
