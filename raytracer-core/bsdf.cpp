@@ -4,14 +4,41 @@
 namespace rt {
 	namespace core {
 		//Utility
+		glm::vec2 concentric_sample_disc(float u1, float u2) {
+			float r, theta;
+			glm::vec2 s(2.f * u1 - 1.f, 2.f * u2 - 1.f);
+			if (s.x == 0. && s.y == 0.) {
+				return glm::vec2();
+			}
+			if (s.x >= -s.y) {
+				if (s.x > s.y) {
+					r = s.x;
+					if (s.y > 0.0) theta = s.y / r;
+					else theta = 8.0f + s.y / r;
+				}
+				else{
+					r = s.y;
+					theta = 2.0f - s.x / r;
+				}
+			}
+			else{
+				if (s.x <= s.y) {
+					r = -s.x;
+					theta = 4.0f - s.y / r;
+				}
+				else{
+					r = -s.y;
+					theta = 6.0f + s.x / r;
+				}
+			}
+			theta *= glm::pi<float>() / 4.f;
+			return glm::vec2(r * glm::cos(theta), r * glm::sin(theta));
+		}
 		glm::vec3 cosine_sample_hemisphere(float u1, float u2) {
-			const float r = glm::sqrt(u1);
-			const float theta = 2 * glm::pi<float>() * u2;
-
-			const float x = r * glm::cos(theta);
-			const float y = r * glm::sin(theta);
-
-			return glm::vec3(x, y, glm::sqrt(glm::max(0.0f, 1 - u1)));
+			glm::vec3 res;
+			res = glm::vec3(concentric_sample_disc(u1, u2), 0.f);
+			res.z = glm::sqrt(glm::max(0.f, 1.f - res.x*res.x - res.y * res.y));
+			return res;
 		}
 		float cosine_sample_pdf(float costheta) {
 			return costheta * glm::one_over_pi<float>();
@@ -25,20 +52,20 @@ namespace rt {
 			float y = r * sinf(phi);
 			return glm::vec3(x, y, z);
 		}
-		float uniform_hemisphere_pdf() {
+		float uniform_hemisphere_pdf(float costheta) {
 			return glm::one_over_pi <float>() / 2.0f;
 		}
 
 		//Impl
 		Spectrum BxDF::evaluate_sample_f(glm::vec3 outgoing_w, glm::vec3* incident_w, float u1, float u2, float* pdf) const {
 			//Better use cosine_sample when I learn the required math
-			*incident_w = uniform_sample_hemisphere(u1, u2);
-			if (outgoing_w.z < 0.) incident_w->z *= -1.f;
+			*incident_w = cosine_sample_hemisphere(u1, u2);
+			//if (outgoing_w.z < 0.) incident_w->z *= -1.f;
 			*pdf = calc_pdf(outgoing_w, *incident_w);
 			return evaluate_f(outgoing_w, *incident_w);
 		}
 		float BxDF::calc_pdf(const glm::vec3 &outgoing_w, const glm::vec3 &incident_w) const {
-			return uniform_hemisphere_pdf();
+			return cosine_sample_pdf(incident_w.z);
 		}
 
 
@@ -52,6 +79,8 @@ namespace rt {
 			_brdfs[_brdf_count++] = brdf;
 		}
 		glm::vec3 BSDF::world_to_local(glm::vec3 world) const {
+			//This random vector is a normalized random direction, used to calculate the spherical coordinate system.
+			//it should be same for the reverse translate function below
 			glm::vec3 random_vec(0.85577678, 0.503440032, 0.119139549);
 			glm::vec3 tn = glm::normalize(glm::cross(_normal, random_vec));
 			glm::vec3 sn = glm::normalize(glm::cross(_normal, tn));
