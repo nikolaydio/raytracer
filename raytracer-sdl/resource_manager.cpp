@@ -236,6 +236,11 @@ namespace rt {
 			for(int i = 0; i < 16; ++i) {
 				current_mat[i/4][i%4] = ai_node->mTransformation[i/4][i%4];
 			}
+			std::string name = ai_node->mName.C_Str();
+			if (name.find("pill") != name.npos) {
+				printf("Found it");
+			};
+
 			transform = transform * current_mat;
 			for(int i = 0; i < ai_node->mNumMeshes; ++i) {
 				rt::core::Node node;
@@ -282,6 +287,8 @@ namespace rt {
 				rt::core::MaterialId mat_id = scene.push_material(mat);
 				materials.push_back(mat_id);
 				shapes.push_back(mesh);
+				//rt::core::Node node;
+				//node.shape = mesh;
 				//scene.push_node(node, mat_id);
 			}
 
