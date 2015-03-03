@@ -223,19 +223,24 @@ namespace rt {
 				return false;
 			}
 
-			JS_Object shape = sjson_object_child(node_obj, "shape");
-			ENSURE_TYPE(stack, shape, AT_TABLE);
-			if (!consume_shape(stack, shape, manager, &node.shape)) {
-				return false;
-			}
+			JS_Object construct_from = sjson_object_child(node_obj, "construct_from");
+			if(construct_from.type == AT_STRING) {
+				return construct_nodes_from_file(scene, manager, sjson_object_string(construct_from));
+			}else{
+				JS_Object shape = sjson_object_child(node_obj, "shape");
+				ENSURE_TYPE(stack, shape, AT_TABLE);
+				if (!consume_shape(stack, shape, manager, &node.shape)) {
+					return false;
+				}
 
-			JS_Object material = sjson_object_child(node_obj, "material");
-			ENSURE_TYPE(stack, material, AT_TABLE);
-			rt::core::MaterialId material_id;
-			if (!consume_material(stack, material, scene, manager, &material_id)) {
-				return false;
+				JS_Object material = sjson_object_child(node_obj, "material");
+				ENSURE_TYPE(stack, material, AT_TABLE);
+				rt::core::MaterialId material_id;
+				if (!consume_material(stack, material, scene, manager, &material_id)) {
+					return false;
+				}
+				scene.push_node(node, material_id);
 			}
-			scene.push_node(node, material_id);
 			return true;
 		}
 		bool consume_nodelist(std::vector<std::string>& stack, JS_Object obj, rt::core::Scene& scene, ResourceManager& manager) {
