@@ -12,6 +12,7 @@
 #include "stb_image.h"
 
 #include <types.h>
+#include <material.h>
 
 namespace rt {
 	namespace sdl {
@@ -211,12 +212,13 @@ namespace rt {
 			*mesh = rtmesh;
 			return true;
 		}
-		bool construct_material(rt::sdl::ResourceManager& manager, const struct aiMaterial* ai_mat, rt::core::Material* mat) {
+		bool get_texture(rt::sdl::ResourceManager& manager, std::shared_ptr<rt::core::ColorFilter>* target, aiTextureType type, const struct aiMaterial* ai_mat) {
 			aiString name;
-			aiReturn r = ai_mat->GetTexture(aiTextureType_DIFFUSE, 0, &name);
+			//diffuse
+			aiReturn r = ai_mat->GetTexture(type, 0, &name);
 			if(AI_SUCCESS != r) {
 				printf("Failed to grab a diffuse texture for one of the materials.\n");
-				mat->diffuse.reset(new core::SpectrumFilter(glm::vec3(0.6, 0.6, 0.6)));
+				(*target).reset(new core::SpectrumFilter(glm::vec3(0.2, 0.2, 0.2)));
 				return true;
 			}
 
@@ -227,7 +229,15 @@ namespace rt {
 				printf("Failed load texture %s.\n", fn.c_str());
 				return false;
 			}
-			mat->diffuse.reset(new core::DirectTexFilter(*texture_surface));
+			(*target).reset(new core::DirectTexFilter(*texture_surface));
+
+		}
+		bool construct_material(rt::sdl::ResourceManager& manager, const struct aiMaterial* ai_mat, rt::core::Material* mat) {
+			get_texture(manager, &mat->diffuse, aiTextureType_DIFFUSE, ai_mat);
+			get_texture(manager, &mat->specular, aiTextureType_SPECULAR, ai_mat);
+			get_texture(manager, &mat->glossy, aiTextureType_SHININESS, ai_mat);
+			
+
 			return true;
 		}
 		bool construct_from_ai_node(rt::core::Scene& scene, rt::sdl::ResourceManager& manager, std::vector<rt::core::Shape*>& shapes, std::vector<rt::core::MaterialId>& mats, aiNode* ai_node, glm::mat4 transform) {

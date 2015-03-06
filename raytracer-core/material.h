@@ -45,7 +45,14 @@ namespace rt {
 				glm::vec2 size = _surface.get_size();
 				//the next 2 lines are here to handle cases where uvs and <0 or abs(uv) > 1
 				glm::vec2 uvs(u, v);
-				uvs = glm::min(glm::abs(uvs), glm::vec2(1.0f, 1.0f));
+				uvs = uvs - glm::trunc(uvs);
+				if (uvs.x < 0.f) {
+					uvs.x = 1. + uvs.x;
+				}
+				if (uvs.y < 0.f) {
+					uvs.y = 1. + uvs.y;
+				}
+
 				int xpos = (int)(size.x * uvs.x);
 				int ypos = (int)(size.y * uvs.y);
 				Color color = _surface.pixel(xpos, ypos);
