@@ -60,12 +60,12 @@ namespace rt {
 		Spectrum BxDF::evaluate_sample_f(glm::vec3 outgoing_w, glm::vec3* incident_w, float u1, float u2, float* pdf) const {
 			//Better use cosine_sample when I learn the required math
 			*incident_w = cosine_sample_hemisphere(u1, u2);
-			//if (outgoing_w.z < 0.) incident_w->z *= -1.f;
+			if (outgoing_w.z < 0.) incident_w->z *= -1.f;
 			*pdf = calc_pdf(outgoing_w, *incident_w);
 			return evaluate_f(outgoing_w, *incident_w);
 		}
 		float BxDF::calc_pdf(const glm::vec3 &outgoing_w, const glm::vec3 &incident_w) const {
-			return cosine_sample_pdf(incident_w.z);
+			return cosine_sample_pdf(glm::abs(incident_w.z));
 		}
 
 

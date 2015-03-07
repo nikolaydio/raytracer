@@ -34,7 +34,7 @@ namespace rt {
 			int light_index = glm::round(rng.gen() * (lights.size() - 1));
 			int light_node_id = lights[light_index];
 			const Node& node = scene.node(light_node_id);
-			return (float)lights.size() * estimate_direct(scene, isect, node, bsdf, outgoing_w, rng, arena);
+			return (float)lights.size() * estimate_direct(scene, isect, node, bsdf, outgoing_w, rng, arena) * scene.material_by_id(scene.material(light_node_id)).emitted;
 		}
 
 

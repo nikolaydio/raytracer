@@ -218,7 +218,7 @@ namespace rt {
 			aiReturn r = ai_mat->GetTexture(type, 0, &name);
 			if(AI_SUCCESS != r) {
 				printf("Failed to grab a diffuse texture for one of the materials.\n");
-				(*target).reset(new core::SpectrumFilter(glm::vec3(0.2, 0.2, 0.2)));
+				(*target).reset(new core::SpectrumFilter(glm::vec3(0.0, 0.0, 0.0)));
 				return true;
 			}
 
@@ -247,9 +247,6 @@ namespace rt {
 				current_mat[i/4][i%4] = ai_node->mTransformation[i/4][i%4];
 			}
 			std::string name = ai_node->mName.C_Str();
-			if (name.find("pill") != name.npos) {
-				printf("Found it");
-			};
 
 			transform = transform * current_mat;
 			for(int i = 0; i < ai_node->mNumMeshes; ++i) {
