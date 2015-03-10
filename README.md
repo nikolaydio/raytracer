@@ -1,8 +1,13 @@
 # RayTracer #
 
 [![Build Status](https://travis-ci.org/nikolaydio/raytracer.svg?branch=master)](https://travis-ci.org/nikolaydio/raytracer)
+[![Build Status](https://travis-ci.org/nikolaydio/raytracer.svg?branch=develop)](https://travis-ci.org/nikolaydio/raytracer)
 
-Screenshots available at https://drive.google.com/folderview?id=0B-aY1M-oaiRtaVE3TWJLM09wRFE
+### Intro ###
+This is a student project that aims to prove that physically based rendering is not some "black magic". It intends to create a minimal&simplified rendering engine usable by students and enthusiasts. 
+
+
+Screenshots(early ones) available at https://drive.google.com/folderview?id=0B-aY1M-oaiRtaVE3TWJLM09wRFE
 
 If you got this document from other source than github - you can view the most up to date version at https://github.com/nikolaydio/raytracer
 
@@ -18,7 +23,8 @@ If you got this document from other source than github - you can view the most u
  * JSON-like configuration files for scene and camera descriptions
  * Multiplatform (tested on linux and windows)
 
-
+### Bugs ###
+Report any bugs you find in the issue tracking system or send a pull request with fix. I doubt anyone cares... but anyways...
 
 ### Building ###
 
