@@ -217,8 +217,6 @@ namespace rt {
 			//diffuse
 			aiReturn r = ai_mat->GetTexture(type, 0, &name);
 			if(AI_SUCCESS != r) {
-				printf("Failed to grab a diffuse texture for one of the materials.\n");
-				(*target).reset(new core::SpectrumFilter(glm::vec3(0.2, 0.2, 0.2)));
 				return true;
 			}
 
@@ -230,13 +228,15 @@ namespace rt {
 				return false;
 			}
 			(*target).reset(new core::DirectTexFilter(*texture_surface));
-
+			return true;
 		}
 		bool construct_material(rt::sdl::ResourceManager& manager, const struct aiMaterial* ai_mat, rt::core::Material* mat) {
 			get_texture(manager, &mat->diffuse, aiTextureType_DIFFUSE, ai_mat);
 			get_texture(manager, &mat->specular, aiTextureType_SPECULAR, ai_mat);
 			get_texture(manager, &mat->glossy, aiTextureType_SHININESS, ai_mat);
-			
+			if (!mat->diffuse && !mat->specular && !mat->glossy) {
+				printf("An object does not contain any tex info.\n");
+			}
 
 			return true;
 		}
@@ -247,9 +247,6 @@ namespace rt {
 				current_mat[i/4][i%4] = ai_node->mTransformation[i/4][i%4];
 			}
 			std::string name = ai_node->mName.C_Str();
-			if (name.find("pill") != name.npos) {
-				printf("Found it");
-			};
 
 			transform = transform * current_mat;
 			for(int i = 0; i < ai_node->mNumMeshes; ++i) {
