@@ -1,26 +1,128 @@
 images = [
 	{
 		method = "path"
-		samples = 4
+		samples = 16
 		camera = {
 			type = "pinhole"
-			eye = [-10 2 6]
-			lookat = [3 2 -2]
+			eye = [-0.6 0.9 -2]
+			lookat = [0 0 0]
 			fov = 60
 		}
-		take_normals = 1
+		take_normals = 0
 	}
 ]
 
 name = "Test Scene"
-accelerator = "std"
+accelerator = "kdtree"
 nodelist = [
+	{
+		transform = [3. 0. 0. 0.
+					 0. 3. 0. 0.
+					 0. 0. 3. 0.
+					 -1.5 1.5 1.5 1.]
+		shape = {
+			type = "mesh"
+			source = "/box.dae"
+		}
+		material = {
+			emit = [0. 0. 0.]
+			diffuse = "/crate.bmp"
+		}
+	}
+	{
+		transform = [3. 0. 0. 0.
+					 0. 1. 0. 0.
+					 0. 0. 3. 0.
+					 -1.5 0.5 -1.5 1.]
+		shape = {
+			type = "mesh"
+			source = "/box.dae"
+		}
+		material = {
+			diffuse = [0.6 0.94 1.]
+			emit = [0. 0. 0.]
+			specular = [1 1 1]
+		}
+	}
+	{
+		transform = [1. 0. 0. 0.
+					 0. 1. 0. 0.
+					 0. 0. 1. 0.
+					 0.4 0.5 -0.5 1.]
+		shape = {
+			type = "sphere"
+			radius = 0.115
+		}
+		material = {
+			emit = [0. 0. 0.]
+			diffuse = [1. 0.5 0.5]
+			specular = [1 1 1]
+		}
+	}
 
 	{
 		transform = [1. 0. 0. 0.
 					 0. 1. 0. 0.
 					 0. 0. 1. 0.
-					 0. -10. 0. 1.]
+					 0. 0. 0. 1.]
+		shape = {
+			type = "mesh"
+			verts = [-1. -1. 1.
+					 -1. 1. 1.
+					 1. 1. 1.
+					 1. 1. 1.
+					 1. -1. 1.
+					 -1. -1. 1.]
+		}
+		material = {
+			emit = [0. 0. 0.]
+			diffuse = [1. 1. 1.]
+		}
+	}
+	{
+		transform = [1. 0. 0. 0.
+					 0. 1. 0. 0.
+					 0. 0. 1. 0.
+					 0. 0. 0. 1.]
+		shape = {
+			type = "mesh"
+			verts = [-1. 1. -1.
+					 -1. 1. 1.
+					 -1. -1. 1.
+					 -1. -1. 1.
+					 -1. -1. -1.
+					 -1. 1. -1.]
+		}
+		material = {
+			emit = [0. 0. 0.]
+			diffuse = [1. 0.5 0.5]
+		}
+	}
+	{
+		transform = [1. 0. 0. 0.
+					 0. 1. 0. 0.
+					 0. 0. 1. 0.
+					 0. 0. 0. 1.]
+		shape = {
+			type = "mesh"
+			verts = [1. -1. 1.
+					 1. 1. 1.
+					 1. 1. -1.
+					 1. 1. -1.
+					 1. -1. -1.
+					 1. -1. 1.]
+		}
+		material = {
+			emit = [0. 0. 0.]
+			diffuse = [0.5 1. 0.5]
+		}
+	}
+
+	{
+		transform = [1. 0. 0. 0.
+					 0. 1. 0. 0.
+					 0. 0. 1. 0.
+					 0. 0. 0. 1.]
 		shape = {
 			type = "mesh"
 			verts = [-1. 1. -1.
@@ -38,9 +140,23 @@ nodelist = [
 	}
 	{
 		transform = [1. 0. 0. 0.
-				 0. 1. 0. 0.
-				 0. 0. 1. 0.
-				 0. 0. 0. 1.]
-		construct_from = "./scenes/sponza.obj"
+					 0. 1. 0. 0.
+					 0. 0. 1. 0.
+					 0. 0. 0. 1.]
+		shape = {
+			type = "mesh"
+			verts = [-1. -1. 1.
+					 1. -1. 1.
+					 -1. -1. -1.
+
+					 1. -1. 1.
+					 1. -1. -1.
+					 -1. -1. -1.]
+		}
+		material = {
+			emit = [0. 0. 0.]
+			diffuse = [1. 1. 1.]
+			specular=[1 1 1]
+		}
 	}
 ]
