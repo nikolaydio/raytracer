@@ -1,12 +1,12 @@
 images = [
 	{
 		method = "path"
-		samples = 16
+		samples = 256
 		camera = {
 			type = "pinhole"
 			eye = [-0.6 0.9 -2]
-			lookat = [0 0 0]
-			fov = 60
+			lookat = [0 0.1 0]
+			fov = 80
 		}
 		take_normals = 0
 	}
@@ -127,14 +127,28 @@ nodelist = [
 			type = "mesh"
 			verts = [-1. 1. -1.
 					 1. 1. 1.
-					 -1. 1. 1.
+					 -1. 1. 1.]
+		}
+		material = {
+			emit = [0. 0.5 1.]
+			diffuse = [0. 0. 0.]
+		}
+	}
+	{
+		transform = [1. 0. 0. 0.
+					 0. 1. 0. 0.
+					 0. 0. 1. 0.
+					 0. 0. 0. 1.]
+		shape = {
+			type = "mesh"
+			verts = [
 
 					 -1. 1. -1.
 					 1. 1. -1.
 					 1. 1. 1.]
 		}
 		material = {
-			emit = [1. 1. 1.]
+			emit = [1. 0.5 0.]
 			diffuse = [0. 0. 0.]
 		}
 	}
