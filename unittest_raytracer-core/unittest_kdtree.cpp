@@ -37,3 +37,53 @@ TEST(kdtree, kdtree_impl)
 		}
 	}
 }
+TEST(accelerators, accelerator_impl) {
+	rt::core::Mesh mesh;
+	mesh.push_face(glm::vec3(0, 0, 0), glm::vec3(0, 1, 0), glm::vec3(1, 1, 0));
+	mesh.push_face(glm::vec3(0, 0, 0), glm::vec3(0, 1, 0), glm::vec3(0, 1, 1));
+	
+	rt::core::Accelerator* std_a = new rt::core::DefaultAccelerator(mesh.get_adapter());
+	std_a->rebuild(mesh.get_adapter());
+
+	rt::core::Ray ray;
+	rt::core::Intersection temp1, temp2;
+
+	ray.origin = glm::vec3(0.5, 0.75, -1);
+	ray.direction = glm::vec3(0, 0, 1);
+	bool res = std_a->intersect(ray, &temp1);
+	EXPECT_EQ(true, res);
+	EXPECT_EQ(1.0f, temp1.d);
+	EXPECT_EQ(glm::vec3(0.5, 0.75, 0), temp1.position);
+
+	ray.origin = glm::vec3(1.4, 0.75, -1);
+	ray.direction = glm::vec3(0, 0, 1);
+	res = std_a->intersect(ray, &temp1);
+	EXPECT_EQ(false, res);
+
+	
+}
+TEST(accelerators, kdtree_impl) {
+	rt::core::Mesh mesh;
+	mesh.push_face(glm::vec3(0, 0, 0), glm::vec3(0, 1, 0), glm::vec3(1, 1, 0));
+	mesh.push_face(glm::vec3(0, 0, 0), glm::vec3(0, 1, 0), glm::vec3(0, 1, 1));
+
+	rt::core::Accelerator* std_a = rt::core::create_kdtree(mesh.get_adapter());
+	std_a->rebuild(mesh.get_adapter());
+
+	rt::core::Ray ray;
+	rt::core::Intersection temp1, temp2;
+
+	ray.origin = glm::vec3(0.5, 0.75, -1);
+	ray.direction = glm::vec3(0, 0, 1);
+	bool res = std_a->intersect(ray, &temp1);
+	EXPECT_EQ(true, res);
+	EXPECT_EQ(1.0f, temp1.d);
+	EXPECT_EQ(glm::vec3(0.5, 0.75, 0), temp1.position);
+
+	ray.origin = glm::vec3(1.4, 0.75, -1);
+	ray.direction = glm::vec3(0, 0, 1);
+	res = std_a->intersect(ray, &temp1);
+	EXPECT_EQ(false, res);
+
+
+}
