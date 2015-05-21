@@ -38,3 +38,10 @@ obj
 
 
 scenes/sponza
+*.jpg
+*.bmp
+*.obj
+*.doc
+*.scene
+*.max
+*.mtl
