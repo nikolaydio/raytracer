@@ -5,7 +5,8 @@
 
 TEST(shape, shape_triangle)
 {
-	rt::core::Triangle a(glm::vec3(0, 0, 0), glm::vec3(0, 1, 0), glm::vec3(1, 0, 0));
+	rt::core::Triangle a(glm::vec3(0, 0, 0), glm::vec3(0, 1, 0), glm::vec3(1, 0, 0),
+		glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0));
 	rt::core::Intersection isect;
 	rt::core::Ray ray;
 	ray.origin = glm::vec3(0.1, 0.1, -1);
