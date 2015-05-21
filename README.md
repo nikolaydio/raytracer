@@ -1,10 +1,11 @@
 # RayTracer #
 
 [![Build Status](https://travis-ci.org/nikolaydio/raytracer.svg?branch=master)](https://travis-ci.org/nikolaydio/raytracer)
+[![Build Status](https://travis-ci.org/nikolaydio/raytracer.svg?branch=develop)](https://travis-ci.org/nikolaydio/raytracer)
 
 Screenshots available at https://drive.google.com/folderview?id=0B-aY1M-oaiRtaVE3TWJLM09wRFE
 
-If you got this document from other source than github - you can view the most up to date version at https://github.com/nikolaydio/raytracer
+If you got this document from source other than github - you can view the most up to date version at https://github.com/nikolaydio/raytracer
 
 ### Features ###
  * Material system with emit, diffuse, glossy and specular options
@@ -18,7 +19,8 @@ If you got this document from other source than github - you can view the most u
  * JSON-like configuration files for scene and camera descriptions
  * Multiplatform (tested on linux and windows)
 
-
+### Bugs ###
+Report any bugs you find in the issue tracking system or send a pull request with fix. I doubt anyone cares... but anyways...
 
 ### Building ###
 

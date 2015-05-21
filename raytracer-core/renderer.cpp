@@ -19,22 +19,22 @@ namespace rt {
 			Intersection temp;
 			Ray tray; tray.origin = isect.position; tray.direction = light_incident;
 			if (!scene.intersect(tray, &temp)) {
-				return Spectrum(0, 0, 0);
+				return Spectrum(0., 0., 0.);
 			}
 			if (temp.d + 0.0000001 < light_distance) {
-				return Spectrum(0, 0, 0);
+				return Spectrum(0., 0., 0.);
 			}
 			return bsdf->evaluate_f(outgoing_w, light_incident) * glm::abs(glm::dot(light_incident, isect.normal)) / pdf;
 		}
 		Spectrum uniform_sample_one_light(const Scene& scene, Intersection isect, BSDF* bsdf, glm::vec3 outgoing_w, RNG& rng, MemoryArena& arena) {
 			auto& lights = scene.get_lights();
 			if (lights.size() == 0){
-				return Spectrum(0, 0, 0);
+				return Spectrum(0., 0., 0.);
 			}
 			int light_index = glm::round(rng.gen() * (lights.size() - 1));
 			int light_node_id = lights[light_index];
 			const Node& node = scene.node(light_node_id);
-			return (float)lights.size() * estimate_direct(scene, isect, node, bsdf, outgoing_w, rng, arena);
+			return (float)lights.size() * estimate_direct(scene, isect, node, bsdf, outgoing_w, rng, arena) * scene.material_by_id(scene.material(light_node_id)).emitted;
 		}
 
 

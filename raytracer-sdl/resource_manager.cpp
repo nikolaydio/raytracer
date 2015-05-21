@@ -11,6 +11,9 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+#include <types.h>
+#include <material.h>
+
 namespace rt {
 	namespace sdl {
 		ResourceCache::~ResourceCache() {
@@ -179,7 +182,125 @@ namespace rt {
 			}
 			rtmesh->set_accelerator(rt::core::create_kdtree(rtmesh->get_adapter()));
 			*size = sizeof(rt::core::Mesh);
+
 			return rtmesh;
+		}
+
+		bool construct_mesh(const struct aiMesh* ai_mesh, rt::core::Mesh** mesh) {
+			rt::core::Mesh* rtmesh = new rt::core::Mesh;
+			for (unsigned int t = 0; t < ai_mesh->mNumFaces; ++t)
+			{
+				const struct aiFace * face = &ai_mesh->mFaces[t];
+
+				for (int i = 2; i >= 0; --i) {
+					int index = face->mIndices[i];
+					glm::vec3 vert(ai_mesh->mVertices[index].x,
+						ai_mesh->mVertices[index].y,
+						ai_mesh->mVertices[index].z);
+
+
+					if (ai_mesh->HasTextureCoords(0)) {
+						glm::vec2 uv(ai_mesh->mTextureCoords[0][index].x,
+							ai_mesh->mTextureCoords[0][index].y);
+
+						rtmesh->push_vert(vert, uv);
+					} else{
+						rtmesh->push_vert(vert);
+					}
+				}
+			}
+			rtmesh->set_accelerator(rt::core::create_kdtree(rtmesh->get_adapter()));
+			*mesh = rtmesh;
+			return true;
+		}
+		bool get_texture(rt::sdl::ResourceManager& manager, std::shared_ptr<rt::core::ColorFilter>* target, aiTextureType type, const struct aiMaterial* ai_mat) {
+			aiString name;
+			//diffuse
+			aiReturn r = ai_mat->GetTexture(type, 0, &name);
+			if(AI_SUCCESS != r) {
+				return true;
+			}
+
+			std::string fn = std::string("/") + name.C_Str();
+			int temp;
+			rt::core::Surface2d* texture_surface = (rt::core::Surface2d*)manager.get_resource(fn.c_str(), ResourceType::TEXTURE, &temp);
+			if (!texture_surface) {
+				printf("Failed load texture %s.\n", fn.c_str());
+				return false;
+			}
+			(*target).reset(new core::DirectTexFilter(*texture_surface));
+			return true;
+		}
+		bool construct_material(rt::sdl::ResourceManager& manager, const struct aiMaterial* ai_mat, rt::core::Material* mat) {
+			get_texture(manager, &mat->diffuse, aiTextureType_DIFFUSE, ai_mat);
+			get_texture(manager, &mat->specular, aiTextureType_SPECULAR, ai_mat);
+			get_texture(manager, &mat->glossy, aiTextureType_SHININESS, ai_mat);
+			if (!mat->diffuse && !mat->specular && !mat->glossy) {
+				printf("An object does not contain any tex info.\n");
+			}
+
+			return true;
+		}
+		bool construct_from_ai_node(rt::core::Scene& scene, rt::sdl::ResourceManager& manager, std::vector<rt::core::Shape*>& shapes, std::vector<rt::core::MaterialId>& mats, aiNode* ai_node, glm::mat4 transform) {
+			//process current node
+			glm::mat4 current_mat;
+			for(int i = 0; i < 16; ++i) {
+				current_mat[i/4][i%4] = ai_node->mTransformation[i/4][i%4];
+			}
+			std::string name = ai_node->mName.C_Str();
+
+			transform = transform * current_mat;
+			for(int i = 0; i < ai_node->mNumMeshes; ++i) {
+				rt::core::Node node;
+				node.transform = transform;
+				node.shape = shapes[ai_node->mMeshes[i]];
+				scene.push_node(node, mats[ai_node->mMeshes[i]]);
+			}
+			//process child notes
+			for(int i = 0; i < ai_node->mNumChildren; ++i) {
+				construct_from_ai_node(scene, manager, shapes, mats, ai_node->mChildren[i], transform);
+			}
+			return true;
+		}
+		bool construct_nodes_from_file(rt::core::Scene& scene, rt::sdl::ResourceManager& manager, const char* fn) {
+			Assimp::Importer importer;
+
+
+			const aiScene* ai_scene = importer.ReadFile(fn,
+				aiProcess_CalcTangentSpace |
+				aiProcess_Triangulate |
+				aiProcess_SortByPType);
+
+			if (!ai_scene)
+			{
+				printf("Failed to load scene desc file\n");
+				return 0;
+			}
+			//import meshes
+			std::vector<rt::core::Shape*> shapes;
+			std::vector<rt::core::MaterialId> materials;
+			for (int mesh_id = 0; mesh_id < ai_scene->mNumMeshes; ++mesh_id) {
+				const struct aiMesh* ai_mesh = ai_scene->mMeshes[mesh_id];
+				const struct aiMaterial* ai_mat = ai_scene->mMaterials[ai_mesh->mMaterialIndex];
+
+				rt::core::Mesh* mesh;
+				rt::core::Material mat;
+				if(!construct_mesh(ai_mesh, &mesh)) {
+					return false;
+				}
+				if(!construct_material(manager, ai_mat, &mat)) {
+					return false;
+				}
+
+				rt::core::MaterialId mat_id = scene.push_material(mat);
+				materials.push_back(mat_id);
+				shapes.push_back(mesh);
+				manager.add_unnamed_shape(mesh);
+			}
+
+			//for each ai node/mesh pair construct a new node.
+			construct_from_ai_node(scene, manager, shapes, materials, ai_scene->mRootNode, glm::mat4());
+			return true;
 		}
 	}
 }

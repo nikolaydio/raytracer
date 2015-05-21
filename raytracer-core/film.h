@@ -6,6 +6,7 @@ namespace rt {
 
 		class Film {
 			Surface2d* _surface;
+			Spectrum* color_matrix;
 			int* samples;
 		public:
 			void apply_radiance(int x, int y, Spectrum value);

@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <string>
 #include <shape.h>
+#include <scene.h>
 
 namespace rt {
 	namespace sdl {
@@ -51,7 +52,11 @@ namespace rt {
 			void add_unnamed_resource(Resource res);
 			void add_unnamed_shape(rt::core::Shape* shape);
 
+			
+
 			void cleanup();
 		};
+
+		bool construct_nodes_from_file(rt::core::Scene& scene, rt::sdl::ResourceManager& manager, const char* fn);
 	}
 }

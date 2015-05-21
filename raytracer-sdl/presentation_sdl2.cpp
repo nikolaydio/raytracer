@@ -1,6 +1,10 @@
 #include "presentation_sdl2.h"
 #include "config.h"
 #include <SDL2/SDL.h>
+#include <sstream>      // std::stringstream
+
+#include <string>
+
 
 
 #define REQUIRE(cond) do { if(!(cond)) { printf("Cond failed %s: %s\n", __FILE__, __LINE__); exit(0); }  }while(0)
@@ -69,6 +73,26 @@ namespace rt {
 								current_image = 0;
 							}
 						}
+						else if (e.key.keysym.sym == SDLK_s) {
+							for (int i = 0; i < surfaces.size(); ++i) {
+								std::stringstream ss;
+								ss << "file";
+								ss << i;
+								ss << ".bmp";
+
+								rt::core::Surface2d* to_copy = surfaces[i];
+								SDL_LockSurface(surface);
+								for (int y = 0; y < h; ++y) {
+									for (int x = 0; x < w; ++x) {
+										putpixel(surface, x, y, to_copy->pixel(x, y));
+									}
+								}
+								SDL_UnlockSurface(surface);
+								SDL_UpdateWindowSurface(window);
+
+								SDL_SaveBMP(surface, ss.str().c_str());
+							}
+						}
 					}
 				}
 				rt::core::Surface2d* to_copy = surfaces[current_image];
@@ -84,7 +108,6 @@ namespace rt {
 				SDL_UpdateWindowSurface(window);
 				SDL_Delay(WAIT_TIME);
 			}
-
 			SDL_DestroyWindow(window);
 			SDL_Quit();
 		}

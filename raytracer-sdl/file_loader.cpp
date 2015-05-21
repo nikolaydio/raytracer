@@ -1,5 +1,6 @@
 #include "file_loader.h"
 #include <fstream>
+#include <iostream>
 
 namespace rt {
 	namespace sdl {
@@ -14,7 +15,7 @@ namespace rt {
 					break;
 				}
 			}
-			std::ifstream file(target_name);
+			std::ifstream file(target_name, std::ifstream::binary);
 
 			if (!file.is_open()) {
 				return 0;
@@ -22,9 +23,11 @@ namespace rt {
 
 			file.seekg(0, std::ios::end);
 			*file_size = file.tellg();
+
 			file.seekg(0, std::ios::beg);
-			
+
 			char* data = new char[*file_size];
+
 			file.read(data, *file_size);
 
 			file.close();
