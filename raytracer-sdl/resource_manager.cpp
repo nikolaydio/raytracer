@@ -182,6 +182,7 @@ namespace rt {
 			}
 			rtmesh->set_accelerator(rt::core::create_kdtree(rtmesh->get_adapter()));
 			*size = sizeof(rt::core::Mesh);
+
 			return rtmesh;
 		}
 
@@ -294,9 +295,7 @@ namespace rt {
 				rt::core::MaterialId mat_id = scene.push_material(mat);
 				materials.push_back(mat_id);
 				shapes.push_back(mesh);
-				//rt::core::Node node;
-				//node.shape = mesh;
-				//scene.push_node(node, mat_id);
+				manager.add_unnamed_shape(mesh);
 			}
 
 			//for each ai node/mesh pair construct a new node.
