@@ -3,13 +3,9 @@
 [![Build Status](https://travis-ci.org/nikolaydio/raytracer.svg?branch=master)](https://travis-ci.org/nikolaydio/raytracer)
 [![Build Status](https://travis-ci.org/nikolaydio/raytracer.svg?branch=develop)](https://travis-ci.org/nikolaydio/raytracer)
 
-### Intro ###
-This is a student project that aims to prove that physically based rendering is not some "black magic". It intends to create a minimal&simplified rendering engine usable by students and enthusiasts. 
+Screenshots available at https://drive.google.com/folderview?id=0B-aY1M-oaiRtaVE3TWJLM09wRFE
 
-
-Screenshots(early ones) available at https://drive.google.com/folderview?id=0B-aY1M-oaiRtaVE3TWJLM09wRFE
-
-If you got this document from other source than github - you can view the most up to date version at https://github.com/nikolaydio/raytracer
+If you got this document from source other than github - you can view the most up to date version at https://github.com/nikolaydio/raytracer
 
 ### Features ###
  * Material system with emit, diffuse, glossy and specular options
